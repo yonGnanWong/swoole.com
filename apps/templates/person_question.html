@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>{{$smarty.session.user.nickname}}的用户中心_{{$smarty.const.SITENAME}}</title>
+<link href="/static/css/base.css" rel="stylesheet" type="text/css">
+<link href="/static/css/grid.css" rel="stylesheet" type="text/css">
+<link href="/static/styles/global.css" rel="stylesheet" type="text/css" />
+<link href="/static/css/ab.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+{{include file='header.html}}
+<script language="javascript">
+function check(of)
+{
+	if(of.title.value=='')
+	{
+		alert('标题不能为空');
+		return false;
+	}
+	if(of.content.value=='')
+	{
+		alert('内容不能为空');
+		return false;
+	}
+	if(parseInt(of.gold.value)>{{$user.gold}})
+	{
+		alert('金币不足');
+		return false;
+	}
+	return true;
+}
+</script>
+<div class="header"></div>
+<div class="ilayout">
+<div class="imenubar">
+{{include file='person_left.html'}}
+</div>
+<div class="icontent">
+{{include file=block/myquestion_head.html}}
+<!--邮件-->
+<div class="mailbox">
+<div class="mailcontent dis">
+<form id="form1" name="form1" method="post" action="" onsubmit="return check(this)">
+<div class="mailfiled">
+  <h2>问题标题</h2>
+  {{$forms.category}}
+  <input name="title" type="text" id="title" size="70" width="400" height="24" />
+(48字以内)</div>
+    <div class="mailfiled">
+    <h2>问题详细内容</h2>
+    <textarea name="content" class="mailtext" id="content"></textarea>
+    </div>   
+    <div class="mailfiled">
+    <h2>悬赏金币</h2>
+    {{$forms.gold}}
+    您目前的金币 <img src="/static/images/gold.png" alt="金币" width="16" height="16" align="absbottom" /><span class="red">{{$user.gold}}</span></div>
+  <div class="mailfiled"></div>
+  <div class="mailfiled"><button type="submit" class="btn1"><img src="/static/images/accept.png" width="16" height="16" /> 提交问题</button></div>
+  </form>
+</div>
+</div>
+<!--邮件-->
+<!--编辑个人资料-->
+<!--编辑个人资料-->
+</div>
+</div>
+{{include file=footer.html}}
+</body>
+</html>

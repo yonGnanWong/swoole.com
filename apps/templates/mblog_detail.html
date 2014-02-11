@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>{{$title}}_{{$user.nickname}}的微博客_{{$smarty.const.SITENAME}}</title>
+<link href="/static/css/base.css" rel="stylesheet" type="text/css">
+<link href="/static/css/grid.css" rel="stylesheet" type="text/css">
+<link href="/static/styles/global.css" rel="stylesheet" type="text/css" />
+<link href="/static/css/ab.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/static/js/jquery.js"></script>
+<script type="text/javascript" src="/static/js/autoresize.js"></script>
+<SCRIPT  language="JavaScript" src="/static/js/SwooleUI.js" type=text/javascript></SCRIPT>
+<SCRIPT  language="JavaScript" src="/static/js/main.js" type=text/javascript></SCRIPT>
+<script type="text/javascript">
+window.onload = function(){
+	left_eq_right();
+};
+$(function(){
+	$('textarea#microblog').autoResize({
+    onResize : function() {
+        $(this).css({opacity:0.8});
+    },
+    animateCallback : function() {
+        $(this).css({opacity:1});
+    },
+    animateDuration : 300,
+    extraSpace : 30,
+	limit: 200});
+})
+</script>
+</head>
+
+<body>
+{{include file='header.html}}
+<div class="ilayout">
+{{include file='block/user_left.html}}
+<div class="icontent" id="pright">
+<!--欢迎页面-->
+<!--欢迎页面-->
+<div class="microblog" id='mblog_list' style="border-bottom:1px dotted #CCC; margin-top:12px;">
+<a href="/page/user/uid-{{$user.id}}">
+<strong class="blu_12b" style="font-size:14px">{{$user.nickname}}</strong>
+</a>
+(<span class="date">{{$mblog.addtime}}</span>)：<br />
+<div style="text-indent:2em">{{$mblog.content|nl2br}}</div>
+<div class="clear"></div>
+<div class="pages">{{$pager.render}}</div>
+</div>
+<div id='comment' style="margin-top:12px;">
+<table width="720" border="0" align="left" cellpadding="0" cellspacing="0" style="margin-top:12px;">	
+{{foreach item=v from=$comments}}		
+  <tr style="padding:5px;">
+    <td width="145" valign="top"><img class="avatar photo" src="{{$v.avatar|default:'/static/images/default.gif'}}" alt=""></td>
+    <td valign="top">
+    <cite class="fn">
+      <a href="/page/user/uid-{{$v.uid}}">{{$v.uname}}</a>
+    </cite> <span class="says">(</span><span class="date">{{$v.addtime|howLongAgo}}</span><span class="says">)says:</span>			
+			<p>{{$v.content|nl2br}}</p>
+    </td>
+  </tr>
+  <tr><td colspan="2" height="10"></td></tr>
+  <tr><td colspan="2" height="10" style="border-top:1px dotted #CCC;"></td></tr>
+{{/foreach}}
+</table>
+<form id="comment_form" name="comment_form" method="post" action="" style="margin-top:12px; padding-top:12px;width:618px;">
+<table border="0" align="left" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td width="45" valign="top">内容</td>
+    <td><textarea name="comment_content" cols="54" rows="5" id="comment_content"></textarea></td>
+  </tr>
+  <tr>
+    <td width="45">验证码</td>
+    <td><input name="authcode" type="text" id="authcode" size="10" />
+      <img src="/page/verify/" name="authcode_img" class="" id="authcode_img" />
+      <input name="app" type="hidden" id="app" value="mblog" />
+      <input name="aid" type="hidden" id="aid" value="{{$mblog.id}}" /></td>
+  </tr>
+  <tr>
+    <td width="45">&nbsp;</td>
+    <td><label>
+      <input type="button" name="button" id="button" value="发表评论" onclick="post_comment()" />
+    </label></td>
+  </tr>
+</table>
+</form>
+</div>
+<!--邮件-->
+<!--邮件-->
+<!--编辑个人资料-->
+<!--编辑个人资料-->
+</div>
+</div>
+{{include file=footer.html}}
+</body>
+</html>

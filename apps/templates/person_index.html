@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>{{$smarty.session.user.nickname}}的用户中心_{{$smarty.const.SITENAME}}</title>
+<link href="/static/css/base.css" rel="stylesheet" type="text/css">
+<link href="/static/css/grid.css" rel="stylesheet" type="text/css">
+<link href="/static/styles/global.css" rel="stylesheet" type="text/css" />
+<link href="/static/css/ab.css" rel="stylesheet" type="text/css" />
+<link href="/static/css/SwooleUI.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="/static/js/jquery.js"></script>
+<script type="text/javascript" src="/static/js/SwooleUI.js"></script>
+<script type="text/javascript" src="/static/js/autoresize.js"></script>
+<script type="text/javascript" src="/static/js/ui.js"></script>
+<script type="text/javascript">
+$(function(){
+	$('textarea#microblog').autoResize({
+    onResize : function() {
+        $(this).css({opacity:0.8});
+    },
+    animateCallback : function() {
+        $(this).css({opacity:1});
+    },
+    animateDuration : 300,
+    extraSpace : 30,
+	limit: 200});
+})
+</script>
+</head>
+
+<body>
+{{include file='header.html}}
+<div class="ilayout">
+<div class="imenubar">
+ {{include file='person_left.html'}}
+</div>
+<div class="icontent" id="pright">
+	<!--欢迎页面-->
+	<div class="welcome">欢迎 {{$smarty.session.user.nickname}} 来到Swoole PHP技术社区</div>
+    <!--欢迎页面-->
+    {{include file=block/mblog_write.html}}
+    
+    <br /><br />
+    <div class="mailbox" style=" clear:both">
+    <div class="mailtitle"></div>
+    <div class="mailboxtab">
+        <ul>
+        <li class="hov"><a href="/person/mails/?act=recv">收件箱</a></li>
+        <li><a href="/person/mails/?act=send">发件箱</a></li>
+        <li><a href="/person/sendmail/">写小纸条</a></li>
+        </ul>
+    </div>        
+    <div class="mailcontent dis">
+        {{include file=block/person_mail.html}}
+        <div class="clear"></div>
+        <div class="pages">{{$pager.render}}</div>
+    </div>
+    </div>
+<!--邮件-->
+
+</div>
+</div>
+{{include file=footer.html}}
+</body>
+</html>

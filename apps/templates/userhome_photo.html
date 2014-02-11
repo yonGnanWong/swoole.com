@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>{{$user.nickname}}的主页_{{$smarty.const.SITENAME}}</title>
+<link href="/static/css/base.css" rel="stylesheet" type="text/css">
+<link href="/static/css/grid.css" rel="stylesheet" type="text/css">
+<link href="/static/styles/global.css" rel="stylesheet" type="text/css" />
+<link href="/static/css/ab.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/static/js/jquery.js"></script>
+<script type="text/javascript" src="/static/js/autoresize.js"></script>
+<SCRIPT  language="JavaScript" src="/static/js/SwooleUI.js" type=text/javascript></SCRIPT>
+<SCRIPT  language="JavaScript" src="/static/js/main.js" type=text/javascript></SCRIPT>
+<script type="text/javascript">
+window.onload = function(){
+	checklogin();
+};
+</script>
+</head>
+
+<body>
+{{include file='header.html}}
+<div class="ilayout">
+{{include file='block/user_left.html}}
+<div class="icontent">
+<div class="welcome">{{$user.nickname}}的相册</div>
+    <div class="my_photpic2 clearfix" style="margin-top:15px;">
+    {{foreach item=p key=k from=$photo}}
+    <div class="my-photup">
+    <div class="my-photup-cover">
+    <a href="/userhome/photo/uid-{{$user.id}}-id-{{$p.id}}"> <img src="{{$p.imagep}}" /></a></div>
+    </div>
+    {{if $k%4==3}}<div class="clear"></div>{{/if}}
+    {{/foreach}}
+    </div>
+</div>
+</div>
+{{include file=footer.html}}
+</body>
+</html>

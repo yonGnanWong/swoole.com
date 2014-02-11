@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>{{if $cate}}{{$cate.name}}_{{/if}}{{$ccate.name}}_PHP开发社区 Swoole开发框架官方网站</title>
+<link href="/static/css/base.css" rel="stylesheet" type="text/css">
+<link href="/static/css/grid.css" rel="stylesheet" type="text/css">
+<meta name="Copyright" content="Swoole.com" />
+<meta name="description" content="Swoole是一个PHP高级开发框架" />
+<meta name="keywords" content="{{if $cate}}{{$cate.name}},{{/if}}{{$ccate.name}},PHP,Web,PHP社区,PHP程序员,PHP高级,Go语言,Python语言,Golang" />
+</head>
+
+<body>
+{{include file='header.html'}}
+{{include file=block/checklogin.html}}
+<div id='main'>
+<div id='mleft' style="padding-top:15px; padding-left:15px; width:690px;">
+<div id='pos'>当前位置： <a href="/">首页</a> &gt;&gt; <a href="/{{$app}}/list_{{$ccate.id}}.html">{{$ccate.name}}</a>
+{{if $cate}} &gt;&gt; {{$cate.name}}{{/if}}
+</div>
+<br />
+<ul>
+{{foreach item=v from=$list}}
+<li class="hei32"><a href="{{magic func=link app=News id=$v.id}}" class="news">{{$v.title}}</a>
+<span class="date">{{$v.addtime|mbcut:10}}</span></li>
+{{/foreach}}
+</ul>
+{{$pager.render}}
+</div>
+
+<div id='mright'>
+<!--{{magic func=cate app=News name=cates fid=$ccate.id}}-->
+<h3>相关分类</h3>
+<ul>
+{{foreach from=$cates item=v}}
+<li class="tag"><a {{if $v.id==$cate.id}}class="cur"{{/if}} href="{{$smarty.const.WEBROOT}}/News/list_{{$v.id}}.html">{{$v.name}}</a></li>
+{{/foreach}}
+</ul>
+<div class="clear"></div>
+<!--{{magic func=list name=about cid=$cid num=10}}-->
+<h3>相关文章</h3>
+<ul class="f12 dot_ul">
+{{foreach from=$about item=v}}
+<li><a href="{{$smarty.const.WEBROOT}}/News/{{$v.id}}.html" title="{{$v.title}}">{{$v.title}}</a></li>
+{{/foreach}}
+</ul>
+
+</div>
+</div>
+{{include file='footer.html'}}
+</body>
+</html>

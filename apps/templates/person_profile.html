@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>编辑个人资料_{{$smarty.const.SITENAME}}</title>
+<link href="/static/css/base.css" rel="stylesheet" type="text/css">
+<link href="/static/css/grid.css" rel="stylesheet" type="text/css">
+<link href="/static/styles/global.css" rel="stylesheet" type="text/css" />
+<link href="/static/css/ab.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+{{include file='header.html}}
+<div class="ilayout">
+<div class="imenubar">
+{{include file='person_left.html'}}
+</div>
+<div class="icontent">
+<!--欢迎页面-->
+<div class="welcome">欢迎 {{$smarty.session.user.nickname}}</div>
+<!--欢迎页面-->
+<!--邮件-->
+<!--邮件-->
+<!--编辑个人资料-->
+<div class="memberpicEdit">
+<form method="post" enctype="multipart/form-data" id="profile">
+<div class="title">编辑个人资料</div>
+<div class="memeberDetail" style="width:auto"><img src="{{$user.avatar|default:'/static/images/default.gif'}}" alt="头像" /></div>
+<div class="memeberreload">
+  <label>
+    上传头像
+      :
+      <input type="file" name="avatar" id="avatar" />
+</label>
+  <p>支持JPG、GIF、PNG 文件格式，最大2M。尺寸不得超过120x90</p>
+</div>
+<div class="clear"></div>
+<div class="memberfield">
+
+<table width="96%" border="0" align="left">
+  <tr>
+    <td width="100">昵称</td>
+    <td><input name="nickname" type="text" id="nickname" value="{{$user.nickname}}"  height="30" /></td>
+  </tr>
+  <tr>
+    <td>自我介绍</td>
+    <td><label>
+      <textarea name="intro" id="intro" cols="45" rows="2">{{$user.intro}}</textarea>
+    </label></td>
+  </tr>
+  <tr>
+    <td>性别</td>
+    <td>{{$forms.sex}}</td>
+  </tr>
+  <tr>
+    <td>学历</td>
+    <td>{{$forms.education}}</td>
+  </tr>
+  <tr>
+    <td width="100">手机号码 </td>
+    <td><input name="mobile" type="text" id="mobile" value="{{$user.mobile}}"  height="30" /></td>
+  </tr>
+  <tr>
+    <td width="100" valign="top">PHP等级</td>
+    <td>{{$forms.level}}</td>
+  </tr>
+  <tr>
+    <td valign="top">就职于</td>
+    <td><input name="company" type="text" id="company" value="{{$user.company}}" size="60"  height="30" /></td>
+  </tr>
+  <tr>
+    <td valign="top">Blog地址</td>
+    <td><input name="blog" type="text" id="blog" value="{{$user.blog}}" size="60"  height="30" /></td>
+  </tr>
+  <tr>
+    <td width="100" valign="top">掌握的技能</td>
+    <td>{{$forms.skill}}</td>
+  </tr>
+  <tr>
+    <td width="100">&nbsp;</td>
+    <td><button class="saveinfo"  type="submit">确认并保存信息</button>&nbsp;</td>
+  </tr>
+  <tr>
+    <td width="100">&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+</div>
+</form>
+</div>
+<!--编辑个人资料-->
+</div>
+</div>
+{{include file='footer.html}}
+</body>
+</html>

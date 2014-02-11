@@ -1,0 +1,35 @@
+<div class="imenubar" id="pleft">
+<div class="memberbox">
+<div class="memberpic">
+<img src="{{$user.avatar|default:'/static/images/default.gif'}}" />
+<p style="margin-top:12px;">
+<ul style="height:42px;">
+<li style="float:left; margin-right:12px;"><a href="/person/friend/add-{{$user.id}}">
+<img src="/static/images/smiley_cool.png" border="0" align="absmiddle" width="16" height="16" alt="加为好友"  style="border:none" /> 加为好友</a></li>
+<li style="float:left"><a href="/person/sendmail/to-{{$user.id}}"><img src="/static/images/email.png" align="absmiddle" width="16" height="16"  style="border:none" alt="写信给他" /> 写信给{{$ta}}</a></li>
+<li style="float:left"><img src="/static/images/rss2.png" width="46" height="15" alt="订阅" /> <a href="/blog/rss/{{$user.id}}">订阅{{$ta}}的发布</a></li>
+</ul>
+</p>
+</div>
+</div>
+<p>{{$user.nickname}}<br />
+  {{if !empty($user.php_level)}}{{$user.php_level}}<br />{{/if}}
+  {{if !empty($user.company)}}就职于{{$user.company}}<br />{{/if}}
+  {{if !empty($user.skill)}}所掌握的技能：{{$user.skill_info}}<br />{{/if}}
+  {{if !empty($user.blog)}}博客地址：<br />
+  <a href="{{$user.blog}}" style="word-break: break-word;">{{$user.blog}}</a>{{/if}}
+</p>
+<p class="topline">
+<h2>我的相册（<a href="/userhome/photo/uid-{{$user.id}}">{{$myphoto_count}}张照片</a>）</h2>
+{{if $myphoto}}
+<a href="/userhome/photo/uid-{{$user.id}}"><img src="{{$myphoto.imagep}}" class="avatar" /></a>
+{{/if}}
+</p>
+<div class="clear"></div>
+  <ul class="dot_ul topline">
+  <li><a href="/blog/category/user-{{$user.id}}.html">全部日志</a></li>
+     {{foreach item=v from=$blog_cates}}
+	<li><a href="/blog/category/cid-{{$v.id}}.html">{{$v.name}} ({{$v.num}})</a></li>
+      {{/foreach}}
+    </ul>
+</div>

@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>{{$smarty.session.user.nickname}}的相册_{{$smarty.const.SITENAME}}</title>
+<link href="/static/css/base.css" rel="stylesheet" type="text/css">
+<link href="/static/css/grid.css" rel="stylesheet" type="text/css">
+<link href="/static/styles/global.css" rel="stylesheet" type="text/css" />
+<link href="/static/css/ab.css" rel="stylesheet" type="text/css" />
+<script language="javascript" src="/static/js/jquery.js"></script>
+<script language="javascript" src="/static/js/SwooleUI.js"></script>
+<script type="text/javascript">
+var nextid = {{json var=$nextid}};
+var perid = {{json var=$perid}};
+var scan_base_url = '/myphoto/show/';
+</script>
+</head>
+<body>
+{{include file=header.html}}
+<div class="ilayout">
+<div class="imenubar">
+{{include file=person_left.html}}
+</div>
+<div class="icontent">
+<!--邮件-->
+<div class="mailbox">
+{{include file=block/myphoto_head.html}}
+<div class="my_phot" id='imga' style="clear:both; margin-top:15px;">
+<div class="mailtitle">当前位置 ： <a href="/person/index/">个人中心</a> &gt; <a href="/myphoto/index/">相册</a> &gt;</div>
+<br />
+	{{include file=block/photo_show.html}}
+</div>
+</div>
+<!--邮件-->
+<!--编辑个人资料-->
+<!--编辑个人资料-->
+</div>
+</div>
+{{include file='footer.html'}}
+</body>
+</html>

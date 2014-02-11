@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>{{$user.nickname}}的主页_{{$smarty.const.SITENAME}}</title>
+<link href="/static/css/base.css" rel="stylesheet" type="text/css">
+<link href="/static/css/grid.css" rel="stylesheet" type="text/css">
+<link href="/static/styles/global.css" rel="stylesheet" type="text/css" />
+<link href="/static/css/ab.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/static/js/jquery.js"></script>
+<script type="text/javascript" src="/static/js/SwooleUI.js"></script>
+<script type="text/javascript">
+window.onload = function(){
+	checklogin();
+};
+var nextid = {{json var=$nextid}};
+var perid = {{json var=$perid}};
+var scan_base_url = '/userhome/photo/uid-{{$user.id}}-id-';
+</script>
+</head>
+
+<body>
+{{include file='header.html}}
+<div class="ilayout">
+{{include file='block/user_left.html}}
+<div class="icontent">
+<div class="welcome">{{$user.nickname}}的相册</div>
+<div class="my_photpic2 clearfix" style="margin-top:15px;">
+    {{include file=block/photo_show.html}}<br />
+</div>
+</div>
+</div>
+{{include file=footer.html}}
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>{{$smarty.session.user.nickname}}的用户中心_{{$smarty.const.SITENAME}}</title>
+<link href="/static/css/base.css" rel="stylesheet" type="text/css">
+<link href="/static/css/grid.css" rel="stylesheet" type="text/css">
+<link href="/static/css/ab.css" rel="stylesheet" type="text/css" />
+<link href="/static/styles/global.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/static/js/jquery.js"></script>
+<script type="text/javascript" src="/static/js/main.js"></script>
+</head>
+
+<body>
+<script type="text/javascript">
+$(document).ready(function(){
+	left_eq_right();		   
+});
+</script>
+{{include file='header.html}} 
+<div class="ilayout">
+<div class="imenubar" id="pleft">
+{{include file='person_left.html'}}
+</div>
+<div class="icontent" id="pright">
+{{include file=block/myblog_head.html}}
+<!--欢迎页面-->
+<!--欢迎页面-->
+<!--邮件-->
+<!--邮件-->
+<!--编辑个人资料-->
+<div class="memberlogs">
+<form method="post"  id="logs">
+<div class="log"></div>
+
+<div class="logs">
+<table width="100%"  cellpadding="0" cellspacing="0" class="table1">
+	<tr bgcolor="#CCCCCC">
+		<th align="center"><strong>ID</strong></th>
+        <th align="left"><strong>标题</strong></th>		
+		<th align="center"><strong>添加时间</strong></th>
+		<th align="center"><strong>操作</strong></th>
+	</tr>
+	{{section name=ol loop=$list}}
+	<tr>
+		<td height="24" align="center">{{$list[ol].id}}</td>
+        <td height="24" align="left"><a href="/blog/detail/{{$list[ol].id}}" target="_blank">{{$list[ol].title|mbcut:20:"...":true}}</a></td>		
+		<td height="24" align="center">{{$list[ol].addtime}}</td>
+		<td height="24" align="center"><a href="/myblog/write/{{$list[ol].id}}"><img src="/static/images/application_edit.png" width="16" height="16" /></a>
+        &nbsp;&nbsp;<a href="?del={{$list[ol].id}}" onclick="return confirm('您确定要删除此内容？');"><img src="/static/images/cross.png" width="16" height="16" /></a>&nbsp;</td>
+	</tr>
+	{{/section}}
+	<tr>
+	  <td align="center" colspan="4">{{$pager.render}}</td>
+	</tr>
+</table>
+
+{{foreach  item=m from=$id}} 
+      <label>
+       {{$m.title|truncate:50}}<a href="/person/logs/{{$m.id}}">修改</a><a href="/person/logmanage/?del={{$m.id}}">删除</a> <br/>
+       </label>
+      {{/foreach}}
+
+</div>
+
+
+</form>
+</div>
+<!--编辑个人资料-->
+</div>
+</div>
+{{include file='footer.html}}
+</body>
+</html>

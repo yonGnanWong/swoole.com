@@ -1,0 +1,7 @@
+handle:
+- directoryindex: index.html
+- compress: if ( out_header["Content-type"] ~ "text/css" ) compress
+- compress: if ( out_header["Content-type"] ~ "text/javascript" ) compress
+- compress: if ( out_header["Content-type"] ~ "text/html" ) compress
+
+- rewrite: if ( !is_file() )  goto "index.php"

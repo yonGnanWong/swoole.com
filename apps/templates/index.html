@@ -1,0 +1,87 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>PHP开发社区 Swoole开发框架官方网站</title>
+{{include file=block/static.html}}
+<script type="text/javascript">
+$.facebox.settings.closeImage = '{{$_static_}}/images/closelabel.png';
+$.facebox.settings.loadingImage = '{{$_static_}}/images/loading.gif';
+
+jQuery(document).ready(function($){
+  $('a[rel=facebox]').facebox();
+})
+</script>
+<link type="text/css" rel="stylesheet" href="{{$_static_}}/css/facebox.css"/>
+<meta name="Copyright" content="Swoole.com" />
+<meta name="description" content="Swoole.com是一个PHP技术社区，社区内讨论PHP以及其他相关技术话题" />
+<meta name="keywords" content="PHP,PHP社区,PHP程序员,PHP高级技术社区" />
+</head>
+
+<body>
+{{include file='header.html'}}
+{{include file=block/checklogin.html}}
+<div id='main'>
+<div class="index_left">
+<div class="index_user_order">
+<h4>
+基于<a href="https://github.com/matyhtf/swoole_framework">Swoole应用服务器</a>
+</h4>
+<h4>&nbsp;&nbsp;活跃博主排行</h4>
+<ul>
+{{foreach item=v key=k from=$userlist}}
+<li>{{$k+1}}. <a href="/page/user/uid-{{$v.id}}">{{$v.nickname}}</a></li>
+{{/foreach}}
+</ul>
+</div>
+</div>
+<div class="index_center">
+{{include file=block/mblog_list.html}}
+</div>
+
+<div class="index_right">
+<!--{{magic func=list cid=38 num=10}}-->
+	<h3>
+		<a href="https://github.com/matyhtf/swoole_framework">
+		<img src="{{$_static_}}/images/world.png" width="16" height="16" /> Swoole扩展(C/C++)</a>
+	</h3>
+	<h3>
+		<a href="https://github.com/matyhtf/swoole">
+		<img src="{{$_static_}}/images/world.png" width="16" height="16" /> Swoole框架(PHP)</a>
+	</h3>	
+<h3><img src="{{$_static_}}/images/world.png" /> <a href="/wiki/index/">开发者文档</a></h3>
+<h3><img src="{{$_static_}}/images/world.png" /> <a href="http://group.swoole.com/">Swoole技术社区</a></h3>
+<h3><img src="{{$_static_}}/images/group.png" /> <a href="http://webim.swoole.com/">进入聊天室</a></h3>
+<h3>技术资讯</h3>
+<ul class="dot_ul f12">
+{{foreach item=v from=$list}}
+<li><a href="{{$smarty.const.WEBROOT}}/News/{{$v.id}}.html" title="{{$v.title}}">{{$v.title}}</a></li>
+{{/foreach}}
+</ul>
+<!--{{magic func=list cid=27 num=10}}-->
+<h3>技术教程</h3>
+<ul class="dot_ul f12">
+{{foreach from=$list27 item=v}}
+<li><a href="{{$smarty.const.WEBROOT}}/News/{{$v.id}}.html" title="{{$v.title}}">{{$v.title}}</a></li>
+{{/foreach}}
+</ul>
+
+<h3>PHP编程常见问题</h3>
+<ul class="dot_ul f12">
+{{foreach from=$list38 item=v}}
+<li><a href="{{$smarty.const.WEBROOT}}/News/{{$v.id}}.html" title="{{$v.title}}">{{$v.title}}</a></li>
+{{/foreach}}
+</ul>
+<!--{{magic func=list cid=19 num=15 order='id desc'}}-->
+<h3>Swoole使用手册</h3>
+<ul class="dot_ul f12">
+{{foreach from=$list19 item=v}}
+<li><a href="{{$smarty.const.WEBROOT}}/News/{{$v.id}}.html" title="{{$v.title}}">{{$v.title}}</a></li>
+{{/foreach}}
+</ul>
+
+</div>
+</div>
+{{include file='footer.html'}}
+</body>
+</html>

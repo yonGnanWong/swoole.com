@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>{{$smarty.session.user.nickname}}的用户中心_{{$smarty.const.SITENAME}}</title>
+<link href="/static/css/base.css" rel="stylesheet" type="text/css">
+<link href="/static/css/grid.css" rel="stylesheet" type="text/css">
+<link href="/static/styles/global.css" rel="stylesheet" type="text/css" />
+<link href="/static/css/ab.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+{{include file='header.html}}
+<script language="javascript">
+function check(of)
+{
+	if(of.tid.value=='' || of.tid.value=="输入企业ID或者个人ID")
+	{
+		alert('ID不能为空');
+		return false;
+	}
+	if(of.title.value=='')
+	{
+		alert('标题不能为空');
+		return false;
+	}
+	if(of.content.value=='')
+	{
+		alert('内容不能为空');
+		return false;
+	}
+	return true;
+}
+</script>
+<div class="ilayout">
+<div class="imenubar">
+{{include file='person_left.html'}}
+</div>
+<div class="icontent">
+<!--欢迎页面-->
+<div class="welcome">欢迎 {{$smarty.session.user.nickname}}</div>
+<!--欢迎页面-->
+<!--邮件-->
+<div class="mailbox">
+<div class="title">我的邮箱</div>
+<div class="mailtextcon" >
+<div class="mailcontext">
+<h1>
+发件人：<a href="/page/user/uid-{{$fuser.id}}" target="_blank">{{$fuser.nickname}}</a>
+</h1>
+<h2>信件标题：{{$mail.title}}</h2>
+<p>{{$mail.content|nl2br}} </p>
+<!--邮件正文不支持超级连接，纯文本-->
+</div>
+{{if $smarty.session.user_id!=$fuser.id}}
+<div class="mailcontent dis">
+<div class="title">回复发件人</div>
+<form id="form1" name="form1" method="post" action="/person/sendmail/" onsubmit="return check(this)">
+<div class="mailfiled">
+    <h2>标题 <span>48字以内</span></h2>
+    <input name="title" type="text" id="title" size="70" width="400" height="24" />
+    <input name="tid" type="hidden" id="tid" value="{{$mail.fid}}" />
+  </div>
+  <div class="mailfiled">
+    <h2>正文<span>300字以内</span></h2>
+    <textarea name="content" rows="5" class="mailtext" id="content" style="height:120px;"></textarea>
+    </div>
+  <div class="mailfiled"><button type="submit">发送邮件</button></div>
+  </form>
+</div>
+{{/if}}
+</div>
+<div class="mailcontent dis"></div>
+</div>
+<!--邮件-->
+<!--编辑个人资料-->
+</div>
+</div>
+{{include file=footer.html}}
+</body>
+</html>

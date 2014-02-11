@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel='stylesheet' href='/static/css/markdown.css' type='text/css' />
+    <!-- Bootstrap core CSS -->
+    <link href="/static/bootstrap3/dist/css/bootstrap.css" rel="stylesheet">
+    <!-- Bootstrap theme -->
+    <link href="/static/bootstrap3/dist/css/bootstrap-theme.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/static/css/wiki/noframe.css" rel="stylesheet">
+    <link href="/static/css/code.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="/static/bootstrap3/dist/js/html5shiv.js"></script>
+    <script src="/static/bootstrap3/dist/js/respond.min.js"></script>
+    <![endif]-->
+    <script src="/static/js/rainbow-custom.min.js"></script>
+    <script src="/static/js/jquery.js"></script>
+    <script src="/static/js/dtree.js"></script>
+    <title>{{$wiki_page.title}}_{{$project.name}}_Swoole文档中心</title>
+</head>
+<body>
+
+<div class="navbar-inverse navbar-fixed-top">
+    <div class="navbar-collapse collapse container">
+        <ul class="nav navbar-nav">
+            {{foreach item=v from=$projects}}
+            <li {{if $v.id==$project_id}}class="active"{{/if}}>
+            <a href="/wiki/index/prid-{{$v.id}}">{{$v.name}}</a></li>
+            {{/foreach}}
+        </ul>
+    </div>
+</div>
+
+<div class="wiki_main">
+    <div class="row row-offcanvas wiki_tree" id="sidebar">
+        <div class="sidebar-offcanvas" role="navigation">
+            <div class="sidebar-nav">
+                <ul class="nav">
+                    {{foreach item=v from=$tree.child}}
+                    <li class="active">
+                        <h3><a href="/wiki/page/{{$v.id}}.html">{{$v.text}}</a></h3>
+                    </li>
+                    <li>
+                    {{if $v.child}}
+                    <ul class="nav li2">
+                    {{foreach item=v2 from=$v.child}}
+                        <li><a href="/wiki/page/{{$v2.id}}.html">{{$v2.text}}</a></li>
+                        <li>
+                            {{if $v2.child}}
+                            <ul class="nav li3">
+                                {{foreach item=v3 from=$v2.child}}
+                                <li> <a href="/wiki/page/{{$v3.id}}.html">{{$v3.text}}</a></li>
+                                {{/foreach}}
+                            </ul>
+                            {{/if}}
+                        </li>
+                    {{/foreach}}
+                    </ul>
+                    {{/if}}
+                    </li>
+                    {{/foreach}}
+                </ul>
+            </div><!--/.well -->
+        </div>
+    </div>
+    <div class="wiki_content blob instapaper_body">
+        <article class="markdown-body entry-content" itemprop="mainContentOfPage">
+            {{if $wiki_page}}
+            <h1>{{$wiki_page.title}}</h1>
+            {{/if}}
+            {{$content}}
+        </article>
+        <hr />
+        <!-- Duoshuo Comment BEGIN -->
+        <div class="ds-thread"></div>
+        <script type="text/javascript">
+            {{if $wiki_page.close_comment=='0' and $project.close_comment=='0'}}
+            var duoshuoQuery = {short_name:"www4swoole"};
+            (function() {
+                var ds = document.createElement('script');
+                ds.type = 'text/javascript';ds.async = true;
+                ds.src = 'http://static.duoshuo.com/embed.js';
+                ds.charset = 'UTF-8';
+                (document.getElementsByTagName('head')[0]
+                        || document.getElementsByTagName('body')[0]).appendChild(ds);
+                var a = $("#sidebar")[0];
+                var b = $("div.wiki_content")[0];
+                if (a.clientHeight < b.clientHeight) {
+                    a.style.height = b.clientHeight + "px";
+                } else {
+                    b.style.height = a.clientHeight + "px";
+                }
+            })();
+            {{/if}}
+            $(document).ready(function() {
+                $('a').each(function(e){
+                    //外链
+                    if(this.href.substring(7, location.host.length +7) != location.host) {
+                        this.target = "_blank";
+                    }
+                });
+            });
+        </script>
+    </div>
+</div>
+<div class="container footer" style="height: 80px; clear: both">
+    <hr />
+    <p>&copy; Swoole.com 2013 备案号：京ICP备10021081号 官方QQ群：321637118 开发组邮件列表：
+        <a href="mailto:team@swoole.com">team@swoole.com</a>
+    </p>
+    <div style="display: none">
+        <script type="text/javascript">
+            var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+            document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F4967f2faa888a2e52742bebe7fcb5f7d' type='text/javascript'%3E%3C/script%3E"));
+        </script>
+    </div>
+</div>
+</body>
+</html>

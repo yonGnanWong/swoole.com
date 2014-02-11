@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Swoole: PHP的异步、并行、分布式扩展框架</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Swoole: PHP的异步并行Server/Client扩展">
+    <meta name="keywords" content="PHP,Swoole,高并发,TCPServer,UDP,PHP应用服务器">
+    <meta name="author" content="tianfenghan">
+
+    <!-- Le styles -->
+    <link href="/static/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+        body {
+            padding-top: 60px;
+            padding-bottom: 40px;
+        }
+    </style>
+    <link href="/static/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/static/css/code.css" rel="stylesheet">
+    <script src="/static/js/rainbow-custom.min.js"></script>
+    <script src="/static/js/jquery.js"></script>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+    <script src="/static/bootstrap/js/html5shiv.js"></script>
+    <![endif]-->
+
+    <!-- Fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/static/bootstrap/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/static/bootstrap/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/static/bootstrap/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="/static/bootstrap/ico/apple-touch-icon-57-precomposed.png">
+    <link rel="shortcut icon" href="/static/bootstrap/ico/favicon.png">
+    <base target="_blank" />
+</head>
+
+<body>
+<a href="https://github.com/matyhtf/swoole">
+    <img style="position: absolute; top: 0; right: 0; border: 0; z-index:9999;" src="/static/image/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="#">Swoole官方网站</a>
+            <div class="nav-collapse collapse">
+                <ul class="nav">
+                    <li class="active"><a target="_self" href="/">首页</a></li>
+                    <li><a target="_self" href="http://wiki.swoole.com/">文档</a></li>
+					<li><a target="_self" href="/wiki/index/prid-1-p-project/road_map.html">路线图</a></li>
+					<li><a target="_self" href="/wiki/index/prid-1-p-project/change_log.html">更新记录</a></li>
+					<li><a href="http://group.swoole.com">社区</a></li>
+                    <li><a target="_self" href="/wiki/index/prid-1-p-author.html">开发者</a></li>
+					<li><a href="https://github.com/matyhtf/swoole/releases">下载</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="hero-unit">
+        <h2 style="margin-bottom: 25px;">Swoole是什么？</h2>
+        <p><span><img src="/static/images/logo.png" style="float:left;width:64px;height:64px; margin-right: 10px; margin-top: 10px;" />
+        </span>Swoole是一个PHP的C扩展，可用来开发PHP的高性能高并发TCP/UDP Server。Swoole的网络IO部分基于多线程的epoll/kqueue事件循环，是全异步非阻塞的。
+            业务逻辑部分既可以像node.js一样全异步回调执行，也可以多进程同步阻塞方式来运行。这样既保证了Server能够应对高并发和大量TCP连接。又保证业务代码仍然可以简单的编写。</p>
+        <p style="margin-top: 25px;"><a href="https://github.com/matyhtf/swoole" class="btn btn-primary">源代码</a>&nbsp;&nbsp;
+           <a href="https://github.com/matyhtf/swoole/issues/new" class="btn btn-danger">提交Bug</a>&nbsp;&nbsp;
+           <a href="https://github.com/matyhtf/swoole/issues/new" class="btn">提建议</a>&nbsp;&nbsp;
+        </p>
+    </div>
+
+    <div class="row">
+        <div class="span4">
+            <h3>新闻</h3>
+            <ul class="nav nav-list">
+                <li style="height: 30px;"><a href="http://www.iteye.com/news/28130">Node.js的颠覆者：PHP的Swoole扩展</a></li>
+                <li style="height: 30px;"><a href="http://www.iteye.com/news/27609">PHP高性能Server扩展Swoole1.3发布</a></li>
+                <li style="height: 30px;"><a href="http://www.iteye.com/news/26387">PHP高性能Server框架Swoole发布C扩展版</a></li>
+                <li style="height: 30px;"><a href="http://www.iteye.com/news/21255-swoole-php-framework">Swoole-真正的PHP Web开发框架</a></li>
+            </ul>
+        </div>
+        <div class="span4">
+            <style >
+                .checklist li {
+                    list-style-image: url("/static/image/li-checks.png");
+                    height: 30px;
+                    float: left;
+                    width: 170px;
+                }
+            </style>
+            <h3>优势</h3>
+            <ul class="checklist nav nav-list">
+                <li>纯C编写无依赖</li>
+                <li>并发10万TCP连接</li>
+                <li>TCP+UDP同时支持</li>
+                <li>Server+Client</li>
+                <li>网络异步/业务同步</li>
+                <li>支持多进程/多线程</li>
+                <li>CPU亲和性/守护进程</li>
+                <li>简单开发效率高</li>
+            </ul>
+        </div>
+        <div class="span4">
+            <h3>案例</h3>
+            <p style="line-height: 180%">swoole在国内被多家网络游戏、手机游戏公司使用。替代了C++、java等复杂编程语言来实现网络Server的程序。使用PHP+Swoole扩展，开发效率可以大大提高。<br/>
+                swoole官方提供了一个基于swoole扩展的<a href="https://github.com/matyhtf/swoole_framework">PHP应用服务器</a>实现，比Apache或Nginx+php-fpm性能高出6-15倍。
+            </p>
+        </div>
+    </div>
+    <hr/>
+    <style>
+        .line180 pre {
+            line-height: 180%;
+        }
+    </style>
+    <div class="row line180">
+        <div class="span6">
+            <h4>Server</h4>
+            <pre>
+<code class="php" data-language="php">$serv = new swoole_server("127.0.0.1", 9501);
+$serv->set(array(
+    'worker_num' => 8,
+    'daemonize' => true, //是否作为守护进程
+));
+$serv->on('connect', function ($serv, $fd){
+    echo "Client:Connect.\n";
+});
+$serv->on('receive', function ($serv, $fd, $from_id, $data) {
+    $serv->send($fd, 'Swoole: '.$data);
+    $serv->close($fd);
+});
+$serv->on('close', function ($serv, $fd) {
+    echo "Client: Close.\n";
+});
+$serv->start();</code></pre>
+            </div>
+    <div class="span6">
+        <h4>Client</h4>
+            <pre>
+<code class="php" data-language="php">$client = new swoole_client(SWOOLE_SOCK_TCP, SWOOLE_SOCK_ASYNC);
+$client->on("connect", function($cli) {
+    $cli->send("hello world\n");
+});
+$client->on("receive", function($cli, $data = ""){
+    //$data = $cli->recv(); //低于swoole1.6.10需要调用
+    echo "Receive: ".$data.PHP_EOL;
+});
+$client->on("error", function($cli){
+    echo "connect fail\n";
+});
+$client->on("close", function($cli){
+    echo "connection close\n";
+    //$cli->close(); //低于swoole1.6.10需要调用
+});
+$client->connect('127.0.0.1', 9501, 0.5);</code></pre>
+    </div>
+    <div class="span6">
+        <h4>Event</h4>
+            <pre>
+<code class="php" data-language="php">$fp = stream_socket_client("tcp://127.0.0.1:80", $code, $msg, 3);
+if (!$fp) {
+    exit("$errstr ($errno)\n");
+}
+$http_request = "GET /index.html HTTP/1.1\r\n";
+$http_request .= "Host: localhost\r\n\r\n";
+fwrite($fp, $http_request);
+swoole_event_add($fp, function($fp){
+    echo fread($fp, 8192);
+    swoole_event_del($fp);
+    fclose($fp);
+});
+echo "http response:\n";
+//swoole_event_wait(); //低于PHP5.4需要加swoole_event_wait
+</code></pre>
+    </div>
+        <div class="span6">
+            <h4>Task</h4>
+            <pre>
+<code class="php" data-language="php">$serv = new swoole_server("127.0.0.1", 9502);
+$serv->set(array('task_worker_num' => 4));
+$serv->on('Receive', function($serv, $fd, $from_id, $data) {
+    $task_id = $serv->task("Async");
+    echo "Dispath AsyncTask: id=$task_id\n";
+});
+$serv->on('Task', function ($serv, $task_id, $from_id, $data) {
+    echo "New AsyncTask[id=$task_id]".PHP_EOL;
+    $serv->finish("$data -> OK");
+});
+$serv->on('Finish', function ($serv, $task_id, $data) {
+    echo "AsyncTask[$task_id] Finish: $data".PHP_EOL;
+});
+$serv->start();</code></pre>
+        </div>
+    </div>
+    <hr />
+    <footer>
+        <p>&copy; Swoole.com 2013 备案号：京ICP备10021081号 官方QQ群：321637118 开发组邮件列表：
+        <a href="mailto:team@swoole.com">team@swoole.com</a>
+        </p>
+    </footer>
+
+</div>
+<script src="/static/js/jquery.js"></script>
+<script src="/static/bootstrap/js/bootstrap.min.js"></script>
+<div style="display: none">
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F4967f2faa888a2e52742bebe7fcb5f7d' type='text/javascript'%3E%3C/script%3E"));
+</script>
+</div>
+</body>
+</html>

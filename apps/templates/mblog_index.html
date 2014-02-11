@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>PHP开发社区 Swoole开发框架官方网站</title>
+<link href="/static/css/base.css" rel="stylesheet" type="text/css">
+<link href="/static/css/grid.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="/static/js/jquery.js"></script>
+<link type="text/css" rel="stylesheet" href="/static/css/facebox.css"/>
+<script type="text/javascript" src="/static/js/facebox.js"></script>
+<script type="text/javascript">
+$.facebox.settings.closeImage = '/static/images/closelabel.png';
+$.facebox.settings.loadingImage = '/static//images/loading.gif';
+
+jQuery(document).ready(function($){
+  $('a[rel=facebox]').facebox();
+})
+</script>
+<meta name="Copyright" content="Swoole.com" />
+<meta name="description" content="Swoole是一个PHP高级开发框架" />
+<meta name="keywords" content="PHP,Web,PHP社区,PHP程序员,PHP高级,Go语言,Python语言,Golang" />
+</head>
+
+<body>
+{{include file='header.html'}}
+{{include file=block/checklogin.html}}
+<div id='main'>
+<div id='mleft'>
+{{include file=block/mblog_list.html}}
+</div>
+<div id='mright'>
+<h3 style="margin-left:5px;">最活跃微博主</h3>
+
+{{foreach from=$users item=v}}
+<div style="clear:both;">
+<div class="userPic" style="margin-bottom:12px;"> <a href="/page/user/uid-{{$v.uid}}"><img class="avatar photo" src="{{$v.avatar|default:'/static/images/default.png'}}" /></a> </div>
+<a href="/page/user/uid-{{$v.uid}}" class="f12">{{$v.nickname}}</a>
+</div>
+{{/foreach}}
+</div>
+</div>
+{{include file='footer.html'}}
+</body>
+</html>
