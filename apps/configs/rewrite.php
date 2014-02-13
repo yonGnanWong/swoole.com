@@ -2,7 +2,7 @@
 $array = array();
 //频道页
 $array[] = array(
-    'regx' => '^/([a-zA-Z_0-9]{2,16})\.html$',
+    'regx' => '^/([a-zA-Z_\-0-9]{2,16})\.html$',
     'mvc' => array('controller' => 'page', 'view' => 'index'),
     'get' => 'p',
 );

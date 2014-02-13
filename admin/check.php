@@ -7,4 +7,3 @@ Auth::login_require();
 
 $access = array();
 require "../dict/acl.php";
-?>
