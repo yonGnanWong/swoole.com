@@ -14,6 +14,9 @@ class wiki_admin extends Swoole\Controller
 
     function __construct($swoole)
     {
+        session();
+        //$this->swoole->db->debug = true;
+
         MdWiki\Content::$php = $swoole;
         parent::__construct($swoole);
         if(isset($_GET['prid']))
@@ -32,9 +35,24 @@ class wiki_admin extends Swoole\Controller
         {
             $this->project_id = 1;
         }
+
+        //未登陆用户
+        if(!isset($_SESSION['user_id']))
+        {
+            Swoole\Http::redirect('/page/login/');
+            Swoole\Http::finish();
+        }
+
         $this->project = createModel('WikiProject')->get($this->project_id);
         $this->swoole->tpl->assign("project_id", $this->project_id);
         $this->swoole->tpl->assign("project", $this->project);
+
+        //非管理员不允许登陆
+        if($this->ifDeny())
+        {
+            Swoole_js::js_goto('您没有编辑权限', '/wiki/index/');
+            Swoole\Http::finish();
+        }
     }
 
     function index_frames()
@@ -168,13 +186,6 @@ class wiki_admin extends Swoole\Controller
 
     function create_project()
     {
-        session();
-        if(!isset($_SESSION['user_id']))
-        {
-            Swoole\Http::redirect('/page/login/');
-            Swoole\Http::finish();
-            return;
-        }
         if(!empty($_POST['name']))
         {
             $project = createModel('WikiProject')->get();
@@ -215,7 +226,6 @@ class wiki_admin extends Swoole\Controller
 
     function setting()
     {
-        if($this->ifDeny()) return Swoole_js::js_back("您没有编辑权限");
         if(!empty($_POST['name']))
         {
             $this->project->name = trim($_POST['name']);
@@ -233,18 +243,6 @@ class wiki_admin extends Swoole\Controller
         $this->swoole->tpl->display("wiki/setting.html");
     }
 
-    function admin()
-    {
-        if($this->ifDeny())
-        {
-            return Swoole_js::js_alert("你没有编辑权限。或者还没有登陆到网站");
-        }
-        else
-        {
-            echo Swoole_js::js_back("登陆成功");
-        }
-    }
-
     private function reflushPage($info)
     {
         echo Swoole_js::js_alert($info);
@@ -254,7 +252,6 @@ class wiki_admin extends Swoole\Controller
 
     function create()
     {
-        if($this->ifDeny()) return Swoole_js::js_back("您没有编辑权限");
         if(!empty($_POST))
         {
             $_tree = createModel('WikiTree');
@@ -307,7 +304,6 @@ class wiki_admin extends Swoole\Controller
 
     function paste()
     {
-        if($this->ifDeny()) return Swoole_js::js_back("您没有编辑权限");
         if(empty($_GET['id'])) return "error: requirer miki_page id";
         $id = (int)$_GET['id'];
         //作为子页面
@@ -336,22 +332,13 @@ class wiki_admin extends Swoole\Controller
 
     function cut()
     {
-        if ($this->ifDeny()) return Swoole_js::js_back("您没有编辑权限");
         if (empty($_GET['id'])) return "error: requirer miki_page id";
-
         Swoole\Cookie::set('wiki_cut_id', $_GET['id'], 86400);
         return Swoole_js::js_back("剪切成功，请到目标页面粘贴");
     }
 
     private function ifDeny()
     {
-        session();
-//        $this->swoole->db->debug = true;
-        if(!isset($_SESSION['user_id']))
-        {
-            Swoole\Http::redirect('/page/login/');
-            Swoole\Http::finish();
-        }
         $owners = explode(',', $this->project['owner']);
         if(!in_array($_SESSION['user_id'], $owners))
         {
@@ -369,7 +356,6 @@ class wiki_admin extends Swoole\Controller
 
     function delete()
     {
-        if($this->ifDeny()) return Swoole_js::js_back("您没有编辑权限");
         if(empty($_GET['id'])) return "error: requirer miki_page id";
         $_cont = createModel('WikiContent');
         $_tree = createModel('WikiTree');
@@ -381,7 +367,6 @@ class wiki_admin extends Swoole\Controller
 
     function modify()
     {
-        if($this->ifDeny()) return Swoole_js::js_back("您没有编辑权限");
         if(empty($_GET['id'])) return "error: requirer miki_page id";
         $id = (int)$_GET['id'];
         $_cont = createModel('WikiContent');
