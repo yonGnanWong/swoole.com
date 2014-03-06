@@ -4,14 +4,15 @@ namespace MdWiki;
 class Content
 {
     static $php;
+    static $order = "pid asc, orderid desc";
     static function getTree($project_id)
     {
-        $data = self::$php->db->query("select id,text,link,pid from wiki_tree where project_id = $project_id order by pid asc, orderid DESC ")->fetchall();
+        $data = self::$php->db->query("select id,text,link,pid from wiki_tree where project_id = $project_id order by ".self::$order)->fetchall();
         return $data;
     }
     static function getTree2($project_id)
     {
-        $data = self::$php->db->query("select id,text,link,pid from wiki_tree where project_id = $project_id order by id asc, orderid DESC ")->fetchall();
+        $data = self::$php->db->query("select id,text,link,pid from wiki_tree where project_id = $project_id order by".self::$order)->fetchall();
         return $data;
     }
     static function newPage($content)

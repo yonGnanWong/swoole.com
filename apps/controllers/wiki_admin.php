@@ -90,6 +90,39 @@ class wiki_admin extends Swoole\Controller
         $this->swoole->tpl->display("wiki/main.html");
     }
 
+    function order()
+    {
+        if(empty($_GET['id']))
+        {
+            return "错误：父页面id为空";
+        };
+
+        $model = createModel('WikiTree');
+        if(!empty($_POST['order']))
+        {
+            $order = explode(',', $_POST['order']);
+            $n = count($order);
+            if($n < 2)
+            {
+                return $this->message(501, '错误的请求');
+            }
+            foreach($order as $k=>$id)
+            {
+                $model->set($id, array('orderid' => $n - $k));
+            }
+            return $this->message(0, '排序操作成功');
+        }
+        else
+        {
+            $pid = $_GET['id'];
+            $gets['pid'] = $pid;
+            $gets['order'] = \MdWiki\Content::$order;
+            $childs = $model->gets($gets);
+            $this->tpl->assign('childs', $childs);
+            $this->tpl->display("wiki/order.html");
+        }
+    }
+
     private function getTopData()
     {
         $projects_link[] = $this->project;
@@ -284,14 +317,7 @@ class wiki_admin extends Swoole\Controller
             }
             $_POST['id'] = $_tree->put($in);
             MdWiki\Content::newPage($_POST);
-            if($id == 0)
-            {
-                $this->reflushPage('增加成功');
-            }
-            else
-            {
-                return Swoole_js::alert("修改成功");
-            }
+            $this->reflushPage('增加成功');
         }
         else
         {

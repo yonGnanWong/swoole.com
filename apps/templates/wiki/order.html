@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel='stylesheet' href='/static/css/markdown.css' type='text/css' />
+    <!-- Bootstrap core CSS -->
+    <link href="/static/bootstrap3/dist/css/bootstrap.css" rel="stylesheet">
+    <!-- Bootstrap theme -->
+    <link href="/static/bootstrap3/dist/css/bootstrap-theme.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="/static/css/theme.css" rel="stylesheet">
+    <link href="/static/css/code.css" rel="stylesheet">
+    <link href="/static/css/jquery-ui.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="/static/bootstrap3/dist/js/html5shiv.js"></script>
+    <script src="/static/bootstrap3/dist/js/respond.min.js"></script>
+    <![endif]-->
+    <script src="/static/js/jquery.js"></script>
+    <script src="/static/js/jquery-ui.js"></script>
+    <style>
+        #sortable {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
+        #sortable li {
+            margin: 0 5px 5px 5px;
+            cursor: move;
+            padding: 5px;
+            padding-left: 12px;
+            font-size: 14px;
+            height: 40px;
+            line-height: 30px;
+        }
+        .ui-state-highlight {
+            height: 40px;
+        }
+    </style>
+    <script>
+        var pid = {{$smarty.get.id}};
+        $(function() {
+            $("#sortable").sortable({
+                placeholder: "ui-state-highlight",
+                start: function(e, ui){
+                    ui.helper.height(40);
+                }
+            });
+            $("#sortable").disableSelection();
+            $('#ok').click(function(o){
+                var items = $('#sortable').children();
+                var orders = [];
+                for (var i = 0; i < items.length; i++) {
+                    orders.push(items[i].id.substring(5))
+                }
+                $.post('/wiki_admin/order/?id='+pid, {'order' : orders.join(',')}, function(data){
+                    alert(data);
+                }, 'json');
+            });
+            //setTimeout(function(){$('#alert-info').hide(500);}, 2000);
+        });
+    </script>
+    <title>排序</title>
+</head>
+<body>
+<div class="main_right">
+    <div class="container">
+        <div id="readme" class="blob instapaper_body">
+            <div id="alert-info" class="alert alert-success hidden"></div>
+            <ul id="sortable">
+                {{foreach from=$childs item=v key=k}}
+                <li class="ui-state-default" id="node-{{$v.id}}">{{$v.text}}</li>
+                {{/foreach}}
+            </ul>
+            <hr/>
+            <button type="button" id="ok" class="button btn-success" style="margin-left: 5px">确定并提交排序结果</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>
