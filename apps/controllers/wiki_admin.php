@@ -279,7 +279,8 @@ class wiki_admin extends Swoole\Controller
     private function reflushPage($info)
     {
         echo Swoole_js::js_alert($info);
-        $js = "parent.window.location.reload();";
+        //$js = "parent.window.location.reload();";
+        $js = "history.back();";
         echo Swoole_js::echojs($js);
     }
 
@@ -289,7 +290,6 @@ class wiki_admin extends Swoole\Controller
         {
             $_tree = createModel('WikiTree');
             $in['text'] = $_POST['title'];
-            $in['orderid'] = (int)$_POST['orderid'];
             $id =  intval($_GET['id']);
             if($id == 0)
             {
@@ -403,6 +403,7 @@ class wiki_admin extends Swoole\Controller
         $form['comment'] = Form::radio('close_comment',
             array('0'=>'开启', '1'=>'关闭'), $cont['close_comment'], false, null, 'radio-inline');
         $this->swoole->tpl->assign("form", $form);
+        
         if(!empty($_POST))
         {
             $cont->title = trim($_POST['title']);
@@ -414,7 +415,6 @@ class wiki_admin extends Swoole\Controller
             $cont->close_comment = $_POST['close_comment'];
             $cont->uptime = time();
 
-            $node->orderid = intval($_POST['orderid']);
             $node->text = $cont->title;
             $node->link = trim($_POST['link']);
 

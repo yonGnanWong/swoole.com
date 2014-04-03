@@ -28,7 +28,7 @@
         {{if $info}}
         <div id="alert-info" class="alert alert-success">{{$info}}</div>
         <script>
-            parent.window.frames['tree'].location.reload();
+            //parent.window.frames['tree'].location.reload();
             setTimeout(function(){$('#alert-info').hide(500);}, 2000);
         </script>
         {{/if}}
@@ -41,9 +41,6 @@
             </div>
             <div class="form-group">
                 <textarea name="content" style="width: 100%; height: 450px;">{{$page.content}}</textarea>
-            </div>
-            <div class="form-group">
-                <input type="input" name="orderid" value="{{$page.orderid}}" class="form-control" placeholder="请输入排序ID">
             </div>
             <div class="form-group">
             {{$form.comment}}

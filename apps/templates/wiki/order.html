@@ -55,10 +55,19 @@
                     orders.push(items[i].id.substring(5))
                 }
                 $.post('/wiki_admin/order/?id='+pid, {'order' : orders.join(',')}, function(data){
-                    alert(data);
+                    $('#alert-info').removeClass('hidden');
+                    $('#alert-info').html(data.msg);
+                    if(data.code == 0) {
+                        setTimeout(function(){
+                            $('#alert-info').hide(500);
+                            //parent.window.frames['tree'].location.reload();
+                        }, 3000);
+                    } else {
+                        $('#alert-info').removeClass('alert-success');
+                        $('#alert-info').toggleClass('alert-warning');
+                    }
                 }, 'json');
             });
-            //setTimeout(function(){$('#alert-info').hide(500);}, 2000);
         });
     </script>
     <title>排序</title>
