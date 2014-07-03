@@ -1,6 +1,6 @@
 <?php
 $cache['master'] = array(
-    'type' => 'CMemcache',
+    'type' => 'Memcache',
 );
 $cache['session'] = array(
     'type' => 'FileCache',

@@ -1,8 +1,8 @@
 <?php
-require_once(WEBPATH.'/class/WeiboOAuth.class.php');
-require_once WEBPATH.'/class/qqoauth.func.php';
+require_once APPSPATH.'/classes/WeiboOAuth.php';
+require_once APPSPATH.'/classes/qqoauth.func.php';
 
-class page extends FrontPage
+class page extends App\FrontPage
 {
 	public $pagesize = 10;
 	function __construct($swoole)
@@ -13,8 +13,8 @@ class page extends FrontPage
     function verify()
     {
         session();
-        Swoole\Http::header('Content-Type', 'image/png');
-        Image::authcode_gd();
+        $this->swoole->http->header('Content-Type', 'image/png');
+        Swoole\Image::authcode_gd();
     }
 
     function test2()
@@ -35,7 +35,7 @@ class page extends FrontPage
 			$_SESSION['oauth_keys'] = $keys;
 			$_SESSION['oauth_serv'] = 'sina';
 			$login_url = $oauth->getAuthorizeURL($keys['oauth_token'],false,WEBROOT.'/page/oauth_callback/');
-			Swoole\Http::redirect($login_url);
+			$this->swoole->http->redirect($login_url);
 		}
 		elseif($_GET['s']=='qq')
 		{
@@ -46,7 +46,7 @@ class page extends FrontPage
 			$_SESSION['oauth_keys'] = $token;
 			$_SESSION['oauth_serv'] = 'qq';
 			$login_url = $oauth->getAuthorizeURL($token,WEBROOT.'/page/oauth_callback/');
-			Swoole\Http::redirect($login_url);
+            $this->swoole->http->redirect($login_url);
 		}
 	}
 	function oauth_callback()
@@ -84,7 +84,7 @@ class page extends FrontPage
 			$_SESSION['user_id'] = $u['id'];
 			$_SESSION['user'] = $u;
 			$this->setLoginStat();
-			Swoole\Http::redirect(WEBROOT."/person/index/");
+            $this->swoole->http->edirect(WEBROOT."/person/index/");
 		}
 		elseif($_SESSION['oauth_serv']=='qq')
 		{
@@ -100,7 +100,7 @@ class page extends FrontPage
 			if(empty($u))
 			{
 				$user = $oauth->api_get('user/get_user_info');
-				if(empty($user)) return Swoole_js::js_back("请求错误");
+				if(empty($user)) return Swoole\JS::js_back("请求错误");
 
 				$u['username'] = $username;
 				$u['nickname'] = $user['nickname'];
@@ -113,7 +113,7 @@ class page extends FrontPage
 			$_SESSION['user_id'] = $u['id'];
 			$_SESSION['user'] = $u;
 			$this->setLoginStat();
-			Swoole\Http::redirect(WEBROOT."/person/index/");
+            $this->swoole->http->redirect(WEBROOT."/person/index/");
 		}
 	}
 	function flist()
@@ -226,32 +226,32 @@ class page extends FrontPage
 	function login()
 	{
 		session();
-		$auth = new Auth($this->swoole->db,'user_login');
+		$auth = new Swoole\Auth($this->swoole->db,'user_login');
 		$refer = isset($_GET['refer'])?$_GET['refer']:WEBROOT.'/person/index/';
-		if($auth->isLogin())
+		if ($auth->isLogin())
 		{
-            Swoole\Http::redirect($refer);
+            $this->swoole->http->redirect($refer);
 		}
 		if(isset($_POST['username']) and $_POST['username']!='')
 		{
 			if(!isset($_POST['authcode']) or strtoupper($_POST['authcode'])!==$_SESSION['authcode'])
 			{
-				return Swoole_js::js_back('验证码错误！');
+				return Swoole\JS::js_back('验证码错误！');
 			}
 			$_POST['username'] = strtolower(trim($_POST['username']));
 			$_POST['password'] = trim($_POST['password']);
 
-			$password = Auth::mkpasswd($_POST['username'],$_POST['password']);
+			$password = Swoole\Auth::mkpasswd($_POST['username'],$_POST['password']);
 			if($auth->login($_POST['username'],$password,isset($_POST['auto'])?1:0))
 			{
 				$userinfo = $this->swoole->model->UserInfo->get($_SESSION['user_id'])->get();
 				$_SESSION['user'] = $userinfo;
 				$this->setLoginStat();
-                Swoole\Http::redirect($refer);
+                $this->swoole->http->redirect($refer);
 			}
 			else
 			{
-				return Swoole_js::js_goto('用户名或密码错误！','/page/login/');
+				return Swoole\JS::js_goto('用户名或密码错误！','/page/login/');
 			}
 		}
 		else
@@ -262,8 +262,8 @@ class page extends FrontPage
 	function logout()
 	{
 		session();
-		Auth::logout();
-		Swoole\Http::redirect('/page/login/');
+        Swoole\Auth::logout();
+		$this->swoole->http->redirect('/page/login/');
 	}
 	function register()
 	{
@@ -272,22 +272,22 @@ class page extends FrontPage
 			session();
 			if(!isset($_POST['authcode']) or strtoupper($_POST['authcode'])!==$_SESSION['authcode'])
 			{
-				Swoole_js::js_back('验证码错误！');
+				Swoole\JS::js_back('验证码错误！');
 				exit;
 			}
 			if($_POST['password']!==$_POST['repassword'])
 			{
-				Swoole_js::js_back('两次输入的密码不一致！');
+				Swoole\JS::js_back('两次输入的密码不一致！');
 				exit;
 			}
 			if(empty($_POST['nickname']))
 			{
-				Swoole_js::js_back('昵称不能为空！');
+				Swoole\JS::js_back('昵称不能为空！');
 				exit;
 			}
 			if(empty($_POST['sex']))
 			{
-				Swoole_js::js_back('性别不能为空！');
+				Swoole\JS::js_back('性别不能为空！');
 				exit;
 			}
 			$userInfo = createModel('UserInfo');
@@ -295,7 +295,7 @@ class page extends FrontPage
 
 			if($userInfo->exists($login['email']))
 			{
-				Swoole_js::js_back('已存在此用户，同一个Email不能注册2次！');
+				Swoole\JS::js_back('已存在此用户，同一个Email不能注册2次！');
 				exit;
 			}
 
@@ -311,7 +311,7 @@ class page extends FrontPage
 			$_SESSION['isLogin'] = true;
 			$_SESSION['user_id'] = $uid;
 			$_SESSION['user'] = $login;
-			return Swoole_js::js_goto('注册成功！','/person/index/');
+			return Swoole\JS::js_goto('注册成功！','/person/index/');
 		}
 		else
 		{
@@ -364,7 +364,7 @@ class page extends FrontPage
 		{
 			if(!$me->checkForm($_POST,'add',$error))
 			{
-				Swoole_js::js_back($error);
+				Swoole\JS::js_back($error);
 				return;
 			}
 			echo 'ok';
@@ -408,7 +408,7 @@ class page extends FrontPage
 		$keyword = mb_substr(trim($_GET['k']),0,32);
 		if(empty($keyword))
 		{
-			Swoole_js::js_back('关键词不能为空！');
+			Swoole\JS::js_back('关键词不能为空！');
 			exit;
 		}
 		$page = empty($_GET['page'])?1:(int)$_GET['page'];
@@ -426,19 +426,19 @@ class page extends FrontPage
 		{
 			if(empty($_POST['realname']))
 			{
-				Swoole_js::js_back('姓名不能为空！');
+				Swoole\JS::js_back('姓名不能为空！');
 				exit;
 			}
 			if(empty($_POST['mobile']))
 			{
-				Swoole_js::js_back('电话不能为空！');
+				Swoole\JS::js_back('电话不能为空！');
 				exit;
 			}
 			unset($_POST['x'],$_POST['y']);
 			$_POST['product'] = implode(',',$_POST['product']);
 			$_POST['source'] = implode(',',$_POST['source']);
 			$php->model->Guestbook->put($_POST);
-			Swoole_js::js_goto('注册成功！','guestbook.php');
+			Swoole\JS::js_goto('注册成功！','guestbook.php');
 		}
 
 		if(!empty($_GET['id']))

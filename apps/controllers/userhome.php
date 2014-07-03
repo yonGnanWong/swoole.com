@@ -1,5 +1,5 @@
 <?php
-class userhome extends FrontPage
+class userhome extends App\FrontPage
 {
     function photo()
     {

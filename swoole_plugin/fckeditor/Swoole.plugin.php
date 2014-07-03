@@ -7,7 +7,7 @@ $dir = dirname(__FILE__);
 require($dir."/fckeditor.php");
 function editor($input_name, $input_value,$height="480",$upfile=true)
 {
-	$prefix = Auth::$session_prefix;
+	$prefix = Swoole\Auth::$session_prefix;
 	$editor = new FCKeditor($input_name) ;
 	$editor->BasePath   = WEBROOT."/swoole_plugin/fckeditor/"; //指定编辑器路径
 	$editor->ToolbarSet = "Default"; //编辑器工具栏有Basic（基本工具）,Default（所有工具）选择

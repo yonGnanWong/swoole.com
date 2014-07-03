@@ -1,14 +1,14 @@
 <?php
-class person extends UserBase
+class person extends \App\UserBase
 {
     function notes()
     {
-        $model = createModel('UserNote');
+        $model = model('UserNote');
         if($_POST)
         {
             if(empty($_POST['title']) or empty($_POST['content']))
             {
-                return Swoole_js::js_back('标题和内容不能为空！');
+                return Swoole\JS::js_back('标题和内容不能为空！');
             }
             $nid = (int)$_POST['id'];
             $in['title'] = trim($_POST['title']);
@@ -55,18 +55,18 @@ class person extends UserBase
 
             if(empty($_POST['title']) or empty($_POST['content']))
             {
-                return Swoole_js::js_back('标题和内容不能为空！');
+                return Swoole\JS::js_back('标题和内容不能为空！');
             }
             $q['gold'] = (int)$_POST['gold'];
             if($q['gold']>200)
             {
-                return Swoole_js::js_back('金币不得超过200');
+                return Swoole\JS::js_back('金币不得超过200');
             }
-            $category = createModel('AskCategory')->get((int)$_POST['category']);
-            $user = createModel('UserInfo')->get($this->uid);
+            $category = model('AskCategory')->get((int)$_POST['category']);
+            $user = model('UserInfo')->get($this->uid);
             if($q['gold']>$user->gold)
             {
-                return Swoole_js::js_back('您没有足够的金币');
+                return Swoole\JS::js_back('您没有足够的金币');
             }
             $q['title'] = $_POST['title'];
             $q['cid'] = $category['id'];
@@ -75,18 +75,18 @@ class person extends UserBase
             $q['expire'] = time()+1296000;
             $q['uid'] = $this->uid;
 
-            $cont['aid'] = createModel('AskSubject')->put($q);
+            $cont['aid'] = model('AskSubject')->put($q);
             $cont['content'] = $_POST['content'];
 
-            createModel('AskContent')->put($cont);
+            model('AskContent')->put($cont);
             $user->gold -= $q['gold'];
             $user->save();
-            return Swoole_js::js_goto('发布成功！','/ask/index/');
+            return Swoole\JS::js_goto('发布成功！','/ask/index/');
         }
         else
         {
-            $user = createModel('UserInfo')->get($this->uid)->get();
-            $forms = createModel('AskSubject')->getForms();
+            $user = model('UserInfo')->get($this->uid)->get();
+            $forms = model('AskSubject')->getForms();
             $this->swoole->tpl->assign('user',$user);
             $this->swoole->tpl->assign('forms',$forms);
             $this->swoole->tpl->display();
@@ -94,7 +94,7 @@ class person extends UserBase
     }
     function myquestion()
     {
-        $model = createModel('AskSubject');
+        $model = model('AskSubject');
         $gets['uid'] = $this->uid;
         $gets['page'] = empty($_GET['page'])?1:(int)$_GET['page'];
         $gets['pagesize'] =15;
@@ -113,19 +113,19 @@ class person extends UserBase
     {
         if(!empty($_POST['microblog']))
         {
-            $model = createModel('MicroBlog');
+            $model = model('MicroBlog');
             $in['content'] = trim($_POST['microblog']);
             $in['uid'] = $this->uid;
             $in['url_id'] = (int)$_POST['mblog_url'];
             $in['pic_id'] = (int)$_POST['mblog_pic'];
             $model->put($in);
-            return Swoole_js::js_goto('发布成功','/person/mblog/');
+            return Swoole\JS::js_goto('发布成功','/person/mblog/');
         }
     }
     function mblog()
     {
-        $model = createModel('MicroBlog');
-        $_user = createModel('UserInfo');
+        $model = model('MicroBlog');
+        $_user = model('UserInfo');
 
         if(!empty($_GET['del']))
         {
@@ -158,7 +158,7 @@ class person extends UserBase
             $add['title'] = trim($_POST['title']);
             $add['url'] = Func::parse_url(trim($_POST['url']));
             $add['uid'] = $this->uid;
-            return createModel('UserLink')->put($add);
+            return model('UserLink')->put($add);
         }
     }
     function profile()
@@ -167,7 +167,7 @@ class person extends UserBase
         {
             if(empty($_POST['nickname']))
             {
-                return Swoole_js::js_back('昵称不能为空！');
+                return Swoole\JS::js_back('昵称不能为空！');
             }
             if(!empty($_FILES['avatar']['name']))
             {
@@ -179,7 +179,7 @@ class person extends UserBase
                 $upfile = $php->upload->save('avatar');
                 if($upfile===false)
                 {
-                    return Swoole_js::js_back('上传失败！');
+                    return Swoole\JS::js_back('上传失败！');
                 }
                 $set['avatar'] = $_SESSION['user']['avatar'] = $upfile['thumb'];
             }
@@ -194,23 +194,23 @@ class person extends UserBase
             $set['skill'] = implode(',',$_POST['skill']);
             $set['php_level'] = (int)$_POST['php_level'];
 
-            $u = createModel('UserInfo');
+            $u = model('UserInfo');
             $u->set($this->uid,$set);
             $_SESSION['user']['realname'] = $set['realname'];
             $_SESSION['user']['mobile'] = $set['mobile'];
-            return Swoole_js::js_back('修改成功！');
+            return Swoole\JS::js_back('修改成功！');
         }
         else
         {
             require WEBPATH.'/dict/forms.php';
-            $_u = createModel('UserInfo');
+            $_u = model('UserInfo');
             $u = $_u->get($this->uid)->get();
 
-            $_skill = createModel('UserSkill')->getMap(array());
-            $_forms['sex'] = Form::radio('sex',$forms['sex'],$u['sex']);
-            $_forms['education'] = Form::select('education',$forms['education'],$u['education']);
-            $_forms['skill'] = Form::checkbox('skill',$_skill,$u['skill']);
-            $_forms['level'] = Form::radio('php_level',$forms['level'],$u['php_level']);
+            $_skill = model('UserSkill')->getMap(array());
+            $_forms['sex'] = Swoole\Form::radio('sex',$forms['sex'],$u['sex']);
+            $_forms['education'] = Swoole\Form::select('education',$forms['education'],$u['education']);
+            $_forms['skill'] = Swoole\Form::checkbox('skill',$_skill,$u['skill']);
+            $_forms['level'] = Swoole\Form::radio('php_level',$forms['level'],$u['php_level']);
 
             $this->swoole->tpl->assign('user',$u);
             $this->swoole->tpl->assign('forms',$_forms);
@@ -227,7 +227,7 @@ class person extends UserBase
         //Error::dbd();
         if(empty($_GET['mid'])) die();
         $id = (int)$_GET['mid'];
-        $_m = createModel('UserMail');
+        $_m = model('UserMail');
         $ms = $_m->get($id);
         if($ms->tid!=$this->uid and $ms->fid!=$this->uid) die('Access deny!');
         else
@@ -238,7 +238,7 @@ class person extends UserBase
                 $ms->save();
             }
 
-            $_e = createModel('UserInfo');
+            $_e = model('UserInfo');
             $_e->select = 'id,nickname';
             $fuser = $_e->get($ms->fid)->get();
             $this->swoole->tpl->assign('ftype','user');
@@ -252,7 +252,7 @@ class person extends UserBase
     {
         if(empty($_GET['mid'])) die();
         $id = (int)$_GET['mid'];
-        $_m = createModel('UserMail');
+        $_m = model('UserMail');
         $ms = $_m->get($id);
         //发信人
         if($ms->fid==$this->uid)
@@ -263,7 +263,7 @@ class person extends UserBase
                 $ms->mstatus=4;
                 $ms->save();
             }
-            return Swoole_js::js_back('删除成功');
+            return Swoole\JS::js_back('删除成功');
         }
         //收信人
         elseif($ms->tid==$this->uid)
@@ -274,7 +274,7 @@ class person extends UserBase
                 $ms->mstatus=5;
                 $ms->save();
             }
-            return Swoole_js::js_back('删除成功');
+            return Swoole\JS::js_back('删除成功');
         }
         else Swoole\Http::response('Error!');
     }
@@ -282,7 +282,7 @@ class person extends UserBase
     function mails()
     {
         //Error::dbd();
-        $_m = createModel('UserMail');
+        $_m = model('UserMail');
         if(isset($_GET['act']) and $_GET['act']=='send')
         {
             $gets['fid'] = $this->uid;
@@ -311,15 +311,15 @@ class person extends UserBase
             $post['title'] = mb_substr($_POST['title'],0,48);
             $post['content'] = mb_substr($_POST['content'],0,300);
             $post['tid'] = $_POST['tid'];
-            $_m = createModel('UserMail');
+            $_m = model('UserMail');
             $_m->put($post);
-            return Swoole_js::js_goto('发送成功','/person/mails/?act=send');
+            return Swoole\JS::js_goto('发送成功','/person/mails/?act=send');
         }
         else
         {
             if(!empty($_GET['to']))
             {
-                $u = createModel('UserInfo')->get((int)$_GET['to'])->get();
+                $u = model('UserInfo')->get((int)$_GET['to'])->get();
                 $this->swoole->tpl->assign('to',$u);
             }
             $this->swoole->tpl->display();
@@ -332,18 +332,18 @@ class person extends UserBase
 	{
 		if(!empty($_GET['add']))
 		{
-			$fm = createModel('UserFriend');
+			$fm = model('UserFriend');
 			$get['frid'] = (int)$_GET['add'];
 			$get['uid'] = $this->uid;
 			$c = $fm->count($get);
 			if($c>0)
 			{
-				return Swoole_js::js_goto('你们已经是好友了！','/person/myfriends/');
+				return Swoole\JS::js_goto('你们已经是好友了！','/person/myfriends/');
 			}
 			else
 			{
 				$fm->put($get);
-                return Swoole_js::js_goto('添加好友成功！','/person/myfriends/');
+                return Swoole\JS::js_goto('添加好友成功！','/person/myfriends/');
 			}
 		}
 	}
@@ -352,7 +352,7 @@ class person extends UserBase
 	 */
 	function myfriends()
 	{
-		$gw = new GeneralView($this->swoole);
+		$gw = new Swoole\GeneralView($this->swoole);
 		$gw->setModel('UserFriend');
 		$gets['uid'] = $this->uid;
 		$gets['select'] = 'frid as uid,addtime,nickname,avatar,sex,addtime,lastlogin';

@@ -1,5 +1,5 @@
 <?php
-class cms extends Controller
+class cms extends Swoole\Controller
 {
 	private $app;
     private $_model;

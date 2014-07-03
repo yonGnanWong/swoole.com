@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/../../class/php-markdown/Michelf/Markdown.php';
-require_once __DIR__ . '/../../class/php-markdown/Michelf/MarkdownExtra.php';
-require_once __DIR__ . '/../../class/Content.php';
+require_once __DIR__ . '/../classes/php-markdown/Michelf/Markdown.php';
+require_once __DIR__ . '/../classes/php-markdown/Michelf/MarkdownExtra.php';
+require_once __DIR__ . '/../classes/Content.php';
 
 use \Michelf;
 

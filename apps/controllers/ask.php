@@ -1,5 +1,5 @@
 <?php
-class ask extends Controller
+class ask extends Swoole\Controller
 {
     function index()
     {

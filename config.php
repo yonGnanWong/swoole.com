@@ -6,7 +6,6 @@ if(!empty($_SERVER['SERVER_NAME']))
     define("WEBROOT", 'http://'.$_SERVER['SERVER_NAME']);
 }
 //应用程序的位置
-define("APPSPATH", WEBPATH.'/apps');
 define('HTML', WEBPATH.'/html');
 define('HTML_URL_BASE','/html');
 define('HTML_FILE_EXT','.html');

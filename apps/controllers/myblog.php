@@ -1,16 +1,16 @@
 <?php
-class myblog extends UserBase
+class myblog extends App\UserBase
 {
     function write()
     {
-        $_m = createModel('UserLogs');
-        $_l = createModel('UserLogCat');
+        $_m = model('UserLogs');
+        $_l = model('UserLogCat');
         if($_POST)
         {
             //如果没得到id，说明提交的是添加操作
             if(empty($_POST['title']))
             {
-                return Swoole_js::js_back('标题不能为空！');
+                return Swoole\JS::js_back('标题不能为空！');
             }
             Swoole\Filter::safe($_POST['content']);
             $_POST['content'] = Swoole\Filter::remove_xss($_POST['content']);
@@ -30,7 +30,7 @@ class myblog extends UserBase
                 if($det['uid']!=$this->uid) exit('access deny!not your blog!');
                 $_m->set($id,$blog);
                 if(isset($_POST['autosave'])) return 1;
-                else return Swoole_js::js_back('修改成功',-2);
+                else return Swoole\JS::js_back('修改成功',-2);
             }
             else
             {
@@ -38,12 +38,12 @@ class myblog extends UserBase
                 $bid = $_m->put($blog);
                 $_l->set($blog['c_id'],array('num'=>'`num`+1'));
                 if(isset($_POST['autosave'])) return $bid;
-                else return Swoole_js::js_back('添加成功');
+                else return Swoole\JS::js_back('添加成功');
             }
         }
         else
         {
-            $this->swoole->plugin->load('fckeditor');
+            require_once WEBPATH.'/swoole_plugin/fckeditor/Swoole.plugin.php';
             $cat = $_l->getMap(array('uid'=>$this->uid),'name');
             if(empty($cat)) $cat = array();
 
@@ -52,13 +52,13 @@ class myblog extends UserBase
                 $id = $_GET['id'];
                 $det = $_m->get($id)->get();
                 Swoole\Filter::deslash($det['content']);
-                $form = Form::select('c_id',$cat,$det['c_id']);
+                $form = Swoole\Form::select('c_id',$cat,$det['c_id']);
                 $this->swoole->tpl->assign('det',$det);
                 $editor = editor("content",$det['content'],480,false,false,array('empty'=>'请选择日志分类'));
             }
             else
             {
-                $form = Form::select('c_id',$cat,'',false,array('empty'=>'请选择日志分类'));
+                $form = Swoole\Form::select('c_id',$cat,'',false,array('empty'=>'请选择日志分类'));
                 $editor = editor("content",'',480,false);
             }
             $this->swoole->tpl->assign('form',$form);
@@ -68,13 +68,13 @@ class myblog extends UserBase
     }
     function category()
     {
-        $_l= createModel('UserLogCat');
+        $_l= model('UserLogCat');
         if(isset($_GET['del']))
         {
             $del = $_l->get((int)$_GET['del']);
             if($del->uid!=$this->uid) die('Access deny');
             $del->delete();
-            return Swoole_js::js_back('删除成功！');
+            return Swoole\JS::js_back('删除成功！');
         }
         if(!empty($_POST['name']))
         {
@@ -84,13 +84,13 @@ class myblog extends UserBase
             if($_l->exists($data))
             {
                 if($_POST['ajax']) echo 'exists';
-                else return Swoole_js::js_back('添加失败，已存在！');
+                else return Swoole\JS::js_back('添加失败，已存在！');
             }
             else
             {
                $id = $_l->put($data);
                 if($_POST['ajax']) echo $id;
-                else return Swoole_js::js_back('添加成功！');
+                else return Swoole\JS::js_back('添加成功！');
             }
         }
         $gets['uid'] = $this->uid;
@@ -106,11 +106,11 @@ class myblog extends UserBase
 
     function index()
     {
-        $_m = createModel('UserLogs');
+        $_m = model('UserLogs');
         if(isset($_GET['del']))
         {
             $_m->del((int)$_GET['del']);
-            return Swoole_js::js_back('删除成功！');
+            return Swoole\JS::js_back('删除成功！');
         }
         if(isset($_GET['act']) and $_GET['act']=='draft') $gets['dir'] = 1;
         else $gets['dir'] = 0;

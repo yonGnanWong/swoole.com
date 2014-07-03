@@ -1,5 +1,5 @@
 <?php
-class myphoto extends UserBase
+class myphoto extends App\UserBase
 {
     /**
      * 相片的呈现

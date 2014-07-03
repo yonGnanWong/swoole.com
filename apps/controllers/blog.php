@@ -1,5 +1,5 @@
 <?php
-class blog extends FrontPage
+class blog extends App\FrontPage
 {
     function index()
     {

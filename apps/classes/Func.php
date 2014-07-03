@@ -1,4 +1,7 @@
 <?php
+namespace App;
+use Swoole;
+
 class Func
 {
     static $sort_mode = -1; //升序/降序

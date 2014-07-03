@@ -8,6 +8,7 @@ Swoole\Error::$echo_html = false;
 $AppSvr = new Swoole\Network\Protocol\AppServer();
 $AppSvr->loadSetting("./swoole.ini"); //加载配置文件
 $AppSvr->setAppPath(__DIR__.'/apps/'); //设置应用所在的目录
+$AppSvr->setDocumentRoot(__DIR__);
 $AppSvr->setLogger(new \Swoole\Log\FileLog('/tmp/swoole.log')); //Logger
 
 $server = new \Swoole\Network\Server('0.0.0.0', 9501);

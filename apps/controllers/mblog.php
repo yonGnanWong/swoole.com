@@ -1,5 +1,5 @@
 <?php
-class mblog extends FrontPage
+class mblog extends App\FrontPage
 {
     function index()
     {
@@ -15,16 +15,16 @@ class mblog extends FrontPage
         if(!isset($_GET['id'])) exit;
         $id = (int)$_GET['id'];
 
-        $model = createModel('MicroBlog');
-        $_u = createModel('UserInfo');
-        $_c = createModel('UserComment');
+        $model = model('MicroBlog');
+        $_u = model('UserInfo');
+        $_c = model('UserComment');
 
         $comments = $_c->getByAid('mblog',$id);
         $mblog = $model->get($id)->get();
         $this->userinfo($mblog['uid']);
         $mblog['addtime'] = date('n月j日 H:i',strtotime($mblog['addtime']));
         $this->swoole->tpl->assign('mblog',$mblog);
-        $title = strip_tags(Func::mblog_link(0,$mblog['content'],32,true));
+        $title = strip_tags(App\Func::mblog_link(0,$mblog['content'],32,true));
         $this->swoole->tpl->assign('title',$title);
         $this->swoole->tpl->assign('comments',$comments);
         $this->swoole->tpl->display();

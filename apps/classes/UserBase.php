@@ -1,5 +1,8 @@
 <?php
-class UserBase extends Controller
+namespace App;
+use Swoole;
+
+class UserBase extends Swoole\Controller
 {
     public $uid;
     function __construct($swoole)
@@ -10,11 +13,11 @@ class UserBase extends Controller
             $_COOKIE['PHPSESSID'] = $_POST["PHPSESSID"];
             session_id($_COOKIE['PHPSESSID']);
         }
-        session();
-        Auth::$login_url = '/page/login/?';
-        if(Auth::login_require() === false)
+        Swoole::$php->session->start();
+        Swoole\Auth::$login_url = '/page/login/?';
+        if (Swoole\Auth::login_require() === false)
         {
-            return Swoole\Http::finish();
+            return $this->swoole->http->finish();
         }
         $this->uid = $_SESSION['user_id'];
     }

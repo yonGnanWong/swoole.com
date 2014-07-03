@@ -1,4 +1,7 @@
 <?php
+namespace App;
+use Swoole;
+
 class FrontPage extends Swoole\Controller
 {
 	/**
