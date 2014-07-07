@@ -69,13 +69,10 @@
 <div class="container">
 
     <div class="hero-unit">
-		<h2 style="margin-bottom: 25px;">Swoole：重新定义PHP</h2>
-        <p>
-		<span><img src="/static/images/swoole.png" style="float:left; margin-right: 25px; margin-top: 15px;" />
-        </span>
-        PHP语言的高性能网络通信框架，提供了PHP语言的异步多线程服务器，异步TCP/UDP网络客户端，异步MySQL，数据库连接池，AsyncTask，消息队列，毫秒定时器，异步文件读写，异步DNS查询。<br />
-        Swoole可以广泛应用于互联网、移动通信、企业软件、网络游戏、物联网、车联网、智能家庭等领域。
-        使用PHP+Swoole作为网络通信框架，可以使企业IT研发团队的效率大大提升，更加专注于开发创新产品。
+        <p><span><img src="/static/images/swoole.png" style="float:left; margin-right: 25px; margin-top: 15px;" />
+        </span>Swoole是一个PHP的C扩展，内置全异步非阻塞的高并发TCP/UDP Server，异步/同步Client。
+        Swoole提供了多线程epoll/kqueue事件循环，业务逻辑部分既可以像node.js一样全异步回调执行，也可以像php-fpm一多进程同步阻塞方式来运行。
+        Swoole还提供了PHP的异步MySQL，AsyncTask，消息队列，毫秒定时器，异步文件读写，异步DNS查询等功能。
         <p style="margin-top: 25px;"><a href="https://github.com/matyhtf/swoole" class="btn btn-primary">源代码</a>&nbsp;&nbsp;
            <a href="https://github.com/matyhtf/swoole/issues/new" class="btn btn-danger">提交Bug</a>&nbsp;&nbsp;
            <a href="https://github.com/matyhtf/swoole/issues/new" class="btn">提建议</a>&nbsp;&nbsp;
@@ -85,8 +82,7 @@
     <div class="row">
         <div class="span3" style="width: 290px;">
             <h3>新闻</h3>
-            <ul class="nav nav-list">
-				<li style="height: 30px;"><a href="hhttp://www.oschina.net/news/52997/swoole-1-7-3">swoole1.7.3增加PHP多进程管理模块</a></li>
+            <ul class="nav nav-list">				
 				<li style="height: 30px;"><a href="http://www.oschina.net/news/50899/swoole-1-7">PHP的异步并行扩展Swoole发布1.7版</a></li>
 				<li style="height: 30px;"><a href="http://www.oschina.net/news/47945/swoole-add-to-offical-php-extensions">异步网络扩展Swoole已收录到PHP官方</a></li>
                 <li style="height: 30px;"><a href="http://www.iteye.com/news/28130">Node.js的颠覆者：PHP的Swoole扩展</a></li>
@@ -98,29 +94,26 @@
             <style >
                 .checklist li {
                     list-style-image: url("/static/image/li-checks.png");
-                    height: 36px;
+                    height: 30px;
                     float: left;
                     width: 170px;
                 }
             </style>
             <h3>优势</h3>
             <ul class="checklist nav nav-list" id="feature_list">
-                <li>纯C编写性能极强</li>
-                <li>简单易用开发效率高</li>
-                <li>事件驱动异步非阻塞</li>
+                <li>纯C编写无依赖</li>
                 <li>并发百万TCP连接</li>
                 <li>TCP/UDP/UnixSock</li>
-                <li>服务器端/客户端</li>
+                <li>Server+Client</li>
                 <li>全异步/半异步半同步</li>
                 <li>支持多进程/多线程</li>
                 <li>CPU亲和性/守护进程</li>
-                <li>支持IPv4/IPv6网络</li>
+                <li>开发效率极高</li>
             </ul>
         </div>
         <div class="span5">
             <h3>案例</h3>
-            <p style="line-height: 180%">swoole目前已被多家移动互联网、物联网、网络游戏、手机游戏企业使用，替代了C++、Java等复杂编程语言来实现网络服务器程序。
-               使用PHP+Swoole，开发效率可以大大提升。<br/>
+            <p style="line-height: 180%">swoole在国内被很多网络游戏、手机游戏公司使用，替代了C++、Java等复杂编程语言来实现网络Server程序。使用PHP+Swoole扩展，开发效率可以大大提升。<br/>
                 官方提供了基于swoole扩展开发的<a href="https://github.com/matyhtf/swoole_framework">PHP网络框架</a>，
                 支持Http，FastCGI，WebSocket，FTP，SMTP，SOA等网络协议。
                 <br/>swoole在美国，英国，法国，印度等国家都有用户分布，在国内的腾讯、阿里、YY语音等多家知名互联网公司均有使用。
@@ -139,7 +132,7 @@
             <pre>
 <code class="php" data-language="php">$serv = new swoole_server("127.0.0.1", 9501);
 $serv->set(array(
-    'worker_num' => 8,   //工作进程数量
+    'worker_num' => 8,
     'daemonize' => true, //是否作为守护进程
 ));
 $serv->on('connect', function ($serv, $fd){
@@ -158,20 +151,20 @@ $serv->start();</code></pre>
         <h4>Client</h4>
             <pre>
 <code class="php" data-language="php">$client = new swoole_client(SWOOLE_SOCK_TCP, SWOOLE_SOCK_ASYNC);
-//设置事件回调函数
 $client->on("connect", function($cli) {
     $cli->send("hello world\n");
 });
-$client->on("receive", function($cli, $data){
-    echo "Received: ".$data."\n";
+$client->on("receive", function($cli, $data = ""){
+    //$data = $cli->recv(); //低于swoole1.6.10需要调用
+    echo "Receive: ".$data.PHP_EOL;
 });
 $client->on("error", function($cli){
-    echo "Connect failed\n";
+    echo "connect fail\n";
 });
 $client->on("close", function($cli){
-    echo "Connection close\n";
+    echo "connection close\n";
+    //$cli->close(); //低于swoole1.6.10需要调用
 });
-//发起网络连接
 $client->connect('127.0.0.1', 9501, 0.5);</code></pre>
     </div>
     <div class="span6">
