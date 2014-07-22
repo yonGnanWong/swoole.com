@@ -87,28 +87,25 @@
                 ds.charset = 'UTF-8';
                 (document.getElementsByTagName('head')[0]
                         || document.getElementsByTagName('body')[0]).appendChild(ds);
+                $(ds).ready(function() {
+                    var resize_count = 0;
+                    var timer = setInterval(function() {
+                        if ($('div#ds-thread')[0].clientHeight < 100) {
+                            return;
+                        }
+                        var a = $("#sidebar")[0];
+                        var b = $("div.wiki_content")[0];
+                        if (a.clientHeight < b.clientHeight) {
+                            a.style.height = (b.clientHeight + 2) + "px";
+                        } else {
+                            b.style.height = (a.clientHeight + 2) + "px";
+                        }
+                        window.clearInterval(timer);
+                    }, 300);
+                });
             })();
             {{/if}}
             $(document).ready(function() {
-                var count = 3;
-                var timer = setInterval(function() {
-                    //console.log("resize");
-                    if (count <= 0) {
-                        window.clearInterval(timer);
-                    }
-                    var a = $("#sidebar")[0];
-                    var b = $("div.wiki_content")[0];
-
-                    if (a.clientHeight == b.clientHeight) {
-                        return;
-                    }
-                    if (a.clientHeight < b.clientHeight) {
-                        a.style.height = b.clientHeight + "px";
-                    } else {
-                        b.style.height = a.clientHeight + "px";
-                    }
-                    count --;
-                }, 300);
                 $('a').each(function(e){
                     //外链
                     if(this.href.substring(7, location.host.length +7) != location.host) {

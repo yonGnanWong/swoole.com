@@ -278,10 +278,10 @@ class wiki_admin extends Swoole\Controller
 
     private function reflushPage($info)
     {
-        echo Swoole_js::js_alert($info);
+        echo Swoole\JS::js_alert($info);
         //$js = "parent.window.location.reload();";
         $js = "history.back();";
-        echo Swoole_js::echojs($js);
+        echo Swoole\JS::echojs($js);
     }
 
     function create()
@@ -321,7 +321,7 @@ class wiki_admin extends Swoole\Controller
         }
         else
         {
-            $form['comment'] = Form::radio('close_comment',
+            $form['comment'] = Swoole\Form::radio('close_comment',
                 array('0'=>'开启', '1'=>'关闭'), 0, false, null, 'radio-inline');
             $this->swoole->tpl->assign("form", $form);
             $this->swoole->tpl->display("wiki/create.html");
@@ -336,7 +336,7 @@ class wiki_admin extends Swoole\Controller
         $cut_node = model('WikiTree')->get($_COOKIE['wiki_cut_id']);
         if(isset($_GET['child']))
         {
-            if(count($cut_node->get()) < 1)
+            if (count($cut_node->get()) < 1)
             {
                 return Swoole\JS::js_back("页面不存在");
             }
@@ -400,7 +400,7 @@ class wiki_admin extends Swoole\Controller
 
         $cont = $_cont->get($id);
         $node = $_tree->get($id);
-        $form['comment'] = Form::radio('close_comment',
+        $form['comment'] = Swoole\Form::radio('close_comment',
             array('0'=>'开启', '1'=>'关闭'), $cont['close_comment'], false, null, 'radio-inline');
         $this->swoole->tpl->assign("form", $form);
         

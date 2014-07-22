@@ -25,7 +25,7 @@ require __DIR__.'/libs/lib_config.php';
 require __DIR__.'/admin/func.php';
 require LIBPATH.'/code/ns_warrper.php';
 
-if(get_cfg_var('env.name') == 'dev')
+if (get_cfg_var('env.name') == 'dev')
 {
     require __DIR__.'/apps/dev_config.php';
     $php->config->setPath(APPSPATH.'/configs/dev/');
