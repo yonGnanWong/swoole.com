@@ -16,7 +16,7 @@ class wiki extends Swoole\Controller
 
     function __construct($swoole)
     {
-        MdWiki\Content::$php = $swoole;
+        App\Content::$php = $swoole;
         parent::__construct($swoole);
     }
 
@@ -80,7 +80,7 @@ class wiki extends Swoole\Controller
         $projects_link[] = $this->project;
         if(!empty($this->project['links']))
         {
-            $projects = createModel('WikiProject')->all();
+            $projects = model('WikiProject')->all();
             $projects->order('id asc');
             $projects->in('id', $this->project['links']);
             $_projects_link = $projects->fetchall();
@@ -94,8 +94,8 @@ class wiki extends Swoole\Controller
 
     private function getPageInfo()
     {
-        $_cont = createModel('WikiContent');
-        $_tree = createModel('WikiTree');
+        $_cont = model('WikiContent');
+        $_tree = model('WikiTree');
 
         if (!empty($_GET['p']))
         {
@@ -139,15 +139,21 @@ class wiki extends Swoole\Controller
 
     private function getTreeData()
     {
-        $data = MdWiki\Content::getTree($this->project_id);
-        $tree =  MdWiki\Content::parseTreeArray($this->project['home_id'], $data);
+        //所有子节点的Tree
+        //$data = App\Content::getTree($this->project_id);
+        //$tree =  App\Content::parseTreeArray($this->project['home_id'], $data);
+        $node_id = isset($_GET['id']) ? intval($_GET['id']) : $this->project['home_id'];
+        //仅当前树
+        $data = App\Content::getTree3($this->project_id, $node_id);
+        $tree = App\Content::parseTreeArray($this->project['home_id'], $data);
+        //debug($tree);
 //        echo json_encode($tree);exit;
         $this->swoole->tpl->assign("tree", $tree);
     }
 
     function tree()
     {
-        $this->swoole->tpl->assign("tree", json_encode(MdWiki\Content::getTree($this->project_id)));
+        $this->swoole->tpl->assign("tree", json_encode(App\Content::getTree($this->project_id)));
         $this->swoole->tpl->display("wiki/tree.html");
     }
 }

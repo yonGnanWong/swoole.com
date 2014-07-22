@@ -21,6 +21,12 @@
     color: #693;
     border-bottom-color:#693;
 }
+
+#wiki_node_active a {
+    color: #693;
+    border-bottom-color:#693;
+}
+
 .wiki_content {
     width: 855px;
     margin-top: 13px;

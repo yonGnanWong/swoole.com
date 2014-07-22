@@ -47,12 +47,12 @@
                     {{if $v.child}}
                     <ul class="nav li2">
                     {{foreach item=v2 from=$v.child}}
-                        <li><a href="/wiki/page/{{$v2.id}}.html">{{$v2.text}}</a></li>
+                        <li {{if $v2.id == $smarty.get.id}}id="wiki_node_active"{{/if}}><a href="/wiki/page/{{$v2.id}}.html">{{$v2.text}}</a></li>
                         <li>
                             {{if $v2.child}}
                             <ul class="nav li3">
                                 {{foreach item=v3 from=$v2.child}}
-                                <li> <a href="/wiki/page/{{$v3.id}}.html">{{$v3.text}}</a></li>
+                                <li {{if $v3.id == $smarty.get.id}}id="wiki_node_active"{{/if}}><a href="/wiki/page/{{$v3.id}}.html">{{$v3.text}}</a></li>
                                 {{/foreach}}
                             </ul>
                             {{/if}}
@@ -81,21 +81,34 @@
             var duoshuoQuery = {short_name:"www4swoole"};
             (function() {
                 var ds = document.createElement('script');
-                ds.type = 'text/javascript';ds.async = true;
+                ds.type = 'text/javascript';
+                ds.async = true;
                 ds.src = 'http://static.duoshuo.com/embed.js';
                 ds.charset = 'UTF-8';
                 (document.getElementsByTagName('head')[0]
                         || document.getElementsByTagName('body')[0]).appendChild(ds);
-                var a = $("#sidebar")[0];
-                var b = $("div.wiki_content")[0];
-                if (a.clientHeight < b.clientHeight) {
-                    a.style.height = b.clientHeight + "px";
-                } else {
-                    b.style.height = a.clientHeight + "px";
-                }
             })();
             {{/if}}
             $(document).ready(function() {
+                var count = 3;
+                var timer = setInterval(function() {
+                    //console.log("resize");
+                    if (count <= 0) {
+                        window.clearInterval(timer);
+                    }
+                    var a = $("#sidebar")[0];
+                    var b = $("div.wiki_content")[0];
+
+                    if (a.clientHeight == b.clientHeight) {
+                        return;
+                    }
+                    if (a.clientHeight < b.clientHeight) {
+                        a.style.height = b.clientHeight + "px";
+                    } else {
+                        b.style.height = a.clientHeight + "px";
+                    }
+                    count --;
+                }, 300);
                 $('a').each(function(e){
                     //外链
                     if(this.href.substring(7, location.host.length +7) != location.host) {

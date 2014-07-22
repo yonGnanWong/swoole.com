@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/../../class/php-markdown/Michelf/Markdown.php';
-require_once __DIR__ . '/../../class/php-markdown/Michelf/MarkdownExtra.php';
-require_once __DIR__ . '/../../class/Content.php';
+require_once __DIR__ . '/../classes/php-markdown/Michelf/Markdown.php';
+require_once __DIR__ . '/../classes/php-markdown/Michelf/MarkdownExtra.php';
+require_once __DIR__ . '/../classes/Content.php';
 
 use \Michelf;
 
@@ -17,7 +17,7 @@ class wiki_admin extends Swoole\Controller
         session();
         //$this->swoole->db->debug = true;
 
-        MdWiki\Content::$php = $swoole;
+        App\Content::$php = $swoole;
         parent::__construct($swoole);
         if(isset($_GET['prid']))
         {
@@ -39,8 +39,8 @@ class wiki_admin extends Swoole\Controller
         //未登陆用户
         if(!isset($_SESSION['user_id']))
         {
-            Swoole\Http::redirect('/page/login/');
-            Swoole\Http::finish();
+            Swoole::$php->http->redirect('/page/login/');
+            Swoole::$php->http->finish();
         }
 
         $this->project = createModel('WikiProject')->get($this->project_id);
@@ -50,8 +50,8 @@ class wiki_admin extends Swoole\Controller
         //非管理员不允许登陆
         if($this->ifDeny())
         {
-            Swoole_js::js_goto('您没有编辑权限', '/wiki/index/');
-            Swoole\Http::finish();
+            Swoole\JS::js_goto('您没有编辑权限', '/wiki/index/');
+            Swoole::$php->http->finish();
         }
     }
 
@@ -59,7 +59,7 @@ class wiki_admin extends Swoole\Controller
     {
         if(empty($this->project))
         {
-            return Swoole_js::js_goto("您访问的项目不存在", "/");
+            return Swoole\JS::js_goto("您访问的项目不存在", "/");
         }
         if(!empty($_GET['p']))
         {
@@ -72,7 +72,7 @@ class wiki_admin extends Swoole\Controller
     {
         if(empty($this->project))
         {
-            return Swoole_js::js_goto("您访问的项目不存在", "/");
+            return Swoole\JS::js_goto("您访问的项目不存在", "/");
         }
         if(!empty($_GET['p']))
         {
@@ -116,7 +116,7 @@ class wiki_admin extends Swoole\Controller
         {
             $pid = $_GET['id'];
             $gets['pid'] = $pid;
-            $gets['order'] = \MdWiki\Content::$order;
+            $gets['order'] = App\Content::$order;
             $childs = $model->gets($gets);
             $this->tpl->assign('childs', $childs);
             $this->tpl->display("wiki/order.html");
@@ -128,7 +128,7 @@ class wiki_admin extends Swoole\Controller
         $projects_link[] = $this->project;
         if(!empty($this->project['links']))
         {
-            $projects = createModel('WikiProject')->all();
+            $projects = model('WikiProject')->all();
             $projects->order('id asc');
             $projects->in('id', $this->project['links']);
             $_projects_link = $projects->fetchall();
@@ -142,7 +142,7 @@ class wiki_admin extends Swoole\Controller
 
     private function getMainData()
     {
-        $_cont = createModel('WikiContent');
+        $_cont = model('WikiContent');
         $page_id = basename($_SERVER['REQUEST_URI'], '.html');
         if(is_numeric($page_id))
         {
@@ -150,7 +150,7 @@ class wiki_admin extends Swoole\Controller
         }
         if (!empty($_GET['p']))
         {
-            $_tree = createModel('WikiTree');
+            $_tree = model('WikiTree');
             $node = $_tree->get($_GET['p'], 'link')->get();
             if(empty($node))
             {
@@ -194,8 +194,8 @@ class wiki_admin extends Swoole\Controller
 
     private function getTreeData()
     {
-        $data = MdWiki\Content::getTree($this->project_id);
-        $tree =  MdWiki\Content::parseTreeArray($this->project['home_id'], $data);
+        $data = App\Content::getTree($this->project_id);
+        $tree =  App\Content::parseTreeArray($this->project['home_id'], $data);
 //        echo json_encode($tree);exit;
         $this->swoole->tpl->assign("tree", $tree);
     }
@@ -213,7 +213,7 @@ class wiki_admin extends Swoole\Controller
 
     function tree()
     {
-        $this->swoole->tpl->assign("tree", json_encode(MdWiki\Content::getTree($this->project_id)));
+        $this->swoole->tpl->assign("tree", json_encode(App\Content::getTree($this->project_id)));
         $this->swoole->tpl->display("wiki/tree.html");
     }
 
@@ -221,7 +221,7 @@ class wiki_admin extends Swoole\Controller
     {
         if(!empty($_POST['name']))
         {
-            $project = createModel('WikiProject')->get();
+            $project = model('WikiProject')->get();
             $project->name = trim($_POST['name']);
             $project->links = trim($_POST['links']);
             $project->owner = trim($_POST['owner']);
@@ -232,7 +232,7 @@ class wiki_admin extends Swoole\Controller
             }
 
             //保存node
-            $node = createModel('WikiTree')->get();
+            $node = model('WikiTree')->get();
             $node->text = $project->name;
             $node->pid = -1;
             $node->project_id = $project->_current_id;
@@ -243,7 +243,7 @@ class wiki_admin extends Swoole\Controller
             $project->save();
 
             //创建内容页
-            $cont = createModel('WikiContent')->get();
+            $cont = model('WikiContent')->get();
             $cont->id = $node->_current_id;
             $cont->title = $project->name;
             $cont->content = 'nothing';
@@ -288,7 +288,7 @@ class wiki_admin extends Swoole\Controller
     {
         if(!empty($_POST))
         {
-            $_tree = createModel('WikiTree');
+            $_tree = model('WikiTree');
             $in['text'] = $_POST['title'];
             $id =  intval($_GET['id']);
             if($id == 0)
@@ -316,7 +316,7 @@ class wiki_admin extends Swoole\Controller
                 $in['project_id'] = $cnode['project_id'];
             }
             $_POST['id'] = $_tree->put($in);
-            MdWiki\Content::newPage($_POST);
+            App\Content::newPage($_POST);
             $this->reflushPage('增加成功');
         }
         else
@@ -333,12 +333,12 @@ class wiki_admin extends Swoole\Controller
         if(empty($_GET['id'])) return "error: requirer miki_page id";
         $id = (int)$_GET['id'];
         //作为子页面
-        $cut_node = createModel('WikiTree')->get($_COOKIE['wiki_cut_id']);
+        $cut_node = model('WikiTree')->get($_COOKIE['wiki_cut_id']);
         if(isset($_GET['child']))
         {
             if(count($cut_node->get()) < 1)
             {
-                return Swoole_js::js_back("页面不存在");
+                return Swoole\JS::js_back("页面不存在");
             }
             else
             {
@@ -348,7 +348,7 @@ class wiki_admin extends Swoole\Controller
         //同级页面
         else
         {
-            $node = createModel('WikiTree')->get($id)->get();
+            $node = model('WikiTree')->get($id)->get();
             $cut_node->pid = $node['pid'];
         }
         $cut_node->save();
@@ -360,7 +360,7 @@ class wiki_admin extends Swoole\Controller
     {
         if (empty($_GET['id'])) return "error: requirer miki_page id";
         Swoole\Cookie::set('wiki_cut_id', $_GET['id'], 86400);
-        return Swoole_js::js_back("剪切成功，请到目标页面粘贴");
+        return Swoole\JS::js_back("剪切成功，请到目标页面粘贴");
     }
 
     private function ifDeny()
@@ -383,8 +383,8 @@ class wiki_admin extends Swoole\Controller
     function delete()
     {
         if(empty($_GET['id'])) return "error: requirer miki_page id";
-        $_cont = createModel('WikiContent');
-        $_tree = createModel('WikiTree');
+        $_cont = model('WikiContent');
+        $_tree = model('WikiTree');
         $id = (int)$_GET['id'];
         $_cont->del($id);
         $_tree->del($id);
@@ -395,8 +395,8 @@ class wiki_admin extends Swoole\Controller
     {
         if(empty($_GET['id'])) return "error: requirer miki_page id";
         $id = (int)$_GET['id'];
-        $_cont = createModel('WikiContent');
-        $_tree = createModel('WikiTree');
+        $_cont = model('WikiContent');
+        $_tree = model('WikiTree');
 
         $cont = $_cont->get($id);
         $node = $_tree->get($id);

@@ -1,20 +1,73 @@
 <?php
-namespace MdWiki;
+namespace App;
 
 class Content
 {
     static $php;
     static $order = "pid asc, orderid desc";
+    static $select = "id,text,link,pid";
+
     static function getTree($project_id)
     {
-        $data = self::$php->db->query("select id,text,link,pid from wiki_tree where project_id = $project_id order by ".self::$order)->fetchall();
+        $data = self::$php->db->query("select ".self::$select." from wiki_tree where project_id = $project_id order by ".self::$order)->fetchall();
         return $data;
     }
+
     static function getTree2($project_id)
     {
-        $data = self::$php->db->query("select id,text,link,pid from wiki_tree where project_id = $project_id order by".self::$order)->fetchall();
+        $data = self::$php->db->query("select ".self::$select." from wiki_tree where project_id = $project_id order by ".self::$order)->fetchall();
         return $data;
     }
+
+    static function getTree3($project_id, $node_id = 0)
+    {
+        //获取Node本身和子节点
+        $nodes = self::$php->db->query("select ".self::$select." from wiki_tree where project_id = $project_id
+        and (pid = $node_id or id = $node_id) order by " . self::$order)->fetchall();
+
+        $map = array();
+        foreach($nodes as $k => $node)
+        {
+            $map[$node['id']] = $node;
+            //删除掉自己
+            if ($node['id'] == $node_id and $node['pid'] != -1)
+            {
+                unset($nodes[$k]);
+            }
+        }
+
+        //根节点直接返回
+        if ($map[$node_id]['pid'] == -1)
+        {
+            return $nodes;
+        }
+
+        //非根节点，向上寻找根节点
+        $find_node_id = $map[$node_id]['pid'];
+
+        //循环获取到顶点
+        while (true)
+        {
+            //父节点
+            $parent_node = self::$php->db->query("select " . self::$select . " from wiki_tree where id = $find_node_id limit 1")->fetch();
+            //兄弟节点
+            $childs = self::$php->db->query("select " . self::$select . " from wiki_tree where pid = $find_node_id order by ".self::$order)->fetchall();
+            $nodes = array_merge($nodes, $childs);
+
+            //达到根节点，退出循环
+            if ($parent_node['pid'] == -1)
+            {
+                $nodes[] = $parent_node;
+                break;
+            }
+            else
+            {
+                $find_node_id = $parent_node['pid'];
+            }
+        }
+        return $nodes;
+    }
+
     static function newPage($content)
     {
         $_cont = createModel('WikiContent');
