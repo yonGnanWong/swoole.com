@@ -219,16 +219,16 @@ class wiki_admin extends Swoole\Controller
 
     function create_project()
     {
-        if(!empty($_POST['name']))
+        if (!empty($_POST['name']))
         {
             $project = model('WikiProject')->get();
             $project->name = trim($_POST['name']);
             $project->links = trim($_POST['links']);
             $project->owner = trim($_POST['owner']);
             $project->close_comment = intval($_POST['close_comment']);
-            if(false === $project->save())
+            if (false === $project->save())
             {
-                return Swoole_js::js_back("创建失败，请稍后重试");
+                return Swoole\JS::js_back("创建失败，请稍后重试");
             }
 
             //保存node
@@ -249,9 +249,9 @@ class wiki_admin extends Swoole\Controller
             $cont->content = 'nothing';
             $cont->save();
 
-            return Swoole_js::echojs("alert(\"创建成功\");parent.window.location.href = \"/wiki/index/prid-".$project->_current_id."\"");
+            return Swoole\JS::echojs("alert(\"创建成功\");parent.window.location.href = \"/wiki/index/prid-".$project->_current_id."\"");
         }
-        $form['comment'] = Form::radio('close_comment',
+        $form['comment'] = Swoole\Form::radio('close_comment',
             array('0'=>'开启', '1'=>'关闭'), 0, false, null, 'radio-inline');
         $this->swoole->tpl->assign("form", $form);
         $this->swoole->tpl->display("wiki/create_project.html");
@@ -259,7 +259,7 @@ class wiki_admin extends Swoole\Controller
 
     function setting()
     {
-        if(!empty($_POST['name']))
+        if (!empty($_POST['name']))
         {
             $this->project->name = trim($_POST['name']);
             $this->project->home_id = intval($_POST['home_id']);
@@ -270,7 +270,7 @@ class wiki_admin extends Swoole\Controller
             $this->reflushPage("修改成功");
             return;
         }
-        $form['comment'] = Form::radio('close_comment',
+        $form['comment'] = Swoole\Form::radio('close_comment',
             array('0'=>'开启', '1'=>'关闭'), $this->project['close_comment'], false, null, 'radio-inline');
         $this->swoole->tpl->assign("form", $form);
         $this->swoole->tpl->display("wiki/setting.html");

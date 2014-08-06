@@ -267,39 +267,38 @@ class page extends App\FrontPage
 	}
 	function register()
 	{
-		if($_POST)
+		if ($_POST)
 		{
-			session();
-			if(!isset($_POST['authcode']) or strtoupper($_POST['authcode'])!==$_SESSION['authcode'])
-			{
-				Swoole\JS::js_back('验证码错误！');
-				exit;
-			}
-			if($_POST['password']!==$_POST['repassword'])
+			Swoole::$php->session->start();
+            if (!isset($_POST['authcode']) or strtoupper($_POST['authcode']) !== $_SESSION['authcode'])
+            {
+                Swoole\JS::js_back('验证码错误！');
+                exit;
+            }
+			if ($_POST['password']!==$_POST['repassword'])
 			{
 				Swoole\JS::js_back('两次输入的密码不一致！');
 				exit;
 			}
-			if(empty($_POST['nickname']))
+			if (empty($_POST['nickname']))
 			{
 				Swoole\JS::js_back('昵称不能为空！');
 				exit;
 			}
-			if(empty($_POST['sex']))
+			if (empty($_POST['sex']))
 			{
 				Swoole\JS::js_back('性别不能为空！');
 				exit;
 			}
 			$userInfo = createModel('UserInfo');
 			$login['email'] = trim($_POST['email']);
-
-			if($userInfo->exists($login['email']))
+			if ($userInfo->exists($login['email']))
 			{
 				Swoole\JS::js_back('已存在此用户，同一个Email不能注册2次！');
 				exit;
 			}
 
-			$login['password'] = Auth::mkpasswd($login['email'],$_POST['password']);
+			$login['password'] = Swoole\Auth::mkpasswd($login['email'],$_POST['password']);
 			$login['username'] = $login['email'];
 //			$login['reg_ip'] = Swoole\Http::getIP();
 			$login['nickname'] = $_POST['nickname'];
@@ -316,7 +315,7 @@ class page extends App\FrontPage
 		else
 		{
 			require WEBPATH.'/dict/forms.php';
-			$_forms['sex'] = Form::radio('sex', $forms['sex']);
+			$_forms['sex'] = Swoole\Form::radio('sex', $forms['sex']);
 			//$_forms['level'] = Form::radio('php_level',$forms['level'],'');
 			$this->swoole->tpl->assign('forms',$_forms);
 			$this->swoole->tpl->display();
@@ -325,8 +324,8 @@ class page extends App\FrontPage
 	function chatroom()
 	{
 		session();
-		Auth::$login_url = '/page/login/?';
-		Auth::login_require();
+        Swoole\Auth::$login_url = '/page/login/?';
+        Swoole\Auth::login_require();
 		$userInfo = createModel('UserInfo');
 		$this->swoole->tpl->assign('user',$userInfo->get($_SESSION['user_id'])->get());
 		$this->swoole->tpl->display();
@@ -346,9 +345,9 @@ class page extends App\FrontPage
 			$ul = $this->model->UserInfo->gets($gets);
 			if(count($ul)!=0)
 			{
-				$password = Func::randomkeys(6);
+				$password = App\Func::randomkeys(6);
 				$this->model->UserInfo->set($ul[0]['id'],array('password'=>Auth::mkpasswd($gets['username'],$password)));
-				Func::success('找回成功！','您的新密码是 <span style="color:#fe7e00;">'.$password.'</a>');
+                App\Func::success('找回成功！','您的新密码是 <span style="color:#fe7e00;">'.$password.'</a>');
 			}
 		}
 		else
@@ -372,8 +371,8 @@ class page extends App\FrontPage
 		else
 		{
 			$form = $me->getForm();
-			$this->swoole->tpl->assign('head',Form::head('me_add','post','',true));
-			$this->swoole->tpl->assign('js',Form::js('me_add'));
+			$this->swoole->tpl->assign('head', Swoole\Form::head('me_add','post','',true));
+			$this->swoole->tpl->assign('js', Swoole\Form::js('me_add'));
 			$this->swoole->tpl->assign('form',$form);
 			$this->swoole->tpl->display('test.html');
 		}
@@ -413,10 +412,10 @@ class page extends App\FrontPage
 		}
 		$page = empty($_GET['page'])?1:(int)$_GET['page'];
 		$res = $this->fulltext($keyword,$page);
-		$pager = new Pager(array('page'=>$page,'perpage'=>$this->pagesize,'total'=>$res['total']));
-		$this->swoole->tpl->assign('pager',array('total'=>$pager->total,'render'=>$pager->render()));
-		$this->swoole->tpl->assign('forms',$_forms);
-		$this->swoole->tpl->assign("list",$res['list']);
+		$pager = new Swoole\Pager(array('page'=>$page,'perpage'=>$this->pagesize,'total'=>$res['total']));
+		$this->swoole->tpl->assign('pager', array('total'=>$pager->total,'render'=>$pager->render()));
+		$this->swoole->tpl->assign('forms', $_forms);
+		$this->swoole->tpl->assign("list", $res['list']);
 		$this->swoole->tpl->display();
 	}
 
@@ -441,7 +440,7 @@ class page extends App\FrontPage
 			Swoole\JS::js_goto('注册成功！','guestbook.php');
 		}
 
-		if(!empty($_GET['id']))
+		if (!empty($_GET['id']))
 		{
 			$gb = $php->model->Guestbook->get($_GET['id'])->get();
 			$php->tpl->assign('gb',$gb);
@@ -457,11 +456,11 @@ class page extends App\FrontPage
 			$gets['where'][] = "reply!=''";
 			$list = $php->model->Guestbook->gets($gets,$pager);
 
-			$_forms['title'] = Form::radio('title',$forms['title'],null,true,array('empty'=>'请选择称谓'));
-			$_forms['age'] = Form::select('age',$forms['age'],null,true,array('empty'=>'请选择年龄阶段'));
-			$_forms['ctime'] = Form::select('ctime',$forms['ctime'],null,true,array('empty'=>'请选择方便沟通的时间'));
-			$_forms['product'] = Form::checkbox('product',$forms['product'],null,true);
-			$_forms['source'] = Form::checkbox('source',$forms['source'],null,true);
+			$_forms['title'] = Swoole\Form::radio('title', $forms['title'],null,true,array('empty'=>'请选择称谓'));
+			$_forms['age'] = Swoole\Form::select('age', $forms['age'],null,true,array('empty'=>'请选择年龄阶段'));
+			$_forms['ctime'] = Swoole\Form::select('ctime',$forms['ctime'],null,true,array('empty'=>'请选择方便沟通的时间'));
+			$_forms['product'] = Swoole\Form::checkbox('product',$forms['product'],null,true);
+			$_forms['source'] = Swoole\Form::checkbox('source',$forms['source'],null,true);
 
 			$pager = array('total'=>$pager->total,'render'=>$pager->render());
 			$php->tpl->assign('pager',$pager);

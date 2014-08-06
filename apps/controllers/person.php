@@ -161,6 +161,38 @@ class person extends \App\UserBase
             return model('UserLink')->put($add);
         }
     }
+
+    function passwd()
+    {
+        if ($_POST)
+        {
+            if (empty($_POST['repass']) or empty($_POST['oldpass']) or empty($_POST['newpass']))
+            {
+                return Swoole\JS::js_back('参数不能为空！');
+            }
+            if ($_POST['repass']!=$_POST['newpass'])
+            {
+                return Swoole\JS::js_back('两次输入的密码不一致！');
+            }
+            if (strlen($_POST['repass']) < 6)
+            {
+                return Swoole\JS::js_back('密码长度不得少于6位！');
+            }
+            $u = model('UserInfo')->get($this->uid);
+            if ($u['password'] != Swoole\Auth::mkpasswd($u['username'], $_POST['oldpass']))
+            {
+                return Swoole\JS::js_back('旧密码错误！');
+            }
+            $u->password = Swoole\Auth::mkpasswd($u['username'], $_POST['newpass']);
+            $u->save();
+            return Swoole\JS::js_back('修改成功！');
+        }
+        else
+        {
+            $this->swoole->tpl->display();
+        }
+    }
+
     function profile()
     {
         if($_POST)
