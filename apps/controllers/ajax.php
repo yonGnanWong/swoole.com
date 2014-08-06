@@ -13,7 +13,7 @@ class ajax extends Swoole\Controller
     
     function comment()
     {
-    	session();
+    	Swoole::$php->session->start();
     	if(!$_SESSION['isLogin']) return 'nologin';
     	$uid = $_SESSION['user_id'];
     	$post['aid'] = (int)$_POST['aid'];
@@ -29,7 +29,7 @@ class ajax extends Swoole\Controller
     		$entity->save();
     		if($entity->uid!=$uid)
     		{
-    			Api::sendmail($entity->uid, $uid, "【系统】{$post['uname']}评论了你的微博", $post['content']);
+    			App\Api::sendmail($entity->uid, $uid, "【系统】{$post['uname']}评论了你的微博", $post['content']);
     		}
     	}
     	elseif($post['app']==='blog')
@@ -40,21 +40,21 @@ class ajax extends Swoole\Controller
     		$entity->save();
     		if($entity->uid!=$uid)
     		{
-    			Api::sendmail($entity->uid, $uid, "【系统】{$post['uname']}评论了你的日志.({$entity['title']})", $post['content']);
+                App\Api::sendmail($entity->uid, $uid, "【系统】{$post['uname']}评论了你的日志.({$entity['title']})", $post['content']);
     		}
     	}
     	createModel('UserComment')->put($post);
     	$return = array('id'=>$_SESSION['user']['id'],
-    			'addtime'=>Swoole_tools::howLongAgo(date('Y-m-d H:i:s')),
+    			'addtime'=>Swoole\Tool::howLongAgo(date('Y-m-d H:i:s')),
     			'nickname'=>$_SESSION['user']['nickname']);
-    	if(empty($_SESSION['user']['avatar'])) $return['avatar'] = Swoole::$config['user']['default_avatar'];
+    	if(empty($_SESSION['user']['avatar'])) $return['avatar'] = Swoole::$php->config['user']['default_avatar'];
     	else $return['avatar'] = $_SESSION['user']['avatar'];
     	return $return;
     }
     
     function ask_best()
     {
-    	session();
+        Swoole::$php->session->start();
     	if(!$_SESSION['isLogin']) return 'nologin';
     	$reid = (int)$_POST['reid'];
     	$reply = createModel('AskReply')->get($reid);
@@ -82,7 +82,7 @@ class ajax extends Swoole\Controller
     function ask_vote()
     {
     	global $php;
-    	session();
+        Swoole::$php->session->start();
     	if(!$_SESSION['isLogin']) return 'nologin';
     	$reid = (int)$_POST['reid'];
     	$reply = createModel('AskReply')->get($reid);
@@ -97,7 +97,7 @@ class ajax extends Swoole\Controller
     
     function checklogin()
     {
-    	session();
+        Swoole::$php->session->start();
     	if(!empty($_SESSION['isLogin']))
         {
             return $_SESSION['user']['nickname'];

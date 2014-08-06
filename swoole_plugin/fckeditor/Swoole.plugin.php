@@ -5,11 +5,19 @@ $swoole_plugin['version'] = '2.6';
 $swoole_plugin['license '] = 'LGPL';
 $dir = dirname(__FILE__);
 require($dir."/fckeditor.php");
+
 function editor($input_name, $input_value,$height="480",$upfile=true)
 {
 	$prefix = Swoole\Auth::$session_prefix;
-	$editor = new FCKeditor($input_name) ;
-	$editor->BasePath   = WEBROOT."/swoole_plugin/fckeditor/"; //指定编辑器路径
+	$editor = new FCKeditor($input_name);
+    if (substr(WEBPATH, -1, 1) == '/')
+    {
+        $editor->BasePath   = WEBROOT."/swoole_plugin/fckeditor/"; //指定编辑器路径
+    }
+    else
+    {
+        $editor->BasePath   = WEBROOT."swoole_plugin/fckeditor/"; //指定编辑器路径
+    }
 	$editor->ToolbarSet = "Default"; //编辑器工具栏有Basic（基本工具）,Default（所有工具）选择
 	$editor->Width      = "100%";
 	$editor->Height     = $height;
@@ -31,6 +39,7 @@ HTML;
 	return $FCKeditor;
 	
 }
+
 function resource($app,$aid='',$catid='')
 {
 	$resource = <<<HTML
@@ -45,4 +54,3 @@ function resource($app,$aid='',$catid='')
 HTML;
 	return $resource;	
 }
-?>

@@ -1,4 +1,6 @@
 <?php
+namespace App;
+
 class Api
 {
 	static $swoole;
@@ -14,9 +16,6 @@ class Api
 	
 	static function feed($type, $uid, $tid=0, $event_id=0)
 	{
-		return self::$swoole->model->Feeds->send($type, $uid, $tid, $event_id);
+		return \Swoole::$php->model->Feeds->send($type, $uid, $tid, $event_id);
 	}
 }
-
-global $php;
-Api::$swoole = $php;
