@@ -32,13 +32,13 @@ class myphoto extends App\UserBase
             $php->upload->max_width = 500;
             $php->upload->max_height = 500;
             $php->upload->thumb_qulitity = 100;
-            
-            if(class_exists('SaeStorage', false))
+
+            if (class_exists('SaeStorage', false))
             {
             	$s = new SaeStorage;
             	$file_id = uniqid('pic_', false).mt_rand(1, 100);
             	$tmp_file = SAE_TMP_PATH.'/thum_'.$file_id.'.jpg';
-            	Image::thumbnail($_FILES['Filedata']['tmp_name'], 
+            	Image::thumbnail($_FILES['Filedata']['tmp_name'],
             			$tmp_file, 
             			$php->upload->thumb_width, 
             			$php->upload->thumb_height, 
@@ -70,16 +70,14 @@ class myphoto extends App\UserBase
             	}
             }
             else
-           {
-            	$php->upload->sub_dir = 'user_images';
-            	$up_pic = $php->upload->save('Filedata');
-            	if(empty($up_pic))
-            	{
-                    echo '上传失败，请重新上传！ Error:'.$php->upload->error_msg;
-                    return;
-            	}
-            	$data['picture'] = $up_pic['name'];
-            	$data['imagep'] = $up_pic['thumb'];
+            {
+                $php->upload->sub_dir = 'user_images';
+                $up_pic = Swoole::$php->upload->save('Filedata');
+                if (empty($up_pic)) {
+                    return '上传失败，请重新上传！ Error:' . $php->upload->error_msg;
+                }
+                $data['picture'] = $up_pic['name'];
+                $data['imagep'] = $up_pic['thumb'];
             }
             $data['uid'] = $_POST['uid'];
             $up_pic['photo_id'] = $this->swoole->model->UserPhoto->put($data);
@@ -95,7 +93,7 @@ class myphoto extends App\UserBase
     function show()
     {
         $pid = (int)$_GET['id'];
-        Widget::photoDetail($pid,$this->uid);
+        App\Widget::photoDetail($pid,$this->uid);
         $this->swoole->tpl->display();
     }
     
@@ -105,7 +103,7 @@ class myphoto extends App\UserBase
     	$id = (int)$_GET['id'];
     	if($this->swoole->model->UserPhoto->del($id))
     	{
-    		return Swoole_js::js_back('删除成功');
+    		return Swoole\JS::js_back('删除成功');
     	}
     }
 }
