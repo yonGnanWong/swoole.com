@@ -5,7 +5,7 @@ require __DIR__.'/config.php';
 //Swoole\Config::$debug = true;
 Swoole\Error::$echo_html = false;
 
-$AppSvr = new Swoole\Network\Protocol\AppServer();
+$AppSvr = new Swoole\Protocol\AppServer();
 $AppSvr->loadSetting("./swoole.ini"); //加载配置文件
 $AppSvr->setAppPath(__DIR__.'/apps/'); //设置应用所在的目录
 $AppSvr->setDocumentRoot(__DIR__);

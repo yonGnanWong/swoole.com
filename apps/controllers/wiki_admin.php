@@ -279,8 +279,8 @@ class wiki_admin extends Swoole\Controller
     private function reflushPage($info)
     {
         echo Swoole\JS::js_alert($info);
-        //$js = "parent.window.location.reload();";
-        $js = "history.back();";
+        $js = "window.frames['tree'].location.reload();";
+        $js .= "history.back();";
         echo Swoole\JS::echojs($js);
     }
 
