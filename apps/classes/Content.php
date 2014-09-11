@@ -5,7 +5,7 @@ class Content
 {
     static $php;
     static $order = "pid asc, orderid desc";
-    static $select = "id,text,link,pid";
+    static $select = "id,text,link,pid,order_by_time";
 
     static function getTree($project_id)
     {
@@ -21,9 +21,32 @@ class Content
 
     static function getTree3($project_id, $node_id = 0)
     {
-        //获取Node本身和子节点
-        $nodes = self::$php->db->query("select ".self::$select." from wiki_tree where project_id = $project_id
-        and (pid = $node_id or id = $node_id) order by " . self::$order)->fetchall();
+        if ($node_id)
+        {
+            $self = self::$php->db->query("select ".self::$select." from wiki_tree where id = $node_id limit 1")->fetch();
+            if ($self['order_by_time'])
+            {
+                $order = 'id desc';
+            }
+            else
+            {
+                $order = self::$order;
+            }
+            //获取子节点
+            $nodes = self::$php->db->query(
+                "select " . self::$select . " from wiki_tree where project_id = $project_id
+                and pid = $node_id order by $order"
+            )->fetchall();
+            $nodes[] = $self;
+        }
+        else
+        {
+            //获取Node本身和子节点
+            $nodes = self::$php->db->query(
+                "select " . self::$select . " from wiki_tree where project_id = $project_id
+                and (pid = $node_id or id = $node_id) order by " . self::$order
+            )->fetchall();
+        }
 
         $map = array();
         foreach($nodes as $k => $node)

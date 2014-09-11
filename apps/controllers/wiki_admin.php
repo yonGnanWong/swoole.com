@@ -97,6 +97,7 @@ class wiki_admin extends Swoole\Controller
             return "错误：父页面id为空";
         };
 
+        $parent_id = intval($_GET['id']);
         $model = createModel('WikiTree');
         if(!empty($_POST['order']))
         {
@@ -114,8 +115,12 @@ class wiki_admin extends Swoole\Controller
         }
         else
         {
-            $pid = $_GET['id'];
-            $gets['pid'] = $pid;
+            $node = $model->get($parent_id);
+            if ($node['order_by_time'])
+            {
+                return Swoole\JS::js_back("已启用自动时间排序，无法使用手工排序功能。");
+            }
+            $gets['pid'] = $parent_id;
             $gets['order'] = App\Content::$order;
             $childs = $model->gets($gets);
             $this->tpl->assign('childs', $childs);
@@ -279,14 +284,14 @@ class wiki_admin extends Swoole\Controller
     private function reflushPage($info)
     {
         echo Swoole\JS::js_alert($info);
-        $js = "window.frames['tree'].location.reload();";
+        $js = "parent.window.frames['tree'].location.reload();";
         $js .= "history.back();";
         echo Swoole\JS::echojs($js);
     }
 
     function create()
     {
-        if(!empty($_POST))
+        if (!empty($_POST))
         {
             $_tree = model('WikiTree');
             $in['text'] = $_POST['title'];
@@ -321,8 +326,14 @@ class wiki_admin extends Swoole\Controller
         }
         else
         {
-            $form['comment'] = Swoole\Form::radio('close_comment',
-                array('0'=>'开启', '1'=>'关闭'), 0, false, null, 'radio-inline');
+            $form['comment'] = Swoole\Form::radio(
+                'close_comment',
+                array('0' => '开启', '1' => '关闭'), 0, false, null, 'radio-inline'
+            );
+            $form['order_by_time'] = Swoole\Form::radio(
+                'order_by_time',
+                array('0'=>'手工排序', '1'=>'按添加时间自动排序'), 0, false, null, 'radio-inline'
+            );
             $this->swoole->tpl->assign("form", $form);
             $this->swoole->tpl->display("wiki/create.html");
         }
@@ -402,21 +413,25 @@ class wiki_admin extends Swoole\Controller
         $node = $_tree->get($id);
         $form['comment'] = Swoole\Form::radio('close_comment',
             array('0'=>'开启', '1'=>'关闭'), $cont['close_comment'], false, null, 'radio-inline');
+        $form['order_by_time'] = Swoole\Form::radio('order_by_time',
+            array('0'=>'手工排序', '1'=>'按添加时间自动排序'), $node['order_by_time'], false, null, 'radio-inline');
         $this->swoole->tpl->assign("form", $form);
         
-        if(!empty($_POST))
+        if (!empty($_POST))
         {
             $cont->title = trim($_POST['title']);
-            if($_POST['content']{0} == '`')
+            if (!empty($_POST['content']) and $_POST['content'][0] == '`')
             {
                 $_POST['content'] = ' '.$_POST['content'];
             }
+
             $cont->content = $_POST['content'];
             $cont->close_comment = $_POST['close_comment'];
             $cont->uptime = time();
 
             $node->text = $cont->title;
             $node->link = trim($_POST['link']);
+            $node->order_by_time = $_POST['order_by_time'];
 
             $node->save();
             $cont->save();
