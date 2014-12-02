@@ -1,11 +1,15 @@
 <?php
+namespace App\Controller;
+use App;
+use Swoole;
+
 require_once __DIR__ . '/../classes/php-markdown/Michelf/Markdown.php';
 require_once __DIR__ . '/../classes/php-markdown/Michelf/MarkdownExtra.php';
 require_once __DIR__ . '/../classes/Content.php';
 
 use \Michelf;
 
-class wiki extends Swoole\Controller
+class Wiki extends Swoole\Controller
 {
     public $if_filter = false;
 

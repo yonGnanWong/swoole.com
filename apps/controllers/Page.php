@@ -1,8 +1,12 @@
 <?php
+namespace App\Controller;
+use App;
+use Swoole;
+
 require_once APPSPATH.'/classes/WeiboOAuth.php';
 require_once APPSPATH.'/classes/qqoauth.func.php';
 
-class page extends App\FrontPage
+class Page extends App\FrontPage
 {
 	public $pagesize = 10;
 	function __construct($swoole)
@@ -14,7 +18,7 @@ class page extends App\FrontPage
     {
         session();
         $this->swoole->http->header('Content-Type', 'image/png');
-        Swoole\Image::authcode_gd();
+        Swoole\Image::verifycode_gd();
     }
 
     function test2()
@@ -30,7 +34,7 @@ class page extends App\FrontPage
 		if(empty($_GET['s']) or $_GET['s']=='sina')
 		{
 			$conf = $this->config['oauth']['weibo'];
-			$oauth = new WeiboOAuth($conf['appid'], $conf['skey']);
+			$oauth = new \WeiboOAuth($conf['appid'], $conf['skey']);
 			$keys = $oauth->getRequestToken();
 			$_SESSION['oauth_keys'] = $keys;
 			$_SESSION['oauth_serv'] = 'sina';
@@ -41,7 +45,7 @@ class page extends App\FrontPage
 		{
 			
 			$conf = $this->config['oauth']['qq'];
-			$oauth = new QQOAuth($conf['APP_ID'], $conf['APP_KEY']);
+			$oauth = new \QQOAuth($conf['APP_ID'], $conf['APP_KEY']);
 			$token = $oauth->getRequestToken();
 			$_SESSION['oauth_keys'] = $token;
 			$_SESSION['oauth_serv'] = 'qq';
@@ -56,10 +60,10 @@ class page extends App\FrontPage
 		{
 			
 			$conf = $this->config['oauth']['weibo'];
-			$oauth = new WeiboOAuth($conf['appid'], $conf['skey'], $_SESSION['oauth_keys']['oauth_token'], $_SESSION['oauth_keys']['oauth_token_secret']);
+			$oauth = new \WeiboOAuth($conf['appid'], $conf['skey'], $_SESSION['oauth_keys']['oauth_token'], $_SESSION['oauth_keys']['oauth_token_secret']);
 			$_SESSION['last_key'] = $oauth->getAccessToken($_REQUEST['oauth_verifier']);
 
-			$client = new WeiboClient($conf['appid'], $conf['skey'],$_SESSION['last_key']['oauth_token'],$_SESSION['last_key']['oauth_token_secret']);
+			$client = new \WeiboClient($conf['appid'], $conf['skey'],$_SESSION['last_key']['oauth_token'],$_SESSION['last_key']['oauth_token_secret']);
 			$userinfo = $client->verify_credentials();
 			if(!isset($userinfo['id']))
             {
@@ -90,7 +94,7 @@ class page extends App\FrontPage
 		{
             $conf = $this->swoole->config['oauth']['qq'];
 			
-			$oauth = new QQOAuth($conf['APP_ID'], $conf['APP_KEY']);
+			$oauth = new \QQOAuth($conf['APP_ID'], $conf['APP_KEY']);
 			$oauth->getAccessToken($_GET['oauth_token'], $_SESSION['oauth_keys']['oauth_token_secret'], $_GET['oauth_vericode']);
 
 			$username = $oauth->access_token['openid'];

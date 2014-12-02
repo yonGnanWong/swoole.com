@@ -1,11 +1,15 @@
 <?php
-class ajax extends Swoole\Controller
+namespace App\Controller;
+use App;
+use Swoole;
+
+class Ajax extends Swoole\Controller
 {
     public $is_ajax = true;
 
     function check_email()
     {
-        if(!empty($_GET['email']))
+        if (!empty($_GET['email']))
         {
             return $this->model->UserInfo->exists($_GET['email']);
         }
@@ -13,7 +17,7 @@ class ajax extends Swoole\Controller
     
     function comment()
     {
-    	Swoole::$php->session->start();
+    	\Swoole::$php->session->start();
     	if(!$_SESSION['isLogin']) return 'nologin';
     	$uid = $_SESSION['user_id'];
     	$post['aid'] = (int)$_POST['aid'];

@@ -73,8 +73,16 @@ class Content
         {
             //父节点
             $parent_node = self::$php->db->query("select " . self::$select . " from wiki_tree where id = $find_node_id limit 1")->fetch();
+            if ($parent_node['order_by_time'])
+            {
+                $order = 'id desc';
+            }
+            else
+            {
+                $order = self::$order;
+            }
             //兄弟节点
-            $childs = self::$php->db->query("select " . self::$select . " from wiki_tree where pid = $find_node_id order by ".self::$order)->fetchall();
+            $childs = self::$php->db->query("select " . self::$select . " from wiki_tree where pid = $find_node_id order by $order")->fetchall();
             $nodes = array_merge($nodes, $childs);
 
             //达到根节点，退出循环

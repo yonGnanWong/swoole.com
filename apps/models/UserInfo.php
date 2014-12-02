@@ -1,4 +1,8 @@
 <?php
+namespace App\Model;
+use App;
+use Swoole;
+
 class UserInfo extends Swoole\Model
 {
     public $table = 'user_login';

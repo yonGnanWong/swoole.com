@@ -1,14 +1,11 @@
 <?php
 define('DEBUG', 'on');
-define("WEBPATH", str_replace("\\","/", __DIR__));
-if(!empty($_SERVER['SERVER_NAME']))
+define('WEBPATH', __DIR__);
+
+if (!empty($_SERVER['SERVER_NAME']))
 {
-    define("WEBROOT", 'http://'.$_SERVER['SERVER_NAME']);
+    define("WEBROOT", 'http://' . $_SERVER['SERVER_NAME']);
 }
-//应用程序的位置
-define('HTML', WEBPATH.'/html');
-define('HTML_URL_BASE','/html');
-define('HTML_FILE_EXT','.html');
 
 define("TABLE_PREFIX", 'st');
 define("SITENAME", 'Swoole_PHP开发社区');
@@ -28,19 +25,19 @@ require LIBPATH.'/code/ns_warrper.php';
 if (get_cfg_var('env.name') == 'dev')
 {
     require __DIR__.'/apps/dev_config.php';
-    $php->config->setPath(APPSPATH.'/configs/dev/');
+    Swoole::$php->config->setPath(APPSPATH.'/configs/dev/');
 }
 //Swoole\Config::$debug = true;
 
-$php->addHook(Swoole::HOOK_INIT, function(){
+Swoole::$php->addHook(Swoole::HOOK_INIT, function(){
     $php = Swoole::getInstance();
     //动态配置系统
     $php->tpl->assign('_site_','/site/'.SITENAME);
     $php->tpl->assign('_static_', $php->config['site']['static']);
 });
 
-$php->tpl->compile_dir = "/tmp/";
-$php->tpl->cache_dir = "/tmp/";
+Swoole::$php->tpl->compile_dir = WEBPATH . "/cache/";
+Swoole::$php->tpl->cache_dir = WEBPATH . "/cache/";
 
 //指定国际编码的方式
 mb_internal_encoding('utf-8');
