@@ -9,7 +9,7 @@ require_once 'check.php';
 require_once 'func.php';
 require_once WEBPATH.'/dict/apps.php';
 
-class admin extends GeneralView
+class admin extends Swoole\GeneralView
 {
 	public $app;
 	public $uid;

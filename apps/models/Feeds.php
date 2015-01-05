@@ -1,4 +1,7 @@
 <?php
+namespace App\Model;
+use Swoole;
+
 class Feeds extends Swoole\Model
 {
 	var $table = 'user_feed';

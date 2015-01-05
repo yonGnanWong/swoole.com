@@ -1,4 +1,7 @@
 <?php
+namespace App\Model;
+use Swoole;
+
 class AskSubject extends Swoole\Model
 {
     public $table = 'ask_subject';

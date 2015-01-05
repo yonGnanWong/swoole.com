@@ -1,4 +1,8 @@
 <?php
+namespace App\Model;
+use Swoole;
+
+
 /**
  * 照片数据库相关查询类
  * @author guoerbo
