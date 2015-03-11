@@ -1,5 +1,8 @@
 <?php
-class person extends \App\UserBase
+namespace App\Controller;
+use Swoole;
+
+class Person extends \App\UserBase
 {
     function notes()
     {

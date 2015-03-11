@@ -35,7 +35,8 @@
         </div>
         <hr />
         <!-- Duoshuo Comment BEGIN -->
-        <div class="ds-thread"></div>
+        <div class="ds-thread" data-thread-key="wiki-{{$wiki_page.id}}" data-title="{{$wiki_page.title}}"
+             data-url="http://wiki.swoole.com/wiki/page/{{$wiki_page.id}}.html"></div>
         <script type="text/javascript">
             $(document).ready(function() {
                 $('a').each(function(e){

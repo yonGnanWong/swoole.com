@@ -1,5 +1,9 @@
 <?php
-class myphoto extends App\UserBase
+namespace App\Controller;
+use Swoole;
+use App;
+
+class Myphoto extends App\UserBase
 {
     /**
      * 相片的呈现
