@@ -146,7 +146,7 @@ class Wiki extends Swoole\Controller
         //所有子节点的Tree
         //$data = App\Content::getTree($this->project_id);
         //$tree =  App\Content::parseTreeArray($this->project['home_id'], $data);
-        $node_id = isset($_GET['id']) ? intval($_GET['id']) : $this->project['home_id'];
+        $node_id = !empty($_GET['id']) ? intval($_GET['id']) : $this->project['home_id'];
         //仅当前树
         $data = App\Content::getTree3($this->project_id, $node_id);
         $tree = App\Content::parseTreeArray($this->project['home_id'], $data);

@@ -27,7 +27,7 @@ function dTree(objName) {
         useStatusText: false,
         closeSameLevel: false,
         inOrder: false
-    }
+    };
     this.icon = {
         root: '/static/js/tree/img/base.gif',
         folder: '/static/js/tree/img/folder.gif',
@@ -52,7 +52,8 @@ function dTree(objName) {
     this.selectedNode = null;
     this.selectedFound = false;
     this.completed = false;
-};
+    this.onOpen = null;
+}
 
 // Adds a new node to the node array
 dTree.prototype.add = function (id, pid, name, url, title, target, icon, iconOpen, open) {
@@ -423,6 +424,9 @@ dTree.prototype.nodeStatus = function (status, id, bottom) {
 
     eDiv.style.display = (status) ? 'block' : 'none';
 
+    if (this.onOpen) {
+        this.onOpen(id, status);
+    }
 };
 
 

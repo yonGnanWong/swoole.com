@@ -22,21 +22,34 @@
         $(document).ready(function() {
             d = new dTree('d');
             d.config.useLines = false;
-            var link = ''
-            for(var i=0;i<wiki_tree_data.length;i++) {
+            d.config.useCookies = false;
+            d.onOpen = function (nodeId, open) {
+                if (!open) {
+                    window.localStorage.removeItem('wiki_node_open_' + nodeId);
+                } else {
+                    window.localStorage.setItem('wiki_node_open_' + nodeId, true);
+                }
+            };
+
+            var link = '';
+            var open;
+            for (var i = 0; i < wiki_tree_data.length; i++) {
                 if(wiki_tree_data[i]['link'].substring(0, 7)=='http://'
                         || wiki_tree_data[i]['link'].substring(0, 8)=='https://') {
                     link = wiki_tree_data[i]['link']
                 } else {
                     link = '/wiki_admin/main/'+wiki_tree_data[i]['id'];
                 }
+                open = window.localStorage.getItem('wiki_node_open_' + i);
+                if (open === null) open = false;
                 d.add(wiki_tree_data[i]["id"],
                         wiki_tree_data[i]["pid"],
                         wiki_tree_data[i]["text"],
-                        link);
+                        link,
+                        wiki_tree_data[i]["text"],
+                        null, null, null, open);
             }
             $('div#tree').html(d.toString());
-            d.openAll();
         });
     </script>
 </body>
