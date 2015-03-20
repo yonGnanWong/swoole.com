@@ -1,5 +1,9 @@
 <?php
-class blog extends App\FrontPage
+namespace App\Controller;
+use App;
+use Swoole;
+
+class Blog extends App\FrontPage
 {
     function index()
     {

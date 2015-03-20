@@ -1,5 +1,9 @@
 <?php
-class ask extends Swoole\Controller
+namespace App\Controller;
+use App;
+use Swoole;
+
+class Ask extends Swoole\Controller
 {
     function index()
     {

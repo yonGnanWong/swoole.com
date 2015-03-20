@@ -1,4 +1,8 @@
 <?php
+namespace App\Controller;
+use App;
+use Swoole;
+
 class mblog extends App\FrontPage
 {
     function index()

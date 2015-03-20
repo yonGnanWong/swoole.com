@@ -1,5 +1,9 @@
 <?php
-class cms extends Swoole\Controller
+namespace App\Controller;
+use App;
+use Swoole;
+
+class Cms extends Swoole\Controller
 {
 	private $app;
     private $_model;

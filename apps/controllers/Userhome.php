@@ -1,5 +1,9 @@
 <?php
-class userhome extends App\FrontPage
+namespace App\Controller;
+use App;
+use Swoole;
+
+class Userhome extends App\FrontPage
 {
     function photo()
     {

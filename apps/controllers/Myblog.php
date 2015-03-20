@@ -1,5 +1,9 @@
 <?php
-class myblog extends App\UserBase
+namespace App\Controller;
+use App;
+use Swoole;
+
+class Myblog extends App\UserBase
 {
     function write()
     {
