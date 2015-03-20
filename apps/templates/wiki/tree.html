@@ -19,11 +19,13 @@
     </div>
     <script type="text/javascript">
         var wiki_tree_data = {{$tree}};
+        var wiki_id_map = [];
         $(document).ready(function() {
             d = new dTree('d');
             d.config.useLines = false;
             d.config.useCookies = false;
-            d.onOpen = function (nodeId, open) {
+            d.onOpen = function (i, open) {
+                var nodeId = wiki_id_map[i];
                 if (!open) {
                     window.localStorage.removeItem('wiki_node_open_' + nodeId);
                 } else {
@@ -33,6 +35,7 @@
 
             var link = '';
             var open;
+            var node_id;
             for (var i = 0; i < wiki_tree_data.length; i++) {
                 if(wiki_tree_data[i]['link'].substring(0, 7)=='http://'
                         || wiki_tree_data[i]['link'].substring(0, 8)=='https://') {
@@ -40,7 +43,9 @@
                 } else {
                     link = '/wiki_admin/main/'+wiki_tree_data[i]['id'];
                 }
-                open = window.localStorage.getItem('wiki_node_open_' + i);
+                node_id = wiki_tree_data[i]["id"];
+                wiki_id_map[i] = node_id;
+                open = window.localStorage.getItem('wiki_node_open_' + node_id);
                 if (open === null) open = false;
                 d.add(wiki_tree_data[i]["id"],
                         wiki_tree_data[i]["pid"],
