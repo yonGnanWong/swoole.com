@@ -20,7 +20,6 @@ define('LOGIN_TABLE','user_login');
 
 require __DIR__.'/libs/lib_config.php';
 require __DIR__.'/admin/func.php';
-require LIBPATH.'/code/ns_warrper.php';
 
 if (get_cfg_var('env.name') == 'dev')
 {
