@@ -1,5 +1,10 @@
 /libs
 /cache/
+<<<<<<< HEAD
 /static/pma/
 /.idea/
 *.log
+=======
+/.idea/
+*.log
+>>>>>>> f29a8cce3ce79fbb9ed166a551398c8168084523
