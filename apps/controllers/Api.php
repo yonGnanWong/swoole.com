@@ -214,4 +214,159 @@ class Api extends Swoole\Controller
         }
         echo json_encode($result, JSON_UNESCAPED_SLASHES);
     }
+
+    function login()
+    {
+        if (empty($_POST['password']) or empty($_POST['username']))
+        {
+            $this->http->status(403);
+            return "access deny\n";
+        }
+
+        $this->session->start();
+
+        $_user = table('aws_users');
+        $_user->primary = 'uid';
+
+        $userinfo = $_user->get($_POST['username'], 'user_name');
+        if ($userinfo->exist())
+        {
+            if (self::check_password($userinfo, $_POST['password']) === false)
+            {
+                goto error_user;
+            }
+            else
+            {
+                $_SESSION['login'] = true;
+                $_SESSION['user'] = $userinfo->get();
+                return $this->json();
+            }
+        }
+        else
+        {
+            error_user:
+            return $this->json('', 403, "错误的用户名或密码");
+        }
+    }
+
+    function profile()
+    {
+        $this->session->start();
+        if (empty($_SESSION['user']))
+        {
+            return $this->json('', 403, "需要登录");
+        }
+        $user = $_SESSION['user'];
+        $categorys = table('aws_category')->gets(array('limit' => 100, 'order' => 'id asc'));
+        $collections = [];
+        foreach($categorys as $c)
+        {
+            $collections[] = $c['title'];
+        }
+        return $this->json(['username' => $user['user_name'], 'collections' => $collections]);
+    }
+
+    static function check_password($userinfo, $post_password)
+    {
+        $salt = $userinfo['salt'];
+        if (strlen($post_password) == 32)
+        {
+            $md5 = md5($post_password . $salt);
+        }
+        else
+        {
+            $md5 = md5(md5($post_password) . $salt);
+        }
+        return $md5 == $userinfo['password'];
+    }
+
+    function post_comment()
+    {
+        if (empty($_POST['content']) or empty($_POST['topic_id']))
+        {
+            $this->http->status(403);
+            return "access deny\n";
+        }
+        $this->session->start();
+        if (empty($_SESSION['user']))
+        {
+            return $this->json('', 403, "需要登录");
+        }
+
+        $topic_id = intval($_POST['topic_id']);
+        $_table = table('aws_question');
+        $_table->primary = 'question_id';
+        $topic = $_table->get($topic_id);
+
+        if ($topic->exist() === false)
+        {
+            return $this->json('', 404, "主题不存在");
+        }
+
+        $user = $_SESSION['user'];
+        $put['question_id'] = $topic_id;
+        $put['uid'] = $user['uid'];
+        $put['add_time'] = time();
+        $put['answer_content'] = trim($_POST['content']);
+        $put['ip'] = ip2long(Swoole\Client::getIP());
+        $put['category_id'] = $topic['category_id'];
+        $id = table('aws_answer')->put($put);
+
+        if ($id)
+        {
+            return $this->json(['commit_id' => $id]);
+        }
+        else
+        {
+            return $this->json('', 500, "操作失败，请稍后重试");
+        }
+    }
+
+    function post_topic()
+    {
+        if (empty($_POST['content']) or empty($_POST['title']) or empty($_POST['category_id']))
+        {
+            $this->http->status(403);
+            return "access deny\n";
+        }
+        $this->session->start();
+        if (empty($_SESSION['user']))
+        {
+            return $this->json('', 403, "需要登录");
+        }
+
+        $user = $_SESSION['user'];
+        $put['question_content'] = trim($_POST['title']);
+        $put['question_detail'] = trim($_POST['content']);
+        $put['published_uid'] = $user['uid'];
+        $put['update_time'] = $put['add_time'] = time();
+        $put['ip'] = ip2long(Swoole\Client::getIP());
+        $put['category_id'] = intval($_POST['category_id']);
+        $id = table('aws_question')->put($put);
+
+        if ($id)
+        {
+            return $this->json(['topic_id' => $id]);
+        }
+        else
+        {
+            return $this->json('', 500, "操作失败，请稍后重试");
+        }
+    }
+
+    function new_message()
+    {
+//        $this->session->start();
+//        if (empty($_SESSION['user']))
+//        {
+//            return $this->json('', 403, "需要登录");
+//        }
+//        $user = $_SESSION['user'];
+        $user['uid'] = 0;
+        $gets['to_uid'] = $user['uid'];
+        $gets['isread'] = 0;
+        $gets['select'] = "question_id as topic_id, title, message as content, time, uid";
+        $message = table('aws_question_comments')->gets($gets);
+        return $this->json($message);
+    }
 }
