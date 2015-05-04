@@ -24,7 +24,7 @@ class Api extends Swoole\Controller
         return $parser->transform($text);
     }
 
-    function latest()
+    function topic()
     {
         $tpl = array(
             'id' => 0,
@@ -62,18 +62,34 @@ class Api extends Swoole\Controller
         $gets = array('order' => 'question_id desc',
             'pagesize' => 20);
         $gets['page'] = empty($_GET['page']) ? 1 : intval($_GET['page']);
+
+        $_user = table('aws_users');
+        $_user->primary = 'uid';
+
+        if (!empty($_GET['category']))
+        {
+            $gets['category_id'] = intval($_GET['category']);
+        }
+        if (!empty($_GET['username']))
+        {
+            $user = $_user->get($_GET['username'], 'user_name');
+            $gets['published_uid'] = $user['uid'];
+        }
+
         $pager = null;
         $list = table('aws_question')->gets($gets, $pager);
 
         $_uids = array();
+        $_categorys = array();
         foreach($list as $li)
         {
-            $_uids[$li['published_uid']] = 1;
+            $_uids[$li['published_uid']] = true;
+            $_categorys[$li['category_id']] = true;
         }
 
-        $_user = table('aws_users');
-        $_user->primary = 'uid';
         $users = $_user->getMap(['in' => array('uid', implode(',', array_keys($_uids)))]);
+
+        $categorys = table('aws_category')->getMap(['in' => array('id', implode(',', array_keys($_categorys)))]);
 
         $result = array();
         foreach($list as $li)
@@ -89,6 +105,11 @@ class Api extends Swoole\Controller
             $uid = $li['published_uid'];
             $tpl['member']['id'] = $uid;
             $tpl['member']['username'] = $users[$uid]['user_name'];
+
+            $_category_id = $li['category_id'];
+            $tpl['node']['id'] = $_category_id;
+            $tpl['node']['title_alternative'] = $tpl['node']['title'] = $tpl['node']['name'] = $categorys[$_category_id]['title'];
+            $tpl['node']['name'] = $categorys[$_category_id]['title'];
 
             if (empty($users[$uid]['avatar_file']))
             {
@@ -109,12 +130,7 @@ class Api extends Swoole\Controller
         echo json_encode($result);
     }
 
-    function topic()
-    {
-        echo file_get_contents(__DIR__.'/data.json');
-    }
-
-    function nodes()
+    function category()
     {
         $tpl = array (
             'id' => 0,
@@ -128,14 +144,14 @@ class Api extends Swoole\Controller
             'created' => 0,
         );
 
-        $list = table('aws_topic')->gets(array('limit' => 100, 'order' => 'topic_id asc'));
+        $list = table('aws_category')->gets(array('limit' => 100, 'order' => 'id asc'));
         $result = [];
         foreach($list as $li)
         {
-            $tpl['id'] = $li['topic_id'];
-            $tpl['title_alternative'] = $tpl['title'] = $tpl['name'] = $li['topic_title'];
-            $tpl['created'] = $li['add_time'];
-            $tpl['topics'] = $li['discuss_count'];
+            $tpl['id'] = $li['id'];
+            $tpl['title_alternative'] = $tpl['title'] = $tpl['name'] = $li['title'];
+            $tpl['created'] = 0;
+            $tpl['topics'] = 0;
             $result[] = $tpl;
         }
         echo json_encode($result);
