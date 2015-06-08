@@ -227,42 +227,43 @@ class Page extends App\FrontPage
 	 * 个人用户登录
 	 * @return unknown_type
 	 */
-	function login()
-	{
-		session();
-		$auth = new Swoole\Auth($this->swoole->db,'user_login');
-		$refer = isset($_GET['refer'])?$_GET['refer']:WEBROOT.'/person/index/';
-		if ($auth->isLogin())
-		{
-            $this->swoole->http->redirect($refer);
-		}
-		if(isset($_POST['username']) and $_POST['username']!='')
-		{
-			if(!isset($_POST['authcode']) or strtoupper($_POST['authcode'])!==$_SESSION['authcode'])
-			{
-				return Swoole\JS::js_back('验证码错误！');
-			}
-			$_POST['username'] = strtolower(trim($_POST['username']));
-			$_POST['password'] = trim($_POST['password']);
-
-			$password = Swoole\Auth::mkpasswd($_POST['username'],$_POST['password']);
-			if($auth->login($_POST['username'],$password,isset($_POST['auto'])?1:0))
-			{
-				$userinfo = $this->swoole->model->UserInfo->get($_SESSION['user_id'])->get();
-				$_SESSION['user'] = $userinfo;
-				$this->setLoginStat();
-                $this->swoole->http->redirect($refer);
-			}
-			else
-			{
-				return Swoole\JS::js_goto('用户名或密码错误！','/page/login/');
-			}
-		}
-		else
+    function login()
+    {
+        session();
+        $refer = isset($_GET['refer']) ? $_GET['refer'] : WEBROOT . '/person/index/';
+        if ($this->user->isLogin())
         {
-			$this->swoole->tpl->display();
-		}
-	}
+            $this->swoole->http->redirect($refer);
+            return;
+        }
+
+        if (isset($_POST['username']) and $_POST['username'] != '')
+        {
+            if (!isset($_POST['authcode']) or strtoupper($_POST['authcode']) !== $_SESSION['authcode'])
+            {
+                return Swoole\JS::js_back('验证码错误！');
+            }
+
+            $_POST['username'] = strtolower(trim($_POST['username']));
+            $_POST['password'] = trim($_POST['password']);
+
+            if ($this->user->login($_POST['username'], $_POST['password'], isset($_POST['auto']) ? 1 : 0))
+            {
+                $userinfo = $this->swoole->model->UserInfo->get($_SESSION['user_id'])->get();
+                $_SESSION['user'] = $userinfo;
+                $this->setLoginStat();
+                $this->swoole->http->redirect($refer);
+            }
+            else
+            {
+                return Swoole\JS::js_goto('用户名或密码错误！', '/page/login/');
+            }
+        }
+        else
+        {
+            $this->swoole->tpl->display();
+        }
+    }
 	function logout()
 	{
 		session();
