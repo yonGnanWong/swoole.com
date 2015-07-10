@@ -5,15 +5,19 @@ use Swoole;
 
 class Cms extends Swoole\Controller
 {
-	private $app;
+    private $app;
     private $_model;
-	private function common()
-	{
-		if(empty($_GET['app'])) exit;
-		$this->app = ucwords(substr($_GET['app'],0,10));
-		$this->swoole->tpl->assign('app', $this->app);
-		$this->_model = createModel($this->app);
-	}
+
+    private function common()
+    {
+        if (empty($_GET['app']))
+        {
+            $this->http->finish("Access Deny");
+        }
+        $this->app = ucwords(substr($_GET['app'], 0, 10));
+        $this->swoole->tpl->assign('app', $this->app);
+        $this->_model = createModel($this->app);
+    }
 	
 	function index()
 	{
@@ -22,45 +26,58 @@ class Cms extends Swoole\Controller
 
 	function detail()
 	{
-		if(empty($_GET['id']))
-		{
-			return "Access Deny";
-		}
+        if (empty($_GET['id']))
+        {
+            return "Access Deny";
+        }
+
         $this->common();
 		$aid = (int)$_GET['id'];
 		//模板名称
 		$tplname = strtolower($this->app).'_detail.html';
 
-		//获取详细内容
-		$det = $this->_model->get($aid)->get();
-        if(!empty($det['uptime']) and Swoole\Tool::httpExpire($det['uptime']) === false)
+        //获取详细内容
+        $det = $this->_model->get($aid)->get();
+        if (empty($det))
         {
-            exit;
+            $this->http->status(404);
+            return "Page Not Found";
         }
-		//阅读次数增加
-		$this->_model->set($aid,array('click_num'=>'`click_num`+1'));
 
-		//关键词
-		if(!empty($_GET['q']))
-		{
-			$det['content'] = preg_replace("/({$_GET['q']})/i","<font color=red>\\1</font>",$det['content']);
-		}
+        if (!empty($det['uptime']) and Swoole\Tool::httpExpire($det['uptime']) === false)
+        {
+            return "";
+        }
 
-		//获取小分类信息
-		$cate = getCategory($det['cid']);
-		$this->swoole->tpl->assign("cate",$cate);
+        //阅读次数增加
+        $this->_model->set($aid, array('click_num' => '`click_num`+1'));
 
-		$ccate = getCategory($det['fid']);
-		$this->swoole->tpl->assign("ccate",$ccate);
+        //关键词
+        if (!empty($_GET['q']))
+        {
+            $det['content'] = preg_replace("/({$_GET['q']})/i", "<font color=red>\\1</font>", $det['content']);
+        }
 
-		$comments = createModel('UserComment')->getByAid($this->app,$det['id']);
-		//是否使用特殊模板
-		if($ccate['tpl_detail']) $tplname = $ccate['tpl_detail'];
-		if($cate['tpl_detail']) $tplname = $cate['tpl_detail'];
-		$this->swoole->tpl->assign('comments',$comments);
-		$this->swoole->tpl->assign('det',$det);
-		$this->swoole->tpl->display($tplname);
+        //获取小分类信息
+        $cate = getCategory($det['cid']);
+        $this->swoole->tpl->assign("cate", $cate);
 
+        $ccate = getCategory($det['fid']);
+        $this->swoole->tpl->assign("ccate", $ccate);
+
+        $comments = createModel('UserComment')->getByAid($this->app, $det['id']);
+        //是否使用特殊模板
+        if ($ccate['tpl_detail'])
+        {
+            $tplname = $ccate['tpl_detail'];
+        }
+        if ($cate['tpl_detail'])
+        {
+            $tplname = $cate['tpl_detail'];
+        }
+        $this->swoole->tpl->assign('comments', $comments);
+        $this->swoole->tpl->assign('det', $det);
+        $this->swoole->tpl->display($tplname);
 	}
 
 	function category()

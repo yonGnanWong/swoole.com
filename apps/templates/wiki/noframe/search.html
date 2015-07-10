@@ -19,7 +19,7 @@
     <script src="/static/js/rainbow-custom.min.js"></script>
     <script src="/static/js/jquery.js"></script>
     <script src="/static/js/dtree.js"></script>
-    <title>{{$wiki_page.title}}-{{$project.name}}-Swoole文档中心</title>
+    <title>搜索结果页-{{$project.name}}-Swoole文档中心</title>
 </head>
 <body>
 
@@ -33,7 +33,7 @@
         </ul>
         <form class="navbar-form navbar-right" action="/wiki/search/" role="search" id="searchForm">
             <div class="form-inline form-group">
-                <input type="text" class="form-control " placeholder="输入要搜索的关键词" name="q">
+                <input type="text" class="form-control" value="{{$smarty.get.q}}" name="q">
             </div>
             <div class="form-inline form-group">
                 <button type="submit" class="btn btn-success">搜索</button>
@@ -76,51 +76,26 @@
     </div>
     <div class="wiki_content blob instapaper_body">
         <article class="markdown-body entry-content" itemprop="mainContentOfPage">
-            {{if $wiki_page}}
-            <h1>{{$wiki_page.title}}</h1>
-            {{/if}}
-            {{$content}}
+            {{foreach item=li from=$list}}
+            <h2><a href="/wiki/page/{{$li.id}}.html" target="_blank">{{$li.title}}</a></h2>
+            <div>
+                {{$li.desc}}
+            </div>
+            {{/foreach}}
         </article>
         <hr />
-        <!-- Duoshuo Comment BEGIN -->
-        <div class="ds-thread" data-thread-key="wiki-{{$wiki_page.id}}" data-title="{{$wiki_page.title}}"
-             data-url="http://wiki.swoole.com/wiki/page/{{$wiki_page.id}}.html"></div>
+        <div class="pagination">
+            {{$pager}}
+        </div>
         <script type="text/javascript">
-            {{if $wiki_page.close_comment=='0' and $project.close_comment=='0'}}
-            var duoshuoQuery = {short_name:"www4swoole"};
-            (function() {
-                var ds = document.createElement('script');
-                ds.type = 'text/javascript';
-                ds.async = true;
-                ds.src = 'http://static.duoshuo.com/embed.js';
-                ds.charset = 'UTF-8';
-                (document.getElementsByTagName('head')[0]
-                        || document.getElementsByTagName('body')[0]).appendChild(ds);
-                $(ds).ready(function() {
-                    var resize_count = 0;
-                    var timer = setInterval(function() {
-                        if ($('div#ds-thread')[0].clientHeight < 100) {
-                            return;
-                        }
-                        var a = $("#sidebar")[0];
-                        var b = $("div.wiki_content")[0];
-                        if (a.clientHeight < b.clientHeight) {
-                            a.style.height = (b.clientHeight + 2) + "px";
-                        } else {
-                            b.style.height = (a.clientHeight + 2) + "px";
-                        }
-                        window.clearInterval(timer);
-                    }, 300);
-                });
-            })();
-            {{/if}}
             $(document).ready(function() {
-                $('a').each(function(e){
-                    //外链
-                    if(this.href.substring(7, location.host.length +7) != location.host) {
-                        this.target = "_blank";
-                    }
-                });
+                var a = $("#sidebar")[0];
+                var b = $("div.wiki_content")[0];
+                if (a.clientHeight < b.clientHeight) {
+                    a.style.height = (b.clientHeight + 2) + "px";
+                } else {
+                    b.style.height = (a.clientHeight + 2) + "px";
+                }
             });
         </script>
     </div>

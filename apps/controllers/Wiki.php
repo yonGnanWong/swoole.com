@@ -6,6 +6,7 @@ use Swoole;
 require_once __DIR__ . '/../classes/php-markdown/Michelf/Markdown.php';
 require_once __DIR__ . '/../classes/php-markdown/Michelf/MarkdownExtra.php';
 require_once __DIR__ . '/../classes/Content.php';
+require_once __DIR__.'/../classes/xunsearch/lib/XS.php';
 
 use \Michelf;
 
@@ -41,6 +42,55 @@ class Wiki extends Swoole\Controller
         $_GET['id'] = $this->project['home_id'];
         $this->getPageInfo();
         $this->swoole->tpl->display("wiki/noframe/index.html");
+    }
+
+    function search()
+    {
+        if (isset($_GET['prid']))
+        {
+            $this->project_id = intval($_GET['prid']);
+        }
+        else
+        {
+            $this->project_id = 1;
+        }
+
+        if (empty($_GET['q']))
+        {
+            return "请输入搜索的关键词";
+        }
+
+        $this->getProjectInfo();
+        $this->getProjectLinks();
+        $this->getTreeData();
+        $_GET['id'] = $this->project['home_id'];
+
+        $pagesize = 10;
+        $page = empty($_GET['page']) ? 1: intval($_GET['page']);
+        $xs = new \XS(WEBPATH.'/search.ini');
+        $search = $xs->getSearch();
+        $q = trim($_GET['q']);
+        $search->setQuery($q);
+        $total = $search->count();
+        if ($page * $pagesize > $total)
+        {
+            $page = 1;
+        }
+        $search->setLimit($pagesize, ($page - 1) * $pagesize);
+        $pager = new Swoole\Pager(array('page' => $page, 'perpage' => $pagesize, 'total' => $total));
+        $docs = $search->search();
+        $list = array();
+        foreach ($docs as $doc)
+        {
+            $li['id'] = $doc->pid;
+            $li['title'] = $doc->subject;
+            $li['desc'] = $doc->message;
+            $list[] = $li;
+        }
+        $pager->page_tpl = "/wiki/search/?q=".urlencode($_GET['q']).'&page=%s';
+        $this->tpl->assign('list', $list);
+        $this->tpl->assign('pager', $pager->render());
+        $this->tpl->display("wiki/noframe/search.html");
     }
 
     function main()
@@ -124,6 +174,14 @@ class Wiki extends Swoole\Controller
             $wiki_id = intval($_GET['id']);
         }
         $this->pageInfo =  $_cont->get($wiki_id)->get();
+
+
+        if (empty($this->pageInfo))
+        {
+            $this->http->status(404);
+            $this->http->finish("<h1>Page#{$wiki_id} Not Found.</h1>");
+        }
+
         $this->nodeInfo =  $_tree->get($wiki_id)->get();
         $text =  $this->pageInfo['content'];
         $this->swoole->tpl->assign("id", $wiki_id);

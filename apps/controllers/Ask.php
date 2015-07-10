@@ -28,52 +28,64 @@ class Ask extends Swoole\Controller
 
     function detail()
     {
-        session();
-        if(empty($_GET['aid'])) exit;
+        $this->session->start();
+
+        if (empty($_GET['aid']))
+        {
+            exit;
+        }
         $_user = createModel('UserInfo');
         $_reply = createModel('AskReply');
 
         $aid = (int)$_GET['aid'];
         $ask = createModel('AskSubject')->get($aid);
-        if(empty($ask->_data))
+
+        if (!$ask->exist())
         {
-        	Swoole\Http::header("HTTP/1.1 404 Not Found");
-        	return Swoole\Error::info("Page not found","");
+            $this->http->status(404);
+            return Swoole\Error::info("Page not found", "");
         }
 
-		$ask->lcount++;
-		$ask->save();
+        $ask->lcount++;
+        $ask->save();
 
-        $timeout['day'] = intval(($ask['expire']-time())/86400);
-        $timeout['hour'] = intval(($ask['expire']-time()-$timeout['day']*86400)/3600);
+        $timeout['day'] = intval(($ask['expire'] - time()) / 86400);
+        $timeout['hour'] = intval(($ask['expire'] - time() - $timeout['day'] * 86400) / 3600);
 
         $user = $_user->get($ask['uid'])->get();
-        $content = createModel('AskContent')->get($aid)->get();
+        $content = model('AskContent')->get($aid)->get();
 
         $gets['aid'] = $aid;
-        $gets['select'] = $_reply->table.'.id as id,uid,sex,best,content,nickname,avatar,addtime';
-        $gets['order'] = 'best desc,'.$_reply->table.'.id asc';
-        $gets['leftjoin'] = array($_user->table,$_user->table.'.id='.$_reply->table.'.uid');
+        $gets['select'] = $_reply->table . '.id as id,uid,sex,best,content,nickname,avatar,addtime';
+        $gets['order'] = 'best desc,' . $_reply->table . '.id asc';
+        $gets['leftjoin'] = array($_user->table, $_user->table . '.id=' . $_reply->table . '.uid');
         $gets['pagesize'] = 10;
-        $gets['page'] = empty($_GET['page'])?1:(int)$_GET['page'];
-        $replys = $_reply->gets($gets,$pager);
+        $gets['page'] = empty($_GET['page']) ? 1 : (int)$_GET['page'];
+        $replys = $_reply->gets($gets, $pager);
 
-        $if_vote=true;
-        if($_SESSION['isLogin'])
+        $if_vote = true;
+        if ($this->user->isLogin())
         {
             $vote = $this->swoole->db->query("select count(*) as c from ask_vote where aid=$aid and uid={$_SESSION['user_id']} limit 1")->fetch();
-            if($vote['c']>0) $if_vote=false;
+            if ($vote['c'] > 0)
+            {
+                $if_vote = false;
+            }
         }
-        $this->swoole->tpl->assign('if_vote',$if_vote);
-        $this->swoole->tpl->assign('if_vote',$if_vote);
-        $this->swoole->tpl->assign('expire',$timeout);
-        $this->swoole->tpl->ref('user',$user);
-        $this->swoole->tpl->ref('ask',$ask->get());
-        $this->swoole->tpl->ref('content',$content);
-        $this->swoole->tpl->ref('replys',$replys);
-        if($pager->totalpage>1) $this->swoole->tpl->ref('pager',$pager->render());
+        $this->swoole->tpl->assign('if_vote', $if_vote);
+        $this->swoole->tpl->assign('if_vote', $if_vote);
+        $this->swoole->tpl->assign('expire', $timeout);
+        $this->swoole->tpl->ref('user', $user);
+        $this->swoole->tpl->ref('ask', $ask->get());
+        $this->swoole->tpl->ref('content', $content);
+        $this->swoole->tpl->ref('replys', $replys);
+        if ($pager->totalpage > 1)
+        {
+            $this->swoole->tpl->ref('pager', $pager->render());
+        }
         $this->swoole->tpl->display();
     }
+
     function reply()
     {
         session();
