@@ -138,8 +138,46 @@
         }
     </style>
     <div class="row line180">
+    <div class="span6">
+    <h4>HttpServer</h4>
+    <pre><code class="php" data-language="php">$serv = new swoole_http_server("127.0.0.1", 9502);
+
+$serv->on('Request', function($request, $response) {
+    var_dump($request->get);
+    var_dump($request->post);
+    var_dump($request->cookie);
+    var_dump($request->files);
+    var_dump($request->header);
+    var_dump($request->server);
+
+    $response->cookie("User", "Swoole");
+    $response->header("X-Server", "Swoole");
+    $response->end("<h1>Hello Swoole!</h1>");
+});
+
+$serv->start();</code></pre>
+</div>
         <div class="span6">
-            <h4>Server</h4>
+        <h4>WebSocket Server</h4>
+            <pre><code class="php" data-language="php">$serv = new swoole_websocket_server("127.0.0.1", 9502);
+
+$serv->on('Open', function($server, $req) {
+    echo "new connection: ".$req->fd;
+});
+
+$serv->on('Message', function($server, $frame) {
+    echo "new message: ".$frame->data;
+    $server->push($frame->fd, json_encode(["hello", "world"]));
+});
+
+$serv->on('Close', function($server, $fd) {
+    echo "connection ".$fd." is closed\n";
+});
+
+$serv->start();</code></pre>
+        </div>
+    <div class="span6">
+            <h4>TCP Server</h4>
             <pre>
 <code class="php" data-language="php">$serv = new swoole_server("127.0.0.1", 9501);
 $serv->set(array(
@@ -159,7 +197,7 @@ $serv->on('close', function ($serv, $fd) {
 $serv->start();</code></pre>
             </div>
     <div class="span6">
-        <h4>Client</h4>
+        <h4>TCP Client</h4>
             <pre>
 <code class="php" data-language="php">$client = new swoole_client(SWOOLE_SOCK_TCP, SWOOLE_SOCK_ASYNC);
 //设置事件回调函数
@@ -179,25 +217,25 @@ $client->on("close", function($cli){
 $client->connect('127.0.0.1', 9501, 0.5);</code></pre>
     </div>
     <div class="span6">
-        <h4>Event</h4>
+        <h4>Async-IO</h4>
             <pre>
 <code class="php" data-language="php">$fp = stream_socket_client("tcp://127.0.0.1:80", $code, $msg, 3);
-if (!$fp) {
-    exit("$errstr ($errno)\n");
-}
-$http_request = "GET /index.html HTTP/1.1\r\n";
-$http_request .= "Host: localhost\r\n\r\n";
+$http_request = "GET /index.html HTTP/1.1\r\n\r\n";
 fwrite($fp, $http_request);
 swoole_event_add($fp, function($fp){
     echo fread($fp, 8192);
     swoole_event_del($fp);
     fclose($fp);
 });
-echo "http response:\n";
-//swoole_event_wait(); //低于PHP5.4需要加swoole_event_wait
+swoole_timer_after(2000, function() {
+    echo "2000ms timeout\n";
+});
+swoole_timer_tick(1000, function() {
+    echo "1000ms interval\n";
+});
 </code></pre>
     </div>
-        <div class="span6">
+    <div class="span6">
             <h4>Task</h4>
             <pre>
 <code class="php" data-language="php">$serv = new swoole_server("127.0.0.1", 9502);
