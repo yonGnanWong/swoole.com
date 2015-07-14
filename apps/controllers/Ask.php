@@ -32,8 +32,10 @@ class Ask extends Swoole\Controller
 
         if (empty($_GET['aid']))
         {
-            exit;
+            $this->http->status(404);
+            return "缺少AID参数";
         }
+
         $_user = createModel('UserInfo');
         $_reply = createModel('AskReply');
 
@@ -88,12 +90,11 @@ class Ask extends Swoole\Controller
 
     function reply()
     {
-        session();
+        $this->session->start();
         if(!$_SESSION['isLogin'])
         {
-            return Swoole_js::echojs("if(confirm('您还没有登录，是否调整到登录页面(请首先复制您的回答内容)？')) window.parent.location.href='/page/login/?'");
+            return Swoole\JS::echojs("if(confirm('您还没有登录，是否调整到登录页面(请首先复制您的回答内容)？')) window.parent.location.href='/page/login/?'");
         }
-        $this->swoole->autoload('user');
         if(!empty($_POST['reply']))
         {
             $answer['content'] = $_POST['reply'];
@@ -112,10 +113,10 @@ class Ask extends Swoole\Controller
             $user->gold +=5;
             $user->save();
             
-            Api::sendmail($ask['uid'], $answer['uid'], "【系统】".$user['nickname']."回答了你的提问.({$ask['title']})", $answer['content']);
+            App\Api::sendmail($ask['uid'], $answer['uid'], "【系统】".$user['nickname']."回答了你的提问.({$ask['title']})", $answer['content']);
 
             createModel('AskReply')->put($answer);
-            return Swoole_js::alert('发布成功').Swoole_js::echojs('window.parent.location.href = window.parent.location.href;');
+            return Swoole\JS::alert('发布成功') .  Swoole\JS::echojs('window.parent.location.href = window.parent.location.href;');
         }
     }
 }
