@@ -162,16 +162,16 @@ $serv->start();</code></pre>
             <pre><code class="php" data-language="php">$serv = new swoole_websocket_server("127.0.0.1", 9502);
 
 $serv->on('Open', function($server, $req) {
-    echo "new connection: ".$req->fd;
+    echo "connection open: ".$req->fd;
 });
 
 $serv->on('Message', function($server, $frame) {
-    echo "new message: ".$frame->data;
+    echo "message: ".$frame->data;
     $server->push($frame->fd, json_encode(["hello", "world"]));
 });
 
 $serv->on('Close', function($server, $fd) {
-    echo "connection ".$fd." is closed\n";
+    echo "connection close: ".$fd;
 });
 
 $serv->start();</code></pre>

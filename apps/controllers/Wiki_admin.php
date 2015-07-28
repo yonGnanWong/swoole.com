@@ -338,8 +338,8 @@ class Wiki_admin extends Swoole\Controller
                 'order_by_time',
                 array('0'=>'手工排序', '1'=>'按添加时间自动排序'), 0, false, null, 'radio-inline'
             );
-            $this->swoole->tpl->assign("form", $form);
-            $this->swoole->tpl->display("wiki/create.html");
+            $this->assign("form", $form);
+            $this->display("wiki/create.php");
         }
     }
 
@@ -408,7 +408,10 @@ class Wiki_admin extends Swoole\Controller
 
     function modify()
     {
-        if(empty($_GET['id'])) return "error: requirer miki_page id";
+        if (empty($_GET['id']))
+        {
+            return "error: requirer miki_page id";
+        }
         $id = (int)$_GET['id'];
         $_cont = model('WikiContent');
         $_tree = model('WikiTree');
@@ -416,10 +419,30 @@ class Wiki_admin extends Swoole\Controller
         $cont = $_cont->get($id);
         $node = $_tree->get($id);
         $form['comment'] = Swoole\Form::radio('close_comment',
-            array('0'=>'开启', '1'=>'关闭'), $cont['close_comment'], false, null, 'radio-inline');
+            array('0' => '开启', '1' => '关闭'), $cont['close_comment'], false, null, 'radio-inline');
+
         $form['order_by_time'] = Swoole\Form::radio('order_by_time',
-            array('0'=>'手工排序', '1'=>'按添加时间自动排序'), $node['order_by_time'], false, null, 'radio-inline');
-        $this->swoole->tpl->assign("form", $form);
+            array('0' => '手工排序', '1' => '按添加时间自动排序'), $node['order_by_time'], false, null, 'radio-inline');
+
+        $this->assign("form", $form);
+
+        if (!isset($_GET['editor']) and !empty($_COOKIE['wiki_use_editor']))
+        {
+            $use_editor = true;
+        }
+        else
+        {
+            if (!empty($_GET['editor']))
+            {
+                $this->http->setcookie('wiki_use_editor', '1', time() + 86400 * 30);
+            }
+            else
+            {
+                $this->http->setcookie('wiki_use_editor', '');
+            }
+            $use_editor = $_GET['editor'];
+        }
+        $this->assign('use_editor', $use_editor);
         
         if (!empty($_POST))
         {
@@ -439,11 +462,51 @@ class Wiki_admin extends Swoole\Controller
 
             $node->save();
             $cont->save();
-            $this->swoole->tpl->assign("info", "修改成功");
+            $this->assign("info", "修改成功");
         }
-        $this->swoole->tpl->assign("node", $node->get());
-        $this->swoole->tpl->assign("page", $cont->get());
-        $this->swoole->tpl->display("wiki/create.html");
+        $this->assign("node", $node->get());
+        $this->assign("page", $cont->get());
+        $this->display("wiki/create.php");
+    }
+
+    function upload()
+    {
+        if (empty($_GET['id']))
+        {
+            return "error: requirer miki_page id";
+        }
+        if (empty($_FILES['editormd-image-file']))
+        {
+            return "error: requirer editormd-image-file";
+        }
+
+        $this->upload->sub_dir = 'wiki';
+        $up_pic = Swoole::$php->upload->save('editormd-image-file');
+
+        if (empty($up_pic))
+        {
+            $result = array('success' => 0,
+                'message' => '上传失败，请重新上传！ Error:' . $this->upload->error_msg);
+            goto return_json;
+        }
+
+        $data['url'] = $up_pic['url'];
+        $data['page_id'] = (int)$_GET['id'];
+        $data['user_id'] = $_SESSION['user_id'];
+
+        $id = table('wiki_image')->put($data);
+        if ($id)
+        {
+            $result['success'] = 1;
+            $result['url'] = $data['url'];
+        }
+        else
+        {
+            $result['success'] = 0;
+            $result['message'] = "插入数据库失败";
+        }
+        return_json:
+        return json_encode($result);
     }
 }
 
