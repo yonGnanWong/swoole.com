@@ -330,6 +330,7 @@ class Wiki_admin extends Swoole\Controller
         }
         else
         {
+            $this->isUseEditor();
             $form['comment'] = Swoole\Form::radio(
                 'close_comment',
                 array('0' => '开启', '1' => '关闭'), 0, false, null, 'radio-inline'
@@ -338,6 +339,7 @@ class Wiki_admin extends Swoole\Controller
                 'order_by_time',
                 array('0'=>'手工排序', '1'=>'按添加时间自动排序'), 0, false, null, 'radio-inline'
             );
+            $this->assign("page", array());
             $this->assign("form", $form);
             $this->display("wiki/create.php");
         }
@@ -406,6 +408,27 @@ class Wiki_admin extends Swoole\Controller
         $this->reflushPage('删除成功');
     }
 
+    protected function isUseEditor()
+    {
+        if (!isset($_GET['editor']) and !empty($_COOKIE['wiki_use_editor']))
+        {
+            $use_editor = true;
+        }
+        else
+        {
+            if (!empty($_GET['editor']))
+            {
+                $this->http->setcookie('wiki_use_editor', '1', time() + 86400 * 30);
+            }
+            else
+            {
+                $this->http->setcookie('wiki_use_editor', '');
+            }
+            $use_editor = $_GET['editor'];
+        }
+        $this->assign('use_editor', $use_editor);
+    }
+
     function modify()
     {
         if (empty($_GET['id']))
@@ -426,24 +449,6 @@ class Wiki_admin extends Swoole\Controller
 
         $this->assign("form", $form);
 
-        if (!isset($_GET['editor']) and !empty($_COOKIE['wiki_use_editor']))
-        {
-            $use_editor = true;
-        }
-        else
-        {
-            if (!empty($_GET['editor']))
-            {
-                $this->http->setcookie('wiki_use_editor', '1', time() + 86400 * 30);
-            }
-            else
-            {
-                $this->http->setcookie('wiki_use_editor', '');
-            }
-            $use_editor = $_GET['editor'];
-        }
-        $this->assign('use_editor', $use_editor);
-        
         if (!empty($_POST))
         {
             $cont->title = trim($_POST['title']);
@@ -464,6 +469,7 @@ class Wiki_admin extends Swoole\Controller
             $cont->save();
             $this->assign("info", "修改成功");
         }
+        $this->isUseEditor();
         $this->assign("node", $node->get());
         $this->assign("page", $cont->get());
         $this->display("wiki/create.php");
@@ -471,10 +477,6 @@ class Wiki_admin extends Swoole\Controller
 
     function upload()
     {
-        if (empty($_GET['id']))
-        {
-            return "error: requirer miki_page id";
-        }
         if (empty($_FILES['editormd-image-file']))
         {
             return "error: requirer editormd-image-file";

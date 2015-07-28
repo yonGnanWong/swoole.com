@@ -247,6 +247,14 @@ class Page extends App\FrontPage
             $_POST['username'] = strtolower(trim($_POST['username']));
             $_POST['password'] = trim($_POST['password']);
 
+            /**
+             * 密码输入错误超过了6次
+             */
+            if ($this->limit->exceed('password_error:' . $_POST['username'], 6))
+            {
+                return "密码输入错误超过频率限制，您的帐号已被冻结，请在24小时后重试";
+            }
+
             if ($this->user->login($_POST['username'], $_POST['password'], isset($_POST['auto']) ? 1 : 0))
             {
                 $userinfo = $this->swoole->model->UserInfo->get($_SESSION['user_id'])->get();
@@ -256,6 +264,8 @@ class Page extends App\FrontPage
             }
             else
             {
+                //统计一天内的密码错误次数
+                $this->limit->addCount('password_error:' . $_POST['username'], 86400);
                 return Swoole\JS::js_goto('用户名或密码错误！', '/page/login/');
             }
         }

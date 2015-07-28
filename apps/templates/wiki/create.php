@@ -35,19 +35,22 @@
         <?php endif; ?>
         <form method="post">
             <div class="form-group">
-                <input type="input" name="title" style="width: 100%;" value="<?= $page['title'] ?>" class="form-control" placeholder="请输入标题">
+                <input type="input" name="title" style="width: 100%;" value="<?= $this->value($page, 'title') ?>"
+                       class="form-control" placeholder="请输入标题">
             </div>
             <div class="form-group">
-                <input type="input" name="link" style="width: 100%;" value="<?= $this->value($page, 'link') ?>" class="form-control" placeholder="请输入页面文件名">
+                <input type="input" name="link" style="width: 100%;" value="<?= $this->value($page, 'link') ?>"
+                       class="form-control" placeholder="请输入页面文件名">
             </div>
             <div class="form-group" id="md_editor">
-                <textarea id="content" name="content" style="width: 100%; height: 640px;" > <?= $page['content'] ?></textarea>
+                <textarea id="content" name="content"
+                          style="width: 100%; height: 640px;"><?= $this->value($page, 'content') ?></textarea>
             </div>
             <div class="form-group">
                 <?php if ($use_editor){ ?>
-                <a href="<?=Swoole\Tool::url_merge('editor', 0)?>"> 使用文本编辑器</a>
+                <a href="javascript: location.href += '&editor=0';"> 使用文本编辑器</a>
                 <?php }else{ ?>
-                <a href="<?=Swoole\Tool::url_merge('editor', 1)?>"> 使用MarkDown编辑器</a>
+                <a href="javascript: location.href += '&editor=1';"> 使用MarkDown编辑器</a>
                 <?php } ?>
             </div>
             <div class="form-group">
@@ -74,7 +77,7 @@
             path: "/static/editor.md/lib/",
             imageUpload : true,
             imageFormats : ["jpg", "jpeg", "gif", "png", "bmp"],
-            imageUploadURL : "/wiki_admin/upload/?id=<?=$page['id']?>"
+            imageUploadURL : "/wiki_admin/upload/?id=<?=$this->value($page, 'id')?>"
         });
     });
 </script>
