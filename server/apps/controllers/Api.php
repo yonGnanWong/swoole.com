@@ -10,8 +10,8 @@ require_once MARKDOWN_LIB_DIR . '/Content.php';
 
 class Api extends Swoole\Controller
 {
-    const AVATAR_URL = 'http://182.254.148.72:9502/uploads/avatar/';
-    const NO_AVATAR = 'http://182.254.148.72:9502/static/common/';
+    const AVATAR_URL = 'http://group.swoole.com/uploads/avatar/';
+    const NO_AVATAR = 'http://group.swoole.com/static/common/';
 
     static function parseMarkdown($text)
     {
@@ -108,6 +108,7 @@ class Api extends Swoole\Controller
         $result = array();
         foreach($list as $li)
         {
+            Swoole\Filter::safe($li['question_content']);
             $tpl['id'] = $li['question_id'];
             $tpl['title'] = $li['question_content'];
             $tpl['content'] = $li['question_detail'];
