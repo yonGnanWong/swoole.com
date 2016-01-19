@@ -175,12 +175,14 @@ class Wiki extends Swoole\Controller
         }
         $this->pageInfo =  $_cont->get($wiki_id)->get();
 
-
         if (empty($this->pageInfo))
         {
             $this->http->status(404);
             $this->http->finish("<h1>Page#{$wiki_id} Not Found.</h1>");
         }
+
+        //更新阅读计数
+        $_cont->set($wiki_id, array('read_count' => $this->pageInfo['read_count'] + 1));
 
         $this->nodeInfo =  $_tree->get($wiki_id)->get();
         $text =  $this->pageInfo['content'];

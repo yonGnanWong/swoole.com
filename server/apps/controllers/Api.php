@@ -13,6 +13,22 @@ class Api extends Swoole\Controller
     const AVATAR_URL = 'http://group.swoole.com/uploads/avatar/';
     const NO_AVATAR = 'http://group.swoole.com/static/common/';
 
+    static function fillAvatarUrl(&$array, $userinfo)
+    {
+        if (empty($userinfo['avatar_file']))
+        {
+            $array['avatar_mini'] = self::NO_AVATAR.'avatar-min-img.jpg';
+            $array['avatar_normal'] = self::NO_AVATAR.'avatar-mid-img.jpg';
+            $array['avatar_large'] = self::NO_AVATAR.'avatar-max-img.jpg';
+        }
+        else
+        {
+            $array['avatar_mini'] = self::AVATAR_URL.$userinfo['avatar_file'];
+            $array['avatar_normal'] = self::AVATAR_URL . str_replace('_min.', '_mid.', $userinfo['avatar_file']);
+            $array['avatar_large'] = self::AVATAR_URL . str_replace('_min.', '_max.', $userinfo['avatar_file']);
+        }
+    }
+
     static function parseMarkdown($text)
     {
         //GitHub Code Parse
@@ -125,20 +141,8 @@ class Api extends Swoole\Controller
             $tpl['node']['id'] = $_category_id;
             $tpl['node']['title_alternative'] = $tpl['node']['title'] = $tpl['node']['name'] = $categorys[$_category_id]['title'];
             $tpl['node']['name'] = $categorys[$_category_id]['title'];
-
-            if (empty($users[$uid]['avatar_file']))
-            {
-                $tpl['member']['avatar_mini'] = self::NO_AVATAR.'avatar-min-img.jpg';
-                $tpl['member']['avatar_normal'] = self::NO_AVATAR.'avatar-mid-img.jpg';
-                $tpl['member']['avatar_large'] = self::NO_AVATAR.'avatar-max-img.jpg';
-            }
-            else
-            {
-                $tpl['member']['avatar_mini'] = self::AVATAR_URL.$users[$uid]['avatar_file'];
-                $tpl['member']['avatar_normal'] = self::AVATAR_URL . str_replace('_min.', '_mid.', $users[$uid]['avatar_file']);
-                $tpl['member']['avatar_large'] = self::AVATAR_URL . str_replace('_min.', '_max.', $users[$uid]['avatar_file']);
-            }
-
+            //头像
+            self::fillAvatarUrl($tpl['member'], $users[$uid]);
             $tpl['content_rendered'] = self::parseMarkdown($li['question_detail']);
             $result[] = $tpl;
         }
@@ -242,9 +246,13 @@ class Api extends Swoole\Controller
             }
             $result[] = $tpl;
         }
-        echo json_encode($result, JSON_UNESCAPED_SLASHES);
+        return json_encode($result, JSON_UNESCAPED_SLASHES);
     }
 
+    /**
+     * 登录
+     * @return string
+     */
     function login()
     {
         if (empty($_POST['password']) or empty($_POST['username']))
@@ -278,6 +286,17 @@ class Api extends Swoole\Controller
         }
     }
 
+    /**
+     * 退出登录
+     * @return string
+     */
+    function logout()
+    {
+        $this->session->start();
+        $_SESSION = array();
+        return $this->json();
+    }
+
     function profile()
     {
         $this->session->start();
@@ -294,9 +313,10 @@ class Api extends Swoole\Controller
             $collections[] = $c['title'];
         }
 
-        $profile =['username' => $user['user_name'],
-                   'collections' => $collections,];
-
+        $profile = ['username' => $user['user_name'],
+            'collections' => $collections,
+        ];
+        self::fillAvatarUrl($profile, $user);
         return $this->json($profile);
     }
 
@@ -352,6 +372,11 @@ class Api extends Swoole\Controller
         {
             return $this->json('', 404, "主题不存在");
         }
+
+        //计数
+        $topic->answer_count += 1;
+        $topic->answer_users += 1;
+        $topic->save();
 
         $user = $_SESSION['user'];
         $put['question_id'] = $topic_id;

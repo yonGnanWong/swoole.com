@@ -2,10 +2,10 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Swoole: PHP的异步、并行、分布式扩展</title>
+    <title>Swoole: PHP的异步、并行网络通信扩展</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Swoole: PHP的异步、并行、分布式扩展，PHP异步并行网络框架">
-    <meta name="keywords" content="PHP,Swoole,PHP异步,高并发,并行,TCP,UDP,PHP应用服务器,Server">
+    <meta name="description" content="Swoole: PHP的异步、并行网络通信扩展">
+    <meta name="keywords" content="PHP,Swoole,PHP异步,高并发,网络通信,并行,TCP,UDP,PHP应用服务器,Server">
     <meta name="author" content="tianfenghan">
 
     <!-- Le styles -->
@@ -64,6 +64,7 @@
                     <li><a href="http://wiki.swoole.com/wiki/index/p-donate.html">捐赠</a></li>
 					<li><a href="https://github.com/swoole/swoole-src/releases">下载</a></li>
 					<li><a href="http://git.oschina.net/matyhtf/swoole">国内镜像</a></li>
+                    <li><a href="https://cdn.rawgit.com/tchiotludo/swoole-ide-helper/dd73ce0dd949870daebbf3e8fee64361858422a1/docs/index.html">English Document</a></li>
                 </ul>
             </div>
         </div>
@@ -77,7 +78,7 @@
         <p>
 		<span><img src="/static/images/swoole.png" width="160" style="float:left; margin-right: 25px; margin-top: 15px;" />
         </span>
-        PHP语言的高性能网络通信框架，提供了PHP语言的异步多线程服务器，异步TCP/UDP网络客户端，异步MySQL，数据库连接池，AsyncTask，消息队列，毫秒定时器，异步文件读写，异步DNS查询。<br />
+        PHP语言的异步、并行、高性能网络通信框架，使用纯C语言编写，提供了PHP语言的异步多线程服务器，异步TCP/UDP网络客户端，异步MySQL，数据库连接池，AsyncTask，消息队列，毫秒定时器，异步文件读写，异步DNS查询。<br />
         Swoole可以广泛应用于互联网、移动通信、企业软件、云计算、网络游戏、物联网、车联网、智能家居等领域。
         使用PHP+Swoole作为网络通信框架，可以使企业IT研发团队的效率大大提升，更加专注于开发创新产品。
         <p style="margin-top: 25px;"><a href="https://github.com/matyhtf/swoole" class="btn btn-primary">源代码</a>&nbsp;&nbsp;
@@ -178,8 +179,7 @@ $serv->start();</code></pre>
         </div>
     <div class="span6">
             <h4>TCP Server</h4>
-            <pre>
-<code class="php" data-language="php">$serv = new swoole_server("127.0.0.1", 9501);
+            <pre><code class="php" data-language="php">$serv = new swoole_server("127.0.0.1", 9501);
 $serv->set(array(
     'worker_num' => 8,   //工作进程数量
     'daemonize' => true, //是否作为守护进程
@@ -198,8 +198,7 @@ $serv->start();</code></pre>
             </div>
     <div class="span6">
         <h4>TCP Client</h4>
-            <pre>
-<code class="php" data-language="php">$client = new swoole_client(SWOOLE_SOCK_TCP, SWOOLE_SOCK_ASYNC);
+            <pre><code class="php" data-language="php">$client = new swoole_client(SWOOLE_SOCK_TCP, SWOOLE_SOCK_ASYNC);
 //设置事件回调函数
 $client->on("connect", function($cli) {
     $cli->send("hello world\n");
@@ -218,8 +217,7 @@ $client->connect('127.0.0.1', 9501, 0.5);</code></pre>
     </div>
     <div class="span6">
         <h4>Async-IO</h4>
-            <pre>
-<code class="php" data-language="php">$fp = stream_socket_client("tcp://127.0.0.1:80", $code, $msg, 3);
+            <pre><code class="php" data-language="php">$fp = stream_socket_client("tcp://127.0.0.1:80", $code, $msg, 3);
 $http_request = "GET /index.html HTTP/1.1\r\n\r\n";
 fwrite($fp, $http_request);
 swoole_event_add($fp, function($fp){
@@ -237,8 +235,7 @@ swoole_timer_tick(1000, function() {
     </div>
     <div class="span6">
             <h4>Task</h4>
-            <pre>
-<code class="php" data-language="php">$serv = new swoole_server("127.0.0.1", 9502);
+            <pre><code class="php" data-language="php">$serv = new swoole_server("127.0.0.1", 9502);
 $serv->set(array('task_worker_num' => 4));
 $serv->on('Receive', function($serv, $fd, $from_id, $data) {
     $task_id = $serv->task("Async");

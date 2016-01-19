@@ -458,6 +458,7 @@ class Wiki_admin extends Swoole\Controller
             }
 
             $cont->content = $_POST['content'];
+            $cont->link = trim($_POST['link']);
             $cont->close_comment = $_POST['close_comment'];
             $cont->uptime = time();
 
