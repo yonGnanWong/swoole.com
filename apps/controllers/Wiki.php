@@ -87,7 +87,7 @@ class Wiki extends Swoole\Controller
             $li['desc'] = $doc->message;
             $list[] = $li;
         }
-        $pager->page_tpl = "/wiki/search/?q=".urlencode($_GET['q']).'&page=%s';
+        $pager->page_tpl = "/wiki/search/?q=".urlencode($_GET['q']).'&page={page}';
         $this->tpl->assign('list', $list);
         $this->tpl->assign('pager', $pager->render());
         $this->tpl->display("wiki/noframe/search.html");
