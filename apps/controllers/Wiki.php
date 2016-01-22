@@ -154,25 +154,18 @@ class Wiki extends Swoole\Controller
         if (!empty($_GET['p']))
         {
             $node = $_tree->get($_GET['p'], 'link')->get();
-            if(empty($node))
+            if (empty($node))
             {
-                $file = WEBPATH."/wiki/".$_GET['p'].'.md';
-                if(!is_file($file))
-                {
-                    $text = "您访问的页面不存在！[点击跳转到首页](http://www.swoole.com/wiki/index/)";
-                }
-                else
-                {
-                    $text = file_get_contents($file);
-                }
+                $text = "您访问的页面不存在！[点击跳转到首页](http://www.swoole.com/wiki/index/)";
                 goto markdown;
             }
-            $wiki_id = $node['id'];
+            $_GET['id'] = $wiki_id = $node['id'];
         }
-        elseif(!empty($_GET['id']))
+        else if (!empty($_GET['id']))
         {
             $wiki_id = intval($_GET['id']);
         }
+
         $this->pageInfo =  $_cont->get($wiki_id)->get();
 
         if (empty($this->pageInfo))

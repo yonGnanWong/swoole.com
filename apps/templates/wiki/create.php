@@ -39,7 +39,7 @@
                        class="form-control" placeholder="请输入标题">
             </div>
             <div class="form-group">
-                <input type="input" name="link" style="width: 100%;" value="<?= $this->value($page, 'link') ?>"
+                <input type="input" name="link" style="width: 100%;" value="<?= $this->value($node, 'link') ?>"
                        class="form-control" placeholder="请输入页面文件名">
             </div>
             <div class="form-group" id="md_editor">
