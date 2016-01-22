@@ -1,5 +1,6 @@
 /libs
 /cache/
 /static/pma/
+/static/uploads/
 /.idea/
 *.log
