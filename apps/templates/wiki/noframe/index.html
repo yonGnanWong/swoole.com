@@ -49,18 +49,20 @@
                 <ul class="nav">
                     {{foreach item=v from=$tree.child}}
                     <li class="active">
-                        <h3><a href="/wiki/page/{{$v.id}}.html">{{$v.text}}</a></h3>
+                        <h3><a href="/wiki/page/{{if $v.link}}p-{{$v.link}}{{else}}{{$v.id}}{{/if}}.html">{{$v.text}}</a></h3>
                     </li>
                     <li>
                     {{if $v.child}}
                     <ul class="nav li2">
                     {{foreach item=v2 from=$v.child}}
-                        <li {{if $v2.id == $smarty.get.id}}id="wiki_node_active"{{/if}}><a href="/wiki/page/{{$v2.id}}.html">{{$v2.text}}</a></li>
+                        <li {{if $v2.id == $smarty.get.id}}id="wiki_node_active"{{/if}}>
+                        <a href="/wiki/page/{{if $v2.link}}p-{{$v2.link}}{{else}}{{$v2.id}}{{/if}}.html">{{$v2.text}}</a></li>
                         <li>
                             {{if $v2.child}}
                             <ul class="nav li3">
                                 {{foreach item=v3 from=$v2.child}}
-                                <li {{if $v3.id == $smarty.get.id}}id="wiki_node_active"{{/if}}><a href="/wiki/page/{{$v3.id}}.html">{{$v3.text}}</a></li>
+                                <li {{if $v3.id == $smarty.get.id}}id="wiki_node_active"{{/if}}>
+                                <a href="/wiki/page/{{if $v3.link}}p-{{$v3.link}}{{else}}{{$v3.id}}{{/if}}.html">{{$v3.text}}</a></li>
                                 {{/foreach}}
                             </ul>
                             {{/if}}

@@ -313,7 +313,7 @@ class Page extends App\FrontPage
 				exit;
 			}
 
-			$login['password'] = Swoole\Auth::mkpasswd($login['email'],$_POST['password']);
+			$login['password'] = Swoole\Auth::makePasswordHash($login['email'],$_POST['password']);
 			$login['username'] = $login['email'];
 //			$login['reg_ip'] = Swoole\Http::getIP();
 			$login['nickname'] = $_POST['nickname'];
