@@ -1,10 +1,12 @@
 <?php
 namespace App;
+
 use Swoole;
 
 class UserBase extends Swoole\Controller
 {
     public $uid;
+
     function __construct($swoole)
     {
         parent::__construct($swoole);
@@ -15,10 +17,7 @@ class UserBase extends Swoole\Controller
         }
         Swoole::$php->session->start();
         Swoole\Auth::$login_url = '/page/login/?';
-        if (Swoole\Auth::login_require() === false)
-        {
-            return $this->swoole->http->finish();
-        }
+        Swoole\Auth::loginRequire();
         $this->uid = $_SESSION['user_id'];
     }
 }

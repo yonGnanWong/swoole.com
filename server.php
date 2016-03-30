@@ -5,13 +5,22 @@ require __DIR__.'/config.php';
 //Swoole\Config::$debug = true;
 Swoole\Error::$echo_html = false;
 
-$AppSvr = new Swoole\Protocol\AppServer();
-$AppSvr->loadSetting("./swoole.ini"); //加载配置文件
-$AppSvr->setAppPath(__DIR__.'/apps/'); //设置应用所在的目录
-$AppSvr->setDocumentRoot(__DIR__);
-$AppSvr->setLogger(new \Swoole\Log\FileLog('/tmp/swoole.log')); //Logger
+//设置PID文件的存储路径
+Swoole\Network\Server::setPidFile(__DIR__ . '/server.pid');
 
-$server = new \Swoole\Network\Server('0.0.0.0', 9501);
-$server->setProtocol($AppSvr);
-//$server->daemonize(); //作为守护进程
-$server->run(array('worker_num' => 2, 'max_request' => 1000));
+/**
+ * 显示Usage界面
+ * php app_server.php start|stop|reload
+ */
+Swoole\Network\Server::start(function ($options)
+{
+    $AppSvr = new Swoole\Protocol\AppServer();
+    $AppSvr->loadSetting("./swoole.ini"); //加载配置文件
+    $AppSvr->setAppPath(__DIR__.'/apps/'); //设置应用所在的目录
+    $AppSvr->setDocumentRoot(__DIR__);
+    $AppSvr->setLogger(new \Swoole\Log\FileLog('/tmp/swoole.log')); //Logger
+
+    $server = new \Swoole\Network\Server('0.0.0.0', 9501);
+    $server->setProtocol($AppSvr);
+    $server->run(array('worker_num' => 16, 'max_request' => 1000));
+});
