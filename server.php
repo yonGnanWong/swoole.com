@@ -20,7 +20,8 @@ Swoole\Network\Server::start(function ($options)
     $AppSvr->setDocumentRoot(__DIR__);
     $AppSvr->setLogger(new \Swoole\Log\FileLog('/tmp/swoole.log')); //Logger
 
-    $server = new \Swoole\Network\Server('0.0.0.0', 9501);
+    $server = new \Swoole\Network\Server('0.0.0.0', 9503);
     $server->setProtocol($AppSvr);
+    $server->setProcessName("webserver_swoole.com");
     $server->run(array('worker_num' => 16, 'max_request' => 1000));
 });

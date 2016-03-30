@@ -274,12 +274,14 @@ class Page extends App\FrontPage
             $this->swoole->tpl->display();
         }
     }
-	function logout()
-	{
-		session();
-        Swoole\Auth::logout();
-		$this->swoole->http->redirect('/page/login/');
-	}
+
+    function logout()
+    {
+        session();
+        $this->user->logout();
+        $this->swoole->http->redirect('/page/login/');
+    }
+
 	function register()
 	{
 		if ($_POST)
