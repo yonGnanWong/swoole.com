@@ -173,7 +173,7 @@ class Person extends \App\UserBase
             {
                 return Swoole\JS::js_back('参数不能为空！');
             }
-            if ($_POST['repass']!=$_POST['newpass'])
+            if ($_POST['repass'] != $_POST['newpass'])
             {
                 return Swoole\JS::js_back('两次输入的密码不一致！');
             }
@@ -182,11 +182,11 @@ class Person extends \App\UserBase
                 return Swoole\JS::js_back('密码长度不得少于6位！');
             }
             $u = model('UserInfo')->get($this->uid);
-            if ($u['password'] != Swoole\Auth::mkpasswd($u['username'], $_POST['oldpass']))
+            if ($u['password'] != Swoole\Auth::makePasswordHash($u['username'], $_POST['oldpass']))
             {
                 return Swoole\JS::js_back('旧密码错误！');
             }
-            $u->password = Swoole\Auth::mkpasswd($u['username'], $_POST['newpass']);
+            $u->password = Swoole\Auth::makePasswordHash($u['username'], $_POST['newpass']);
             $u->save();
             return Swoole\JS::js_back('修改成功！');
         }
