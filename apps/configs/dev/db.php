@@ -7,7 +7,7 @@ $db['master'] = array(
 		'engine'  => 'MyISAM',
 		'user'    => SAE_MYSQL_USER,
 		'passwd'  => SAE_MYSQL_PASS,
-		'name'    => SAE_MYSQL_DB,
+		'name'    => 'wiki4swoole',
 		'charset' => "utf8",
 		'setname' => true,
 );

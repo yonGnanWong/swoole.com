@@ -82,54 +82,65 @@ class Cms extends Swoole\Controller
 
 	function category()
 	{
-
-		if(empty($_GET['cid']))
-		{
-			return "Access Deny";
-		}
-
-		//Error::dbd();
-		$this->common();
-		$tplname = strtolower($this->app).'_list.html';
-		$cate_id = (int)$_GET['cid'];
-		$cate = getCategory($cate_id);
-		if(empty($cate))
-		{
-			Swoole_js::js_back('不存在的分类！','/index.php');
-			exit;
-		}
-        if(!empty($cate['uptime']) and Swoole\Tool::httpExpire($cate['uptime']) === false)
+        if (empty($_GET['cid']))
         {
-            exit;
+            return "Access Deny";
         }
-		if($cate['fid']==0)
-		{
-			$this->swoole->tpl->assign("fid",$cate_id);
-			$this->swoole->tpl->assign("ccate",$cate);
-			if($cate['tplname']) $tplname = $cate['tplname'];
-			$gets['fid'] = $cate_id;
-		}
-		else
-		{
-			if($cate['tplname']) $tplname = $cate['tplname'];
-			$this->swoole->tpl->assign("cate",$cate);
-			$ccate = $this->swoole->db->query("select * from st_catelog where id={$cate['fid']} limit 1")->fetch();
-			$this->swoole->tpl->assign("ccate",$ccate);
-			$gets['cid'] = $cate_id;
-		}
 
-		$pager = null;
-		$gets['order'] = 'addtime desc';
-		$gets['page'] = empty($_GET['page'])?1:(int)$_GET['page'];
-		$gets['pagesize'] = empty($this->_model->pagesize)?$this->swoole->config['cms']['pagesize']:$this->_model->pagesize;
-		$gets['select'] = "id,title,addtime";
-		$list = $this->_model->gets($gets,$pager);
-		if($this->swoole->config['cms']['html_static']) $pager->page_tpl = WEBROOT."/$this->app/list_{$cate_id}_%s.html";
+        //Error::dbd();
+        $this->common();
+        $tplname = strtolower($this->app) . '_list.html';
+        $cate_id = (int)$_GET['cid'];
+        $cate = getCategory($cate_id);
+        if (empty($cate))
+		{
+			Swoole\JS::js_back('不存在的分类！','/index.php');
+            return;
+		}
+        if (!empty($cate['uptime']) and Swoole\Tool::httpExpire($cate['uptime']) === false)
+        {
+            return;
+        }
+        if ($cate['fid'] == 0)
+        {
+            $this->swoole->tpl->assign("fid", $cate_id);
+            $this->swoole->tpl->assign("ccate", $cate);
+            if ($cate['tplname'])
+            {
+                $tplname = $cate['tplname'];
+            }
+            $gets['fid'] = $cate_id;
+        }
+        else
+        {
+            if ($cate['tplname'])
+            {
+                $tplname = $cate['tplname'];
+            }
+            $this->swoole->tpl->assign("cate", $cate);
+            $ccate = $this->swoole->db->query("select * from st_catelog where id={$cate['fid']} limit 1")->fetch();
+            $this->swoole->tpl->assign("ccate", $ccate);
+            $gets['cid'] = $cate_id;
+        }
 
-		$pager = array('total'=>$pager->total,'render'=>$pager->render());
-		$this->swoole->tpl->assign('pager',$pager);
-		$this->swoole->tpl->assign("list",$list);
-		$this->swoole->tpl->assign('cid',$cate_id);
-		$this->swoole->tpl->display($tplname);
+        /**
+         * @var Swoole\Pager
+         */
+        $pager = null;
+        $gets['order'] = 'addtime desc';
+        $gets['page'] = empty($_GET['page']) ? 1 : (int)$_GET['page'];
+        $gets['pagesize'] = empty($this->_model->pagesize) ? $this->swoole->config['cms']['pagesize'] : $this->_model->pagesize;
+        $gets['select'] = "id,title,addtime";
+        $list = $this->_model->gets($gets, $pager);
+        if ($this->swoole->config['cms']['html_static'])
+        {
+            $pager->page_tpl = WEBROOT . "/$this->app/list_{$cate_id}_{page}.html";
+        }
+
+        $pager = array('total' => $pager->total, 'render' => $pager->render());
+        $this->swoole->tpl->assign('pager', $pager);
+        $this->swoole->tpl->assign("list", $list);
+        $this->swoole->tpl->assign('cid', $cate_id);
+        $this->swoole->tpl->display($tplname);
 	}
 }
