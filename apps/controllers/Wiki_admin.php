@@ -26,9 +26,9 @@ class Wiki_admin extends Swoole\Controller
         if(isset($_GET['prid']))
         {
             $this->project_id = intval($_GET['prid']);
-            if(!isset($_COOKIE['wiki_project_id']) or $_COOKIE['wiki_project_id']!=$this->project_id)
+            if (!isset($_COOKIE['wiki_project_id']) or $_COOKIE['wiki_project_id'] != $this->project_id)
             {
-                Swoole\Cookie::set('wiki_project_id', $this->project_id, 86400*30);
+                Swoole\Cookie::set('wiki_project_id', $this->project_id, 86400 * 30);
             }
         }
         elseif (isset($_COOKIE['wiki_project_id']))
@@ -52,7 +52,7 @@ class Wiki_admin extends Swoole\Controller
         $this->swoole->tpl->assign("project", $this->project);
 
         //非管理员不允许登陆
-        if($this->ifDeny())
+        if ($this->ifDeny())
         {
             Swoole\JS::js_goto('您没有编辑权限', '/wiki/index/');
             Swoole::$php->http->finish();
@@ -375,24 +375,29 @@ class Wiki_admin extends Swoole\Controller
 
     function cut()
     {
-        if (empty($_GET['id'])) return "error: requirer miki_page id";
+        if (empty($_GET['id']))
+        {
+            return "error: requirer miki_page id";
+        }
         Swoole\Cookie::set('wiki_cut_id', $_GET['id'], 86400);
+
         return Swoole\JS::js_back("剪切成功，请到目标页面粘贴");
     }
 
     private function ifDeny()
     {
         $owners = explode(',', $this->project['owner']);
-        if(!in_array($_SESSION['user_id'], $owners))
+        if (!in_array($_SESSION['user_id'], $owners))
         {
             return true;
         }
         else
         {
-            if(!isset($_COOKIE['wiki_admin']))
+            if (!isset($_COOKIE['wiki_admin']))
             {
-                Swoole\Cookie::set('wiki_admin', '1', 86400*30);
+                Swoole\Cookie::set('wiki_admin', '1', 86400 * 30);
             }
+
             return false;
         }
     }
