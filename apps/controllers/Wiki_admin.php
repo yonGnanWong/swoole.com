@@ -447,6 +447,9 @@ class Wiki_admin extends Swoole\Controller
         $form['order_by_time'] = Swoole\Form::radio('order_by_time',
             array('0' => '手工排序', '1' => '按添加时间自动排序'), $node['order_by_time'], false, null, 'radio-inline');
 
+        $form['publish'] = Swoole\Form::radio('publish',
+            array('0' => '关闭', '1' => '开启'), $node['publish'], false, null, 'radio-inline');
+
         $this->assign("form", $form);
 
         if (!empty($_POST))
@@ -464,6 +467,7 @@ class Wiki_admin extends Swoole\Controller
             $node->text = $cont->title;
             $node->link = trim($_POST['link']);
             $node->order_by_time = $_POST['order_by_time'];
+            $node->publish = intval($_POST['publish']);
 
             $node->save();
             $cont->save();

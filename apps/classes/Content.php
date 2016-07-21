@@ -5,7 +5,7 @@ class Content
 {
     static $php;
     static $order = "pid asc, orderid desc";
-    static $select = "id,text,link,pid,order_by_time";
+    static $select = "id,text,link,pid,order_by_time,publish";
 
     static function getTree($project_id)
     {
@@ -35,7 +35,7 @@ class Content
             //获取子节点
             $nodes = self::$php->db->query(
                 "select " . self::$select . " from wiki_tree where project_id = $project_id
-                and pid = $node_id order by $order"
+                and pid = $node_id and publish=1 order by $order"
             )->fetchall();
             $nodes[] = $self;
         }
@@ -44,7 +44,7 @@ class Content
             //获取Node本身和子节点
             $nodes = self::$php->db->query(
                 "select " . self::$select . " from wiki_tree where project_id = $project_id
-                and (pid = $node_id or id = $node_id) order by " . self::$order
+                and (pid = $node_id or id = $node_id) and publish=1 order by " . self::$order
             )->fetchall();
         }
 
@@ -82,7 +82,7 @@ class Content
                 $order = self::$order;
             }
             //兄弟节点
-            $childs = self::$php->db->query("select " . self::$select . " from wiki_tree where pid = $find_node_id order by $order")->fetchall();
+            $childs = self::$php->db->query("select " . self::$select . " from wiki_tree where pid = $find_node_id and publish=1 order by $order")->fetchall();
             $nodes = array_merge($nodes, $childs);
 
             //达到根节点，退出循环

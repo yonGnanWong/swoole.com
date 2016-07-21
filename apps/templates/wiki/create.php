@@ -58,6 +58,10 @@
                 <?= $form['comment'] ?>
             </div>
             <div class="form-group">
+                <span>是否公开：</span>
+                <?= $form['publish'] ?>
+            </div>
+            <div class="form-group">
                 <span>时间排序：</span>
                 <?= $form['order_by_time'] ?>
             </div>
