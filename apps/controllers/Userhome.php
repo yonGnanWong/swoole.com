@@ -15,7 +15,7 @@ class Userhome extends App\FrontPage
         if(!empty($_GET['id']))
         {
             $pid = (int)$_GET['id'];
-            Widget::photoDetail($pid,$uid);
+            App\Widget::photoDetail($pid,$uid);
             $this->swoole->tpl->display('userhome_photo_detail.html');
         }
         else
