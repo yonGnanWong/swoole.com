@@ -57,26 +57,39 @@ class FrontPage extends Swoole\Controller
 		$_photo = createModel('UserPhoto');
 		$_link = createModel('UserLink');
 
-		$gets1['select'] = $_mblog->table.'.id as id,uid,pic_id,url_id,sex,substring(content,1,170) as content,nickname,avatar,UNIX_TIMESTAMP(addtime) as addtime,reply_count';
-		$gets1['order'] = $_mblog->table.'.id desc';
-		if(!empty($uid)) $gets1['uid'] = $uid;
-		$gets1['leftjoin'] = array($_user->table,$_user->table.'.id='.$_mblog->table.'.uid');
-		$gets1['page'] = empty($_GET['page'])?1:(int)$_GET['page'];
-		$gets1['pagesize'] = $pagesize;
+        $gets1['select'] = $_mblog->table . '.id as id,uid,pic_id,url_id,sex,substring(content,1,170) as content,nickname,avatar,UNIX_TIMESTAMP(addtime) as addtime,reply_count';
+        $gets1['order'] = $_mblog->table . '.id desc';
+        if (!empty($uid))
+        {
+            $gets1['uid'] = $uid;
+        }
+        $gets1['leftjoin'] = array($_user->table, $_user->table . '.id=' . $_mblog->table . '.uid');
+        $gets1['page'] = empty($_GET['page']) ? 1 : (int)$_GET['page'];
+        $gets1['pagesize'] = $pagesize;
 
+        /**
+         * @var $pager Swoole\Pager
+         */
         $pager = '';
-		$mblogs_atta = array();
-		$mblogs = $_mblog->gets($gets1, $pager);
-		$pager->span_open = array();
-		$pager = array('total'=>$pager->total,'render'=>$pager->render());
+        $mblogs_atta = array();
+        $mblogs = $_mblog->gets($gets1, $pager);
+        $pager->span_open = array();
+        $pager->page_tpl = '/page/index/page-{page}';
+        $pager = array('total' => $pager->total, 'render' => $pager->render());
 
-		foreach($mblogs as &$m)
-		{
-			$m['content'] = Func::mblog_link($m['id'],$m['content']);
-			$m['addtime'] = date('n月j日 H:i',$m['addtime']);
-			if(!empty($m['url_id'])) $mblogs_atta['url'][] = $m['url_id'];
-			if(!empty($m['pic_id'])) $mblogs_atta['pic'][] = $m['pic_id'];
-		}
+        foreach ($mblogs as &$m)
+        {
+            $m['content'] = Func::mblog_link($m['id'], $m['content']);
+            $m['addtime'] = date('n月j日 H:i', $m['addtime']);
+            if (!empty($m['url_id']))
+            {
+                $mblogs_atta['url'][] = $m['url_id'];
+            }
+            if (!empty($m['pic_id']))
+            {
+                $mblogs_atta['pic'][] = $m['pic_id'];
+            }
+        }
 		if(!empty($mblogs_atta['pic']))
 		{
 			$pics = $_photo->getMap(array('select'=>'id,imagep,picture','in'=>array('id',implode(',',$mblogs_atta['pic']))));

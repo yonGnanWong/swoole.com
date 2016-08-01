@@ -197,8 +197,8 @@ class Page extends App\FrontPage
 
 	function index()
 	{
-		if(empty($_GET['p']) or $_GET['p']=='index')
-		{
+        if (empty($_GET['p']) or $_GET['p'] == 'index')
+        {
 			$_user = createModel('UserInfo');
 			//微博客列表
 			$this->getMblogs(14);

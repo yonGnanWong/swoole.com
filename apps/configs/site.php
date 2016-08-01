@@ -1,4 +1,4 @@
 <?php
 return array(
-	'static' => 'http://www4swoole-static.stor.sinaapp.com/',		
+	'static' => 'http://www.swoole.com/static/',
 );
