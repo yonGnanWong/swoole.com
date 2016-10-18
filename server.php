@@ -14,14 +14,21 @@ Swoole\Network\Server::setPidFile(__DIR__ . '/server.pid');
  */
 Swoole\Network\Server::start(function ($options)
 {
-    $AppSvr = new Swoole\Protocol\AppServer();
-    $AppSvr->loadSetting("./swoole.ini"); //加载配置文件
-    $AppSvr->setAppPath(__DIR__.'/apps/'); //设置应用所在的目录
-    $AppSvr->setDocumentRoot(__DIR__);
-    $AppSvr->setLogger(new \Swoole\Log\FileLog('/tmp/swoole.log')); //Logger
-
-    $server = new \Swoole\Network\Server('0.0.0.0', 9503);
-    $server->setProtocol($AppSvr);
-    $server->setProcessName("webserver_swoole.com");
-    $server->run(array('worker_num' => 16, 'max_request' => 1000));
+    $config = array(
+        'document_root' => WEBPATH,
+        'worker_num' => 1,
+        'max_request' => 1000,
+        'log_file' => __DIR__.'/logs/swoole.log',
+    );
+    Swoole::$php->runHttpServer('0.0.0.0', 9503, $config);
+//    $AppSvr = new Swoole\Protocol\AppServer();
+//    $AppSvr->loadSetting("./swoole.ini"); //加载配置文件
+//    $AppSvr->setAppPath(__DIR__.'/apps/'); //设置应用所在的目录
+//    $AppSvr->setDocumentRoot(__DIR__);
+//    $AppSvr->setLogger(new \Swoole\Log\FileLog('/tmp/swoole.log')); //Logger
+//
+//    $server = new \Swoole\Network\Server('0.0.0.0', 9503);
+//    $server->setProtocol($AppSvr);
+//    $server->setProcessName("webserver_swoole.com");
+//    $server->run(array('worker_num' => 16, 'max_request' => 1000));
 });

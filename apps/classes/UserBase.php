@@ -16,7 +16,6 @@ class UserBase extends Swoole\Controller
             session_id($_COOKIE['PHPSESSID']);
         }
         Swoole::$php->session->start();
-        Swoole\Auth::$login_url = '/page/login/?';
         Swoole\Auth::loginRequire();
         $this->uid = $_SESSION['user_id'];
     }
