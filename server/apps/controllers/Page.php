@@ -277,7 +277,6 @@ class Page extends App\FrontPage
 
     function logout()
     {
-        session();
         $this->user->logout();
         $this->swoole->http->redirect('/page/login/');
     }

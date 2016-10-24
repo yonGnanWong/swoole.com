@@ -36,6 +36,10 @@ class Person extends \App\UserBase
             if($note['uid']!=$this->uid) exit;
             $this->swoole->tpl->assign('note',$note);
         }
+        elseif (isset($this->request->get['delete']))
+        {
+            $model->del(intval($this->request->get['delete']));
+        }
 
         $gets['select'] = 'id,title,addtime';
         $gets['uid'] = $this->uid;

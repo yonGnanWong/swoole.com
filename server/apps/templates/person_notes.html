@@ -49,7 +49,9 @@ function check_change(){
   {{if $note.id==$v.id}}
   <li class="note">
   <img src="/static/images/page_2.png" width="16" height="16" /> {{$v.title|mbcut:14:' ...'}}</li>
-  <li><span class="date" style="clear:both">最后修改：{{$v.addtime|mbcut:16}} </span></li>
+  <li><span class="date" style="clear:both">最后修改：{{$v.addtime|mbcut:16}} </span>
+  <span class="delete f12"><a href="/person/notes/?delete={{$v.id}}" onclick="return confirm('确定要删除？');">[删除]</a></span>
+  </li>
   {{else}}
   <li class="note">
   <img src="/static/images/page_2.png" width="16" height="16" />
