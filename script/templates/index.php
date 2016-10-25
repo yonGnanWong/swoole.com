@@ -83,8 +83,8 @@
         <p style="margin-top: 25px;"><a href="https://github.com/matyhtf/swoole" class="btn btn-primary">源代码</a>&nbsp;&nbsp;
            <a href="https://github.com/matyhtf/swoole/issues/new" class="btn btn-danger">提交Bug</a>&nbsp;&nbsp;
            <a href="https://github.com/matyhtf/swoole/issues/new" class="btn">提建议</a>&nbsp;&nbsp;
-           <a class="btn btn-sm btn-success" href="https://github.com/swoole/swoole-src/releases/tag/1.8.12-stable">
-             <i class="glyphicon glyphicon-download"></i> &nbsp; 下载 <span style="font-size: 60%;">(1.8.12)</span> &nbsp;
+           <a class="btn btn-sm btn-success" href="https://github.com/swoole/swoole-src/releases/tag/v<?=$version?>-stable">
+             <i class="glyphicon glyphicon-download"></i> &nbsp; 下载 <span style="font-size: 60%;">(<?=$version?>)</span> &nbsp;
 		   </a>
         <a href="http://edu.csdn.net/course/detail/2800" class="btn btn-warning">视频教学课程</a>&nbsp;&nbsp;
         </p>
