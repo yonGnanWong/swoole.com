@@ -88,13 +88,15 @@
         <div class="ds-thread" data-thread-key="wiki-{{$wiki_page.id}}" data-title="{{$wiki_page.title}}"
              data-url="http://wiki.swoole.com/wiki/page/{{$wiki_page.id}}.html"></div>
         <script type="text/javascript">
-            {{if $wiki_page.close_comment=='0' and $project.close_comment=='0'}}
+            var _bdhmProtocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+//            {{if $wiki_page.close_comment=='0' and $project.close_comment=='0'}}
+
             var duoshuoQuery = {short_name:"www4swoole"};
             (function() {
                 var ds = document.createElement('script');
                 ds.type = 'text/javascript';
                 ds.async = true;
-                ds.src = 'http://static.duoshuo.com/embed.js';
+                ds.src = _bdhmProtocol + 'static.duoshuo.com/embed.js';
                 ds.charset = 'UTF-8';
                 (document.getElementsByTagName('head')[0]
                         || document.getElementsByTagName('body')[0]).appendChild(ds);
@@ -115,11 +117,12 @@
                     }, 300);
                 });
             })();
-            {{/if}}
+//            {{/if}}
+
             $(document).ready(function() {
                 $('a').each(function(e){
                     //外链
-                    if(this.href.substring(7, location.host.length +7) != location.host) {
+                    if (this.href.substring(_bdhmProtocol.length, location.host.length + _bdhmProtocol.length) != location.host) {
                         this.target = "_blank";
                     }
                 });
@@ -134,9 +137,14 @@
         当前Swoole扩展版本：<a href="https://github.com/swoole/swoole-src" target="_blank">swoole-{{$smarty.const.SWOOLE_VERSION}}</a>
     </p>
     <div style="display: none">
-        <script type="text/javascript">
-            var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
-            document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F4967f2faa888a2e52742bebe7fcb5f7d' type='text/javascript'%3E%3C/script%3E"));
+        <script>
+            var _hmt = _hmt || [];
+            (function () {
+                var hm = document.createElement("script");
+                hm.src = "https://hm.baidu.com/hm.js?4967f2faa888a2e52742bebe7fcb5f7d";
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(hm, s);
+            })();
         </script>
     </div>
 </div>

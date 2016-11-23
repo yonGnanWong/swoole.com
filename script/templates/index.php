@@ -22,7 +22,7 @@
     <link href="/static/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
     <link href="/static/css/code.css" rel="stylesheet">
     <script src="/static/js/rainbow-custom.min.js"></script>
-    <script src="/static/js/jquery.js"></script>
+    <script src="/static/js/jquery.min.js"></script>
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -39,8 +39,7 @@
 </head>
 
 <body>
-<a href="https://github.com/swoole/swoole-src">
-    <img style="position: absolute; top: 0; right: 0; border: 0; z-index:9999;" src="/static/image/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
+
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
@@ -80,9 +79,9 @@
             Swoole内置了Http/WebSocket服务器端/客户端、Http2.0服务器端。<br />
         Swoole可以广泛应用于互联网、移动通信、企业软件、云计算、网络游戏、物联网（IOT）、车联网、智能家居等领域。
         使用PHP+Swoole作为网络通信框架，可以使企业IT研发团队的效率大大提升，更加专注于开发创新产品。
-        <p style="margin-top: 25px;"><a href="https://github.com/matyhtf/swoole" class="btn btn-primary">源代码</a>&nbsp;&nbsp;
-           <a href="https://github.com/matyhtf/swoole/issues/new" class="btn btn-danger">提交Bug</a>&nbsp;&nbsp;
-           <a href="https://github.com/matyhtf/swoole/issues/new" class="btn">提建议</a>&nbsp;&nbsp;
+        <p style="margin-top: 25px;"><a href="https://github.com/swoole/swoole-src" class="btn btn-primary">源代码(Github)</a>&nbsp;&nbsp;
+           <a href="https://github.com/swoole/swoole-src/issues/new" class="btn btn-danger">提交Bug</a>&nbsp;&nbsp;
+           <a href="https://github.com/swoole/swoole-src/issues/new" class="btn">提建议</a>&nbsp;&nbsp;
            <a class="btn btn-sm btn-success" href="https://github.com/swoole/swoole-src/releases/tag/v<?=$version?>-stable">
              <i class="glyphicon glyphicon-download"></i> &nbsp; 下载 <span style="font-size: 60%;">(<?=$version?>)</span> &nbsp;
 		   </a>
@@ -131,8 +130,8 @@
             <h3>案例</h3>
             <p style="line-height: 180%">swoole目前已被多家移动互联网、物联网、网络游戏、手机游戏企业使用，替代了C++、Java等复杂编程语言来实现网络服务器程序。
                使用PHP+Swoole，开发效率可以大大提升。<br/>
-                官方提供了基于swoole扩展开发的<a href="https://github.com/matyhtf/swoole_framework">PHP网络框架</a>，
-                支持Http，FastCGI，WebSocket，FTP，SMTP，SOA等网络协议。
+                官方提供了基于swoole扩展开发的<a href="http://git.oschina.net/matyhtf/swoole_framework">PHP网络框架</a>，
+                支持Http，FastCGI，WebSocket，FTP，SMTP，<a href="http://git.oschina.net/matyhtf/swoole_framework/blob/master/libs/Swoole/Client/RPC.php">RPC</a>等网络协议
                 <br/>swoole在美国，英国，法国，印度等国家都有用户分布，在国内的
                     <a href="http://wiki.swoole.com/wiki/page/p-tencent.html">腾讯</a>、
                     <a href="http://wiki.swoole.com/wiki/page/p-baidu.html">百度</a>、阿里巴巴、YY语音等多家知名互联网公司均有使用。
@@ -148,7 +147,7 @@
     <div class="row line180">
     <div class="span6">
     <h4>HttpServer</h4>
-    <pre><code class="php" data-language="php">$serv = new swoole_http_server("127.0.0.1", 9502);
+    <pre><code class="php" data-language="php">$serv = new Swoole\Http\Server("127.0.0.1", 9502);
 
 $serv->on('Request', function($request, $response) {
     var_dump($request->get);
@@ -167,7 +166,7 @@ $serv->start();</code></pre>
 </div>
         <div class="span6">
         <h4>WebSocket Server</h4>
-            <pre><code class="php" data-language="php">$serv = new swoole_websocket_server("127.0.0.1", 9502);
+            <pre><code class="php" data-language="php">$serv = new Swoole\Websocket\Server("127.0.0.1", 9502);
 
 $serv->on('Open', function($server, $req) {
     echo "connection open: ".$req->fd;
@@ -186,7 +185,7 @@ $serv->start();</code></pre>
         </div>
     <div class="span6">
             <h4>TCP Server</h4>
-            <pre><code class="php" data-language="php">$serv = new swoole_server("127.0.0.1", 9501);
+            <pre><code class="php" data-language="php">$serv = new Swoole\Server("127.0.0.1", 9501);
 $serv->set(array(
     'worker_num' => 8,   //工作进程数量
     'daemonize' => true, //是否作为守护进程
@@ -205,7 +204,7 @@ $serv->start();</code></pre>
             </div>
     <div class="span6">
         <h4>TCP Client</h4>
-            <pre><code class="php" data-language="php">$client = new swoole_client(SWOOLE_SOCK_TCP, SWOOLE_SOCK_ASYNC);
+            <pre><code class="php" data-language="php">$client = new Swoole\Client(SWOOLE_SOCK_TCP, SWOOLE_SOCK_ASYNC);
 //设置事件回调函数
 $client->on("connect", function($cli) {
     $cli->send("hello world\n");
@@ -222,27 +221,79 @@ $client->on("close", function($cli){
 //发起网络连接
 $client->connect('127.0.0.1', 9501, 0.5);</code></pre>
     </div>
+
+<div class="span6">
+    <h4>异步MySQL</h4>
+    <pre><code class="php" data-language="php">$db = new Swoole\MySQL;
+$server = array(
+    'host' => '127.0.0.1',
+    'user' => 'test',
+    'password' => 'test',
+    'database' => 'test',
+);
+
+$db->connect($server, function ($db, $result) {
+    $db->query("show tables", function (Swoole\MySQL $db, $result) {
+        if ($r === false) {
+            var_dump($db->error, $db->errno);
+        } elseif ($r === true) {
+            var_dump($db->affected_rows, $db->insert_id);
+        } else {
+            var_dump($$result);
+            $db->close();
+        }
+    });
+});
+</code></pre>
+</div>
+
+<div class="span6">
+            <h4>异步Redis/异步Http客户端</h4>
+    <pre><code class="php" data-language="php">$redis = new Swoole\Redis;
+$redis->connect('127.0.0.1', 6379, function ($redis, $result) {
+    $redis->set('test_key', 'value', function ($redis, $result) {
+        $redis->get('test_key', function ($redis, $result) {
+            var_dump($result);
+        });
+    });
+});
+
+$cli = new Swoole\Http\Client('127.0.0.1', 80);
+$cli->setHeaders(array('User-Agent' => 'swoole-http-client'));
+$cli->setCookies(array('test' => 'value'));
+
+$cli->post('/dump.php', array("test" => 'abc'), function ($cli) {
+    var_dump($cli->body);
+    $cli->get('/index.php', function ($cli) {
+        var_dump($cli->cookies);
+        var_dump($cli->headers);
+    });
+});
+</code></pre>
+</div>
+
+
     <div class="span6">
         <h4>Async-IO</h4>
             <pre><code class="php" data-language="php">$fp = stream_socket_client("tcp://127.0.0.1:80", $code, $msg, 3);
 $http_request = "GET /index.html HTTP/1.1\r\n\r\n";
 fwrite($fp, $http_request);
-swoole_event_add($fp, function($fp){
+Swoole\Event::add($fp, function($fp){
     echo fread($fp, 8192);
     swoole_event_del($fp);
     fclose($fp);
 });
-swoole_timer_after(2000, function() {
+Swoole\Timer::after(2000, function() {
     echo "2000ms timeout\n";
 });
-swoole_timer_tick(1000, function() {
+Swoole\Timer::tick(1000, function() {
     echo "1000ms interval\n";
 });
 </code></pre>
     </div>
     <div class="span6">
-            <h4>Task</h4>
-            <pre><code class="php" data-language="php">$serv = new swoole_server("127.0.0.1", 9502);
+            <h4>异步任务</h4>
+            <pre><code class="php" data-language="php">$serv = new Swoole\Server("127.0.0.1", 9502);
 $serv->set(array('task_worker_num' => 4));
 $serv->on('Receive', function($serv, $fd, $from_id, $data) {
     $task_id = $serv->task("Async");
@@ -266,7 +317,6 @@ $serv->start();</code></pre>
     </footer>
 
 </div>
-<script src="/static/js/jquery.js"></script>
 <script src="/static/bootstrap/js/bootstrap.min.js"></script>
 <div style="display: none">
 <script type="text/javascript">

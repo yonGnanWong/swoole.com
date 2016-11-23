@@ -39,8 +39,6 @@
 </head>
 
 <body>
-<a href="https://github.com/swoole/swoole-src">
-    <img style="position: absolute; top: 0; right: 0; border: 0; z-index:9999;" src="/static/image/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
@@ -82,8 +80,8 @@
         <p style="margin-top: 25px;">
         <iframe src="http://ghbtns.com/github-btn.html?user=swoole&repo=swoole-src&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>
         <iframe src="http://ghbtns.com/github-btn.html?user=swoole&repo=swoole-src&type=fork&count=true&size=large" frameborder="0" scrolling="0" width="158px" height="30px"></iframe>
-        <a class="btn btn-sm btn-success" href="https://github.com/swoole/swoole-src/releases/tag/1.8.12-stable" style="margin-top: -20px; height: 20px;">
-			<i class="glyphicon glyphicon-download"></i> &nbsp; Download <span style="font-size: 60%;">(1.8.12)</span> &nbsp;
+        <a class="btn btn-sm btn-success" href="https://github.com/swoole/swoole-src/releases/tag/v1.9.0-stable" style="margin-top: -20px; height: 20px;">
+			<i class="glyphicon glyphicon-download"></i> &nbsp; Download <span style="font-size: 60%;">(1.9.0)</span> &nbsp;
 		</a>
         </p>
     </div>
@@ -206,6 +204,58 @@ $client->on("close", function($cli){
 //connect to server
 $client->connect('127.0.0.1', 9501, 0.5);</code></pre>
     </div>
+
+
+<div class="span6">
+    <h4>Async MySQL Client</h4>
+    <pre><code class="php" data-language="php">$db = new Swoole\MySQL;
+$server = array(
+    'host' => '127.0.0.1',
+    'user' => 'test',
+    'password' => 'test',
+    'database' => 'test',
+);
+
+$db->connect($server, function ($db, $result) {
+    $db->query("show tables", function (Swoole\MySQL $db, $result) {
+        if ($r === false) {
+            var_dump($db->error, $db->errno);
+        } elseif ($r === true) {
+            var_dump($db->affected_rows, $db->insert_id);
+        } else {
+            var_dump($$result);
+            $db->close();
+        }
+    });
+});
+</code></pre>
+</div>
+
+<div class="span6">
+            <h4>Async Redis/Http/WebSocket Client</h4>
+    <pre><code class="php" data-language="php">$redis = new Swoole\Redis;
+$redis->connect('127.0.0.1', 6379, function ($redis, $result) {
+    $redis->set('test_key', 'value', function ($redis, $result) {
+        $redis->get('test_key', function ($redis, $result) {
+            var_dump($result);
+        });
+    });
+});
+
+$cli = new Swoole\Http\Client('127.0.0.1', 80);
+$cli->setHeaders(array('User-Agent' => 'swoole-http-client'));
+$cli->setCookies(array('test' => 'value'));
+
+$cli->post('/dump.php', array("test" => 'abc'), function ($cli) {
+    var_dump($cli->body);
+    $cli->get('/index.php', function ($cli) {
+        var_dump($cli->cookies);
+        var_dump($cli->headers);
+    });
+});
+</code></pre>
+</div>
+
     <div class="span6">
         <h4>Async-IO</h4>
             <pre><code class="php" data-language="php">$fp = stream_socket_client("tcp://127.0.0.1:80", $code, $msg, 3);

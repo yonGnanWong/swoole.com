@@ -1,5 +1,5 @@
 <?php
-require dirname(__DIR__).'/config.php';
+require dirname(__DIR__).'/server/config.php';
 require APPSPATH.'/classes/xunsearch/lib/XS.php';
 
 $wikis = table('wiki_tree')->gets(array('project_id' => 1));
