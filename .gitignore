@@ -1,6 +1,9 @@
 /libs
 /cache/
 /static/pma/
-/static/uploads/
+/web/static/uploads/
 /.idea/
 *.log
+/web/index.html
+/server/cache
+/server/libs

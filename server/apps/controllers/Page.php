@@ -16,59 +16,54 @@ class Page extends App\FrontPage
 
     function verify()
     {
-        session();
-        $this->swoole->http->header('Content-Type', 'image/png');
-        Swoole\Image::verifycode_gd();
+        $this->session->start();
+        $this->http->header('Content-Type', 'image/jpeg');
+        $verifyCode = Swoole\Image::verifycode_gd();
+        $_SESSION['authcode'] = $verifyCode['code'];
+        return $verifyCode['image'];
     }
 
-    function test2()
+    function oauth()
     {
         session();
-        $_SESSION['test'] =1 ;
-        var_dump($_SESSION);
+        if (empty($_GET['s']) or $_GET['s'] == 'sina')
+        {
+            $conf = $this->config['oauth']['weibo'];
+            $oauth = new \WeiboOAuth($conf['appid'], $conf['skey']);
+            $keys = $oauth->getRequestToken();
+            $_SESSION['oauth_keys'] = $keys;
+            $_SESSION['oauth_serv'] = 'sina';
+            $login_url = $oauth->getAuthorizeURL($keys['oauth_token'], false, WEBROOT . '/page/oauth_callback/');
+            $this->swoole->http->redirect($login_url);
+        }
+        elseif ($_GET['s'] == 'qq')
+        {
+
+            $conf = $this->config['oauth']['qq'];
+            $oauth = new \QQOAuth($conf['APP_ID'], $conf['APP_KEY']);
+            $token = $oauth->getRequestToken();
+            $_SESSION['oauth_keys'] = $token;
+            $_SESSION['oauth_serv'] = 'qq';
+            $login_url = $oauth->getAuthorizeURL($token, WEBROOT . '/page/oauth_callback/');
+            $this->swoole->http->redirect($login_url);
+        }
     }
 
-	function oauth()
-	{
-		session();
-		if(empty($_GET['s']) or $_GET['s']=='sina')
-		{
-			$conf = $this->config['oauth']['weibo'];
-			$oauth = new \WeiboOAuth($conf['appid'], $conf['skey']);
-			$keys = $oauth->getRequestToken();
-			$_SESSION['oauth_keys'] = $keys;
-			$_SESSION['oauth_serv'] = 'sina';
-			$login_url = $oauth->getAuthorizeURL($keys['oauth_token'],false,WEBROOT.'/page/oauth_callback/');
-			$this->swoole->http->redirect($login_url);
-		}
-		elseif($_GET['s']=='qq')
-		{
-			
-			$conf = $this->config['oauth']['qq'];
-			$oauth = new \QQOAuth($conf['APP_ID'], $conf['APP_KEY']);
-			$token = $oauth->getRequestToken();
-			$_SESSION['oauth_keys'] = $token;
-			$_SESSION['oauth_serv'] = 'qq';
-			$login_url = $oauth->getAuthorizeURL($token,WEBROOT.'/page/oauth_callback/');
-            $this->swoole->http->redirect($login_url);
-		}
-	}
 	function oauth_callback()
 	{
-		session();
-		if($_SESSION['oauth_serv']=='sina')
-		{
-			
+        session();
+        if ($_SESSION['oauth_serv'] == 'sina')
+        {
 			$conf = $this->config['oauth']['weibo'];
 			$oauth = new \WeiboOAuth($conf['appid'], $conf['skey'], $_SESSION['oauth_keys']['oauth_token'], $_SESSION['oauth_keys']['oauth_token_secret']);
 			$_SESSION['last_key'] = $oauth->getAccessToken($_REQUEST['oauth_verifier']);
 
-			$client = new \WeiboClient($conf['appid'], $conf['skey'],$_SESSION['last_key']['oauth_token'],$_SESSION['last_key']['oauth_token_secret']);
-			$userinfo = $client->verify_credentials();
-			if(!isset($userinfo['id']))
+            $client = new \WeiboClient($conf['appid'], $conf['skey'], $_SESSION['last_key']['oauth_token'],
+                $_SESSION['last_key']['oauth_token_secret']);
+            $userinfo = $client->verify_credentials();
+            if (!isset($userinfo['id']))
             {
-                var_dump($conf, $_SESSION);
-                return "请求错误:".var_export($userinfo, true);
+                return "请求错误:" . var_export($userinfo, $conf, $_SESSION, true);
             }
 			$model = createModel('UserInfo');
 			$username = 'sina_'.$userinfo['id'];
@@ -88,7 +83,7 @@ class Page extends App\FrontPage
 			$_SESSION['user_id'] = $u['id'];
 			$_SESSION['user'] = $u;
 			$this->setLoginStat();
-            $this->swoole->http->edirect(WEBROOT."/person/index/");
+            $this->http->redirect(WEBROOT."/person/index/");
 		}
 		elseif($_SESSION['oauth_serv']=='qq')
 		{
@@ -98,13 +93,17 @@ class Page extends App\FrontPage
 			$oauth->getAccessToken($_GET['oauth_token'], $_SESSION['oauth_keys']['oauth_token_secret'], $_GET['oauth_vericode']);
 
 			$username = $oauth->access_token['openid'];
+
 			$model = createModel('UserInfo');
 			$u = $model->get($username,'username')->get();
-			//不存在，则插入数据库
-			if(empty($u))
-			{
-				$user = $oauth->api_get('user/get_user_info');
-				if(empty($user)) return Swoole\JS::js_back("请求错误");
+            //不存在，则插入数据库
+            if (empty($u))
+            {
+                $user = $oauth->api_get('user/get_user_info');
+                if (empty($user))
+                {
+                    return Swoole\JS::js_back("请求错误");
+                }
 
 				$u['username'] = $username;
 				$u['nickname'] = $user['nickname'];
@@ -117,9 +116,10 @@ class Page extends App\FrontPage
 			$_SESSION['user_id'] = $u['id'];
 			$_SESSION['user'] = $u;
 			$this->setLoginStat();
-            $this->swoole->http->redirect(WEBROOT."/person/index/");
+            $this->http->redirect(WEBROOT."/person/index/");
 		}
 	}
+
 	function flist()
 	{
 		//Error::dbd();
@@ -208,8 +208,9 @@ class Page extends App\FrontPage
 			$gets['fid'] = 9;
 			$model = createModel('News');
 			$list = $model->gets($gets);
-			
+
 			$userlist = $this->getActiveUsers(50);
+
 			$this->swoole->tpl->assign('userlist', $userlist);
 			$this->swoole->tpl->assign('list', $list);
 			$this->swoole->tpl->display('index.html');
@@ -218,14 +219,15 @@ class Page extends App\FrontPage
 		{
 			$page = $_GET['p'];
 			$model = createModel('Cpage');
+
 			$det = $model->get($page,'pagename');
 			$this->swoole->tpl->assign('det',$det);
 			$this->swoole->tpl->display('index_page.html');
 		}
 	}
+
 	/**
 	 * 个人用户登录
-	 * @return unknown_type
 	 */
     function login()
     {
@@ -330,8 +332,8 @@ class Page extends App\FrontPage
 		}
 		else
 		{
-			require WEBPATH.'/dict/forms.php';
-			$_forms['sex'] = Swoole\Form::radio('sex', $forms['sex']);
+            $forms = require WEBPATH . '/dict/forms.php';
+            $_forms['sex'] = Swoole\Form::radio('sex', $forms['sex']);
 			//$_forms['level'] = Form::radio('php_level',$forms['level'],'');
 			$this->swoole->tpl->assign('forms',$_forms);
 			$this->swoole->tpl->display();
@@ -346,25 +348,26 @@ class Page extends App\FrontPage
 		$this->swoole->tpl->assign('user',$userInfo->get($_SESSION['user_id'])->get());
 		$this->swoole->tpl->display();
 	}
+
 	/**
 	 * 忘记密码
-	 * @return unknown_type
 	 */
 	function forgot()
-	{
-		if($_POST)
-		{
-			$gets['realname'] = $_POST['realname'];
-			$gets['username'] = $_POST['email'];
-			$gets['mobile'] = $_POST['mobile'];
-			$gets['select'] = 'id';
-			$ul = $this->model->UserInfo->gets($gets);
-			if(count($ul)!=0)
-			{
-				$password = App\Func::randomkeys(6);
-				$this->model->UserInfo->set($ul[0]['id'],array('password'=>Auth::mkpasswd($gets['username'],$password)));
-                App\Func::success('找回成功！','您的新密码是 <span style="color:#fe7e00;">'.$password.'</a>');
-			}
+    {
+        if ($_POST)
+        {
+            $gets['realname'] = $_POST['realname'];
+            $gets['username'] = $_POST['email'];
+            $gets['mobile'] = $_POST['mobile'];
+            $gets['select'] = 'id';
+            $ul = $this->model->UserInfo->gets($gets);
+            if (count($ul) != 0)
+            {
+                $password = App\Func::randomkeys(6);
+                $this->model->UserInfo->set($ul[0]['id'],
+                    array('password' => Auth::mkpasswd($gets['username'], $password)));
+                App\Func::success('找回成功！', '您的新密码是 <span style="color:#fe7e00;">' . $password . '</a>');
+            }
 		}
 		else
 		{
