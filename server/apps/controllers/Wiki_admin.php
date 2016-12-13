@@ -41,57 +41,56 @@ class Wiki_admin extends Swoole\Controller
         }
 
         //未登陆用户
-        if(!isset($_SESSION['user_id']))
+        if (!isset($_SESSION['user_id']))
         {
-            Swoole::$php->http->redirect('/page/login/');
+            Swoole::$php->http->redirect('/page/login/?refer='.urlencode('/wiki_admin/index/'));
             Swoole::$php->http->finish();
         }
 
         $this->project = createModel('WikiProject')->get($this->project_id);
-        $this->swoole->tpl->assign("project_id", $this->project_id);
-        $this->swoole->tpl->assign("project", $this->project);
+        $this->assign("project_id", $this->project_id);
+        $this->assign("project", $this->project);
 
         //非管理员不允许登陆
         if ($this->ifDeny())
         {
-            Swoole\JS::js_goto('您没有编辑权限', '/wiki/index/');
-            Swoole::$php->http->finish();
+            Swoole::$php->http->finish(Swoole\JS::js_goto('您没有编辑权限', '/wiki/index/'));
         }
     }
 
     function index_frames()
     {
-        if(empty($this->project))
+        if (empty($this->project))
         {
             return Swoole\JS::js_goto("您访问的项目不存在", "/");
         }
-        if(!empty($_GET['p']))
+        if (!empty($_GET['p']))
         {
-            $this->swoole->tpl->assign('p', trim($_GET['p']));
+            $this->assign('p', trim($_GET['p']));
         }
-        $this->swoole->tpl->display("wiki/index.html");
+        $this->display("wiki/index.html");
     }
 
     function index()
     {
-        if(empty($this->project))
+        if (empty($this->project))
         {
             return Swoole\JS::js_goto("您访问的项目不存在", "/");
         }
-        if(!empty($_GET['p']))
+        if (!empty($_GET['p']))
         {
-            $this->swoole->tpl->assign('p', trim($_GET['p']));
+            $this->assign('p', trim($_GET['p']));
         }
         $this->getTopData();
         $this->getTreeData();
         $this->getMainData();
-        $this->swoole->tpl->display("wiki/index.html");
+        $this->display();
     }
 
     function main()
     {
         $this->getMainData();
-        $this->swoole->tpl->display("wiki/main.html");
+        $this->display();
     }
 
     function order()
@@ -135,36 +134,37 @@ class Wiki_admin extends Swoole\Controller
     private function getTopData()
     {
         $projects_link[] = $this->project;
-        if(!empty($this->project['links']))
+        if (!empty($this->project['links']))
         {
             $projects = model('WikiProject')->all();
             $projects->order('id asc');
             $projects->in('id', $this->project['links']);
             $_projects_link = $projects->fetchall();
-            if(count($_projects_link) > 0)
+            if (count($_projects_link) > 0)
             {
                 $projects_link = array_merge($projects_link, $_projects_link);
             }
         }
-        $this->swoole->tpl->assign("projects", $projects_link);
+        $this->assign("projects", $projects_link);
     }
 
     private function getMainData()
     {
         $_cont = model('WikiContent');
+        $_tree = model('WikiTree');
+
         $page_id = basename($_SERVER['REQUEST_URI'], '.html');
-        if(is_numeric($page_id))
+        if (is_numeric($page_id))
         {
             $_GET['id'] = $page_id;
         }
         if (!empty($_GET['p']))
         {
-            $_tree = model('WikiTree');
             $node = $_tree->get($_GET['p'], 'link')->get();
-            if(empty($node))
+            if (empty($node))
             {
-                $file = WEBPATH."/wiki/".$_GET['p'].'.md';
-                if(!is_file($file))
+                $file = WEBPATH . "/wiki/" . $_GET['p'] . '.md';
+                if (!is_file($file))
                 {
                     $text = "您访问的页面不存在！[点击跳转到首页](http://www.swoole.com/wiki/index/)";
                 }
@@ -176,7 +176,7 @@ class Wiki_admin extends Swoole\Controller
             }
             $wiki_id = $node['id'];
         }
-        elseif(!empty($_GET['id']))
+        elseif (!empty($_GET['id']))
         {
             $wiki_id = intval($_GET['id']);
         }
@@ -184,10 +184,21 @@ class Wiki_admin extends Swoole\Controller
         {
             $wiki_id = $this->project['home_id'];
         }
+        if (!$node)
+        {
+            $node = $_tree->get($wiki_id)->get();
+        }
         $wiki_page =  $_cont->get($wiki_id)->get();
-        $text = $wiki_page['content'];
-        $this->swoole->tpl->assign("id", $wiki_id);
-        $this->swoole->tpl->assign("wiki_page", $wiki_page);
+        if (!empty($node['markdown_file']))
+        {
+            $text = file_get_contents($this->config['site']['git_path'].'/'.$node['markdown_file']);
+        }
+        else
+        {
+            $text = $wiki_page['content'];
+        }
+        $this->assign("id", $wiki_id);
+        $this->assign("wiki_page", $wiki_page);
 
         markdown:
         //GitHub Code Parse
@@ -198,7 +209,7 @@ class Wiki_admin extends Swoole\Controller
         $parser->tab_width = 4;
         $html = $parser->transform($text);
 
-        $this->swoole->tpl->assign("content", $html);
+        $this->assign("content", $html);
     }
 
     private function getTreeData()
@@ -206,7 +217,7 @@ class Wiki_admin extends Swoole\Controller
         $data = App\Content::getTree($this->project_id);
         $tree =  App\Content::parseTreeArray($this->project['home_id'], $data);
 //        echo json_encode($tree);exit;
-        $this->swoole->tpl->assign("tree", $tree);
+        $this->assign("tree", $tree);
     }
 
     function page()
@@ -217,13 +228,13 @@ class Wiki_admin extends Swoole\Controller
     function top()
     {
         $this->getTopData();
-        $this->swoole->tpl->display("wiki/top.html");
+        $this->display();
     }
 
     function tree()
     {
-        $this->swoole->tpl->assign("tree", json_encode(App\Content::getTree($this->project_id)));
-        $this->swoole->tpl->display("wiki/tree.html");
+        $this->assign("tree", json_encode(App\Content::getTree($this->project_id)));
+        $this->display();
     }
 
     function create_project()
@@ -262,8 +273,8 @@ class Wiki_admin extends Swoole\Controller
         }
         $form['comment'] = Swoole\Form::radio('close_comment',
             array('0'=>'开启', '1'=>'关闭'), 0, false, null, 'radio-inline');
-        $this->swoole->tpl->assign("form", $form);
-        $this->swoole->tpl->display("wiki/create_project.html");
+        $this->assign("form", $form);
+        $this->display();
     }
 
     function setting()
@@ -274,6 +285,7 @@ class Wiki_admin extends Swoole\Controller
             $this->project->home_id = intval($_POST['home_id']);
             $this->project->links = trim($_POST['links']);
             $this->project->owner = trim($_POST['owner']);
+            $this->project->git_repo = trim($_POST['git_repo']);
             $this->project->close_comment = intval($_POST['close_comment']);
             $this->project->save();
             $this->reflushPage("修改成功");
@@ -281,8 +293,8 @@ class Wiki_admin extends Swoole\Controller
         }
         $form['comment'] = Swoole\Form::radio('close_comment',
             array('0'=>'开启', '1'=>'关闭'), $this->project['close_comment'], false, null, 'radio-inline');
-        $this->swoole->tpl->assign("form", $form);
-        $this->swoole->tpl->display("wiki/setting.html");
+        $this->assign("form", $form);
+        $this->display();
     }
 
     private function reflushPage($info)
@@ -322,6 +334,7 @@ class Wiki_admin extends Swoole\Controller
                 {
                     $in['link'] = trim($_POST['link']);
                 }
+                $in['markdown_file'] = trim($_POST['markdown_file']);
                 $in['project_id'] = $cnode['project_id'];
             }
             $_POST['id'] = $_tree->put($in);
@@ -341,7 +354,7 @@ class Wiki_admin extends Swoole\Controller
             );
             $this->assign("page", array());
             $this->assign("form", $form);
-            $this->display("wiki/create.php");
+            $this->display();
         }
     }
 
@@ -397,7 +410,6 @@ class Wiki_admin extends Swoole\Controller
             {
                 Swoole\Cookie::set('wiki_admin', '1', 86400 * 30);
             }
-
             return false;
         }
     }
@@ -413,6 +425,9 @@ class Wiki_admin extends Swoole\Controller
         $this->reflushPage('删除成功');
     }
 
+    /**
+     *
+     */
     protected function isUseEditor()
     {
         if (!isset($_GET['editor']) and !empty($_COOKIE['wiki_use_editor']))
@@ -424,16 +439,20 @@ class Wiki_admin extends Swoole\Controller
             if (!empty($_GET['editor']))
             {
                 $this->http->setcookie('wiki_use_editor', '1', time() + 86400 * 30);
+                $use_editor = $_GET['editor'];
             }
             else
             {
                 $this->http->setcookie('wiki_use_editor', '');
+                $use_editor = false;
             }
-            $use_editor = $_GET['editor'];
         }
         $this->assign('use_editor', $use_editor);
     }
 
+    /**
+     * @return string
+     */
     function modify()
     {
         if (empty($_GET['id']))
@@ -473,15 +492,23 @@ class Wiki_admin extends Swoole\Controller
             $node->link = trim($_POST['link']);
             $node->order_by_time = $_POST['order_by_time'];
             $node->publish = intval($_POST['publish']);
+            $node->markdown_file = trim($_POST['markdown_file']);
 
-            $node->save();
-            $cont->save();
-            $this->assign("info", "修改成功");
+            if (!empty($node->markdown_file) and !is_file($this->config['site']['git_path'].'/'.$node->markdown_file))
+            {
+                $this->assign("info", "修改失败，文件不存在。");
+            }
+            else
+            {
+                $node->save();
+                $cont->save();
+                $this->assign("info", "修改成功");
+            }
         }
         $this->isUseEditor();
         $this->assign("node", $node->get());
         $this->assign("page", $cont->get());
-        $this->display("wiki/create.php");
+        $this->display("wiki_admin/create.php");
     }
 
     function upload()

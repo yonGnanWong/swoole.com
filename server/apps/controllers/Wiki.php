@@ -150,6 +150,7 @@ class Wiki extends Swoole\Controller
     {
         $_cont = model('WikiContent');
         $_tree = model('WikiTree');
+        $node = false;
 
         if (!empty($_GET['p']))
         {
@@ -165,7 +166,10 @@ class Wiki extends Swoole\Controller
         {
             $wiki_id = intval($_GET['id']);
         }
-
+        if (!$node)
+        {
+            $node = $_tree->get($wiki_id)->get();
+        }
         $this->pageInfo =  $_cont->get($wiki_id)->get();
 
         if (empty($this->pageInfo))
@@ -178,7 +182,14 @@ class Wiki extends Swoole\Controller
         $_cont->set($wiki_id, array('read_count' => $this->pageInfo['read_count'] + 1));
 
         $this->nodeInfo =  $_tree->get($wiki_id)->get();
-        $text =  $this->pageInfo['content'];
+        if (!empty($node['markdown_file']))
+        {
+            $text = file_get_contents($this->config['site']['git_path'].'/'.$node['markdown_file']);
+        }
+        else
+        {
+            $text = $this->pageInfo['content'];
+        }
         $this->swoole->tpl->assign("id", $wiki_id);
         $this->swoole->tpl->assign("wiki_page",  $this->pageInfo);
 

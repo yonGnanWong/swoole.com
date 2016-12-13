@@ -18,7 +18,7 @@
         </div>
     </div>
     <script type="text/javascript">
-        var wiki_tree_data = {{$tree}};
+        var wiki_tree_data = <?=$tree?>;
         var wiki_id_map = [];
         $(document).ready(function() {
             d = new dTree('d');

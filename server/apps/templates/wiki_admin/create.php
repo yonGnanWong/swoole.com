@@ -42,6 +42,7 @@
                 <input type="input" name="link" style="width: 100%;" value="<?= $this->value($node, 'link') ?>"
                        class="form-control" placeholder="请输入页面文件名">
             </div>
+            <?php if (empty($node['markdown_file'])) :?>
             <div class="form-group" id="md_editor">
                 <textarea id="content" name="content"
                           style="width: 100%; height: 640px;"><?= $this->value($page, 'content') ?></textarea>
@@ -53,6 +54,7 @@
                 <a href="javascript: location.href += '&editor=1';"> 使用MarkDown编辑器</a>
                 <?php } ?>
             </div>
+            <?php endif; ?>
             <div class="form-group">
                 <span>允许评论：</span>
                 <?= $form['comment'] ?>
@@ -65,12 +67,16 @@
                 <span>时间排序：</span>
                 <?= $form['order_by_time'] ?>
             </div>
+            <div class="form-group">
+                <input type="input" name="markdown_file" value="<?= $this->value($node, 'markdown_file') ?>"
+                       class="form-control" placeholder="请输入Markdow页面Git地址">
+            </div>
             <hr>
                 <button type="submit" class="button btn-primary">提交</button>
                 <button type="button" class="button" onclick="history.back()">取消</button>
         </form>
 </div>
-<?php if ($use_editor){ ?>
+<?php if (empty($node['markdown_file']) and $use_editor){ ?>
 <script>
     var WikiEditor;
     $(function () {

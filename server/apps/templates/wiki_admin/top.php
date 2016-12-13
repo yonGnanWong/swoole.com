@@ -13,13 +13,13 @@
         <div class="navbar navbar-inverse navbar-fixed-top">
                 <div class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
-                        {{foreach item=v from=$projects}}
-                        <li {{if $v.id==$project_id}}class="active"{{/if}}>
-                        <a href="/wiki_admin/index/prid-{{$v.id}}">{{$v.name}}</a></li>
-                        {{/foreach}}
+                        <?php foreach($projects as $v): ?>
+                        <li <?php if ($v['id'] == $project_id) { ?> class="active"<?php } ?>>
+                        <a href="/wiki_admin/index/prid-<?=$v['id']?>"><?=$v['name']?></a></li>
+                      <?php endforeach; ?>
                     </ul>
                     <div class="btn-group" style="margin-left: 600px;line-height: 50px;">
-                        <a href="/wiki_admin/setting/prid-{{$project_id}}" class="small" target="main">
+                        <a href="/wiki_admin/setting/prid-<?=$project_id?>" class="small" target="main">
                             <span class="glyphicon glyphicon-th"></span> 项目设置</a>
                         <span style="color: #fff; margin-left: 10px;margin-right: 10px;">|</span>
                         <a href="/wiki_admin/create_project/" class="small" target="main">

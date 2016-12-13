@@ -20,23 +20,23 @@
     <script src="/static/js/rainbow-custom.min.js"></script>
     <script src="/static/js/jquery.js"></script>
     <script src="/static/js/dtree.js"></script>
-    <title>{{$wiki_page.title}}_Swoole文档中心</title>
+    <title><?=$wiki_page['title']?>_Swoole文档中心</title>
 </head>
 <body>
     <div class="main_right">
         <div id="readme" class="blob instapaper_body">
             <article class="markdown-body entry-content" itemprop="mainContentOfPage">
-                {{if $wiki_page}}
-                <h1>{{$wiki_page.title}}</h1>
-                {{/if}}
-                {{include file=wiki/admin_menu.html}}
-                {{$content}}
+                <?php if ($wiki_page) { ?>
+                <h1><?=$wiki_page['title']?></h1>
+            <?php }?>
+                <?php include __DIR__."/admin_menu.php"; ?>
+                <?=$content?>
             </article>
         </div>
         <hr />
         <!-- Duoshuo Comment BEGIN -->
-        <div class="ds-thread" data-thread-key="wiki-{{$wiki_page.id}}" data-title="{{$wiki_page.title}}"
-             data-url="http://wiki.swoole.com/wiki/page/{{$wiki_page.id}}.html"></div>
+        <div class="ds-thread" data-thread-key="wiki-<?=$wiki_page['id']?>" data-title="<?=$wiki_page['title']?>"
+             data-url="http://wiki.swoole.com/wiki/page/<?=$wiki_page['id']?>.html"></div>
         <script type="text/javascript">
             $(document).ready(function() {
                 $('a').each(function(e){

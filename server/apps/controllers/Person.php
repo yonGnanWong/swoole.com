@@ -202,21 +202,21 @@ class Person extends \App\UserBase
 
     function profile()
     {
-        if($_POST)
+        if ($_POST)
         {
-            if(empty($_POST['nickname']))
+            if (empty($_POST['nickname']))
             {
                 return Swoole\JS::js_back('昵称不能为空！');
             }
-            if(!empty($_FILES['avatar']['name']))
+            if (!empty($_FILES['avatar']['name']))
             {
                 global $php;
                 $php->upload->thumb_width = 90;
                 $php->upload->thumb_height = 120;
                 $php->upload->thumb_qulitity = 90;
-                $php->upload->base_dir = "/static/uploads/avatar";
+                $php->upload->sub_dir = "avatar";
                 $upfile = $php->upload->save('avatar');
-                if($upfile===false)
+                if ($upfile === false)
                 {
                     return Swoole\JS::js_back('上传失败！');
                 }

@@ -218,12 +218,12 @@ $server = array(
 
 $db->connect($server, function ($db, $result) {
     $db->query("show tables", function (Swoole\MySQL $db, $result) {
-        if ($r === false) {
+        if ($result === false) {
             var_dump($db->error, $db->errno);
-        } elseif ($r === true) {
+        } elseif ($result === true) {
             var_dump($db->affected_rows, $db->insert_id);
         } else {
-            var_dump($$result);
+            var_dump($result);
             $db->close();
         }
     });
