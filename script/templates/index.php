@@ -62,7 +62,6 @@
                     <li><a target="_self" href="http://wiki.swoole.com/wiki/page/p-case.html">用户案例</a></li>
                     <li><a href="http://wiki.swoole.com/wiki/page/p-donate.html">捐赠</a></li>
 					<li><a href="https://github.com/swoole/swoole-src/releases">下载</a></li>
-					<li><a href="http://git.oschina.net/matyhtf/swoole">国内镜像</a></li>
                     <li><a href="https://rawgit.com/tchiotludo/swoole-ide-helper/english/docs/index.html">English Document</a></li>
                 </ul>
             </div>
@@ -75,15 +74,21 @@
         <p>
 		<span><img src="/static/images/swoole.png" width="160" style="float:left; margin-right: 25px; margin-top: 15px;" />
         </span>
-        PHP的异步、并行、高性能网络通信引擎，使用纯C语言编写，提供了PHP语言的异步多线程服务器，异步TCP/UDP网络客户端，异步MySQL，异步Redis，数据库连接池，AsyncTask，消息队列，毫秒定时器，异步文件读写，异步DNS查询。
-            Swoole内置了Http/WebSocket服务器端/客户端、Http2.0服务器端。<br />
+         <p>PHP的异步、并行、高性能网络通信引擎，使用纯C语言编写，提供了<a href="/wiki/page/p-server.html">PHP语言的异步多线程服务器</a>，<a href="/wiki/page/p-client.html">异步TCP/UDP网络客户端</a>，<a href="/wiki/page/517.html">异步MySQL</a>，<a href="/wiki/page/p-redis.html">异步Redis</a>，<a href="https://github.com/swoole/framework/blob/master/tests/async_mysql.php" target="_blank">数据库连接池</a>，<a href="/wiki/page/134.html">AsyncTask</a>，<a href="http://wiki.swoole.com/wiki/page/289.html">消息队列</a>，<a href="/wiki/page/244.html">毫秒定时器</a>，<a href="/wiki/page/183.html">异步文件读写</a>，<a href="/wiki/page/186.html">异步DNS查询</a>。 Swoole内置了<a href="/wiki/page/326.html">Http/WebSocket服务器端</a>/<a href="/wiki/page/p-http_client.html">客户端</a>、<a href="/wiki/page/326.html">Http2.0服务器端</a>。</p>
+        <p>除了异步IO的支持之外，Swoole为PHP多进程的模式设计了多个并发数据结构和IPC通信机制，可以大大简化多进程并发编程的工作。其中包括了<a href="/wiki/page/p-atomic.html">并发原子计数器</a>，<a href="/wiki/page/p-table.html">并发HashTable</a>，<a href="/wiki/page/p-channel.html">Channel</a>，<a href="/wiki/page/p-lock.html">Lock</a>，<a href="/wiki/page/363.html">进程间通信IPC</a>等丰富的功能特性。</p>
+        
+<p><a href="https://git.oschina.net/matyhtf/swoole/tree/2.0.1">Swoole2.0</a>支持了类似Go语言的<strong><a href="http://wiki.swoole.com/wiki/page/p-coroutine.html">协程</a></strong>，可以使用完全同步的代码实现异步程序。PHP代码无需额外增加任何关键词，底层自动进行协程调度，实现异步。</p>
+
         Swoole可以广泛应用于互联网、移动通信、企业软件、云计算、网络游戏、物联网（IOT）、车联网、智能家居等领域。
         使用PHP+Swoole作为网络通信框架，可以使企业IT研发团队的效率大大提升，更加专注于开发创新产品。
-        <p style="margin-top: 25px;"><a href="https://github.com/swoole/swoole-src" class="btn btn-primary">源代码(Github)</a>&nbsp;&nbsp;
-           <a href="https://github.com/swoole/swoole-src/issues/new" class="btn btn-danger">提交Bug</a>&nbsp;&nbsp;
-           <a href="https://github.com/swoole/swoole-src/issues/new" class="btn">提建议</a>&nbsp;&nbsp;
-           <a class="btn btn-sm btn-success" href="https://github.com/swoole/swoole-src/releases/tag/v<?=$version?>-stable">
+        <p style="margin-top: 25px;"><a href="https://git.oschina.net/matyhtf/swoole" class="btn btn-primary">源代码(开源中国-码云)</a>&nbsp;&nbsp;
+           <a href="http://git.oschina.net/matyhtf/swoole/issues/new" class="btn btn-danger">提交Bug</a>&nbsp;&nbsp;
+           <a href="http://git.oschina.net/matyhtf/swoole/issues/new" class="btn">提建议</a>&nbsp;&nbsp;
+           <a class="btn btn-sm btn-success" href="https://git.oschina.net/matyhtf/swoole/tree/v<?=$version?>">
              <i class="glyphicon glyphicon-download"></i> &nbsp; 下载 <span style="font-size: 60%;">(<?=$version?>)</span> &nbsp;
+		   </a>
+          <a class="btn btn-sm btn-success" href="https://git.oschina.net/matyhtf/swoole/tree/v2.0.5">
+             <i class="glyphicon glyphicon-download"></i> &nbsp; 下载 <span style="font-size: 60%;">(2.0.5)</span> &nbsp;
 		   </a>
         <a href="http://edu.csdn.net/course/detail/2800" class="btn btn-warning">视频教学课程</a>&nbsp;&nbsp;
         </p>
@@ -95,7 +100,7 @@
             <ul class="nav nav-list">
                 <?php foreach($news as $v): ?>
                 <li style="height: 30px;">
-                    <a href="https://www.oschina.net<?=$v['link']?>" title="<?=$v['title']?>">
+                    <a href="<?=$v['link']?>" title="<?=$v['title']?>">
                     <?php
                     if (mb_strlen($v['title']) > 24) echo mb_substr($v['title'], 0, 24).'...'; else echo $v['title'];
                     ?>
@@ -120,7 +125,7 @@
                 <li>并发百万TCP连接</li>
                 <li>TCP/UDP/UnixSock</li>
                 <li>服务器端/客户端</li>
-                <li>全异步/半异步半同步</li>
+                <li>支持异步/同步/协程</li>
                 <li>支持多进程/多线程</li>
                 <li>CPU亲和性/守护进程</li>
                 <li>支持IPv4/IPv6网络</li>

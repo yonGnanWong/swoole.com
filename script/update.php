@@ -7,12 +7,12 @@ require ROOT.'/server/config.php';
 function getNews()
 {
     $curl = new \Swoole\Client\CURL();
-    $html = $curl->get('https://www.oschina.net/p/swoole-server/news');
-    preg_match('#location\.href\="\?fromerr\=([a-z0-9]+)";#i', $html, $match);
-
-    $html = $curl->get('https://www.oschina.net/p/swoole-server/news?fromerr='.$match[1]);
+    $curl->addHeaders(array(
+        'Referer' => 'https://www.oschina.net/p/swoole-server',
+    ));
+    $html = $curl->get('https://www.oschina.net/search?scope=news&q=swoole&sort_by_time=1');
     $dom = new Swoole\DOM\Tree($html);
-    $list = $dom->find('ul.List > h3 > a');
+    $list = $dom->find('ul#results > h3 > a');
 
     $news = array();
     foreach ($list as $li)
@@ -31,7 +31,7 @@ function getLastVersion()
 {
     $curl = new \Swoole\Client\CURL();
     $html = $curl->get('http://git.oschina.net/matyhtf/swoole/tags', null, 30);
-    if ($html and preg_match('#/matyhtf/swoole/tree/v(\d+\.\d+\.\d+)\-stable#i', $html, $match))
+    if ($html and preg_match('#/matyhtf/swoole/tree/v(1\.9\.\d+)#i', $html, $match))
     {
         return $match[1];
     }
