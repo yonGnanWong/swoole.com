@@ -15,6 +15,7 @@ class Wiki_admin extends Swoole\Controller
 
     protected $project_id;
     protected $project;
+    protected $uid;
 
     function __construct($swoole)
     {
@@ -23,15 +24,16 @@ class Wiki_admin extends Swoole\Controller
 
         App\Content::$php = $swoole;
         parent::__construct($swoole);
-        if(isset($_GET['prid']))
+
+        if (isset($_GET['prid']))
         {
             $this->project_id = intval($_GET['prid']);
             if (!isset($_COOKIE['wiki_project_id']) or $_COOKIE['wiki_project_id'] != $this->project_id)
             {
-                Swoole\Cookie::set('wiki_project_id', $this->project_id, 86400 * 30);
+                $this->http->setcookie('wiki_project_id', $this->project_id, time() + 86400 * 30, '/');
             }
         }
-        elseif (isset($_COOKIE['wiki_project_id']))
+        elseif (!empty($_COOKIE['wiki_project_id']))
         {
             $this->project_id = intval($_COOKIE['wiki_project_id']);
         }
@@ -47,7 +49,9 @@ class Wiki_admin extends Swoole\Controller
             Swoole::$php->http->finish();
         }
 
+        $this->uid = $_SESSION['user_id'];
         $this->project = createModel('WikiProject')->get($this->project_id);
+
         $this->assign("project_id", $this->project_id);
         $this->assign("project", $this->project);
 
@@ -337,8 +341,29 @@ class Wiki_admin extends Swoole\Controller
                 $in['markdown_file'] = trim($_POST['markdown_file']);
                 $in['project_id'] = $cnode['project_id'];
             }
-            $_POST['id'] = $_tree->put($in);
-            App\Content::newPage($_POST);
+
+            $in['create_uid'] = $this->uid;
+            $node_id = $_tree->put($in);
+            $_cont = createModel('WikiContent');
+
+            $in2['title'] = $in['title'];
+            if (strlen($_POST['content']) > 0 and $_POST['content']{0} == '`')
+            {
+                $_POST['content'] = ' ' . $_POST['content'];
+            }
+            $in2['content'] = $_POST['content'];
+            $in2['id'] = $node_id;
+            $_cont->put($in2);
+
+            //写入历史记录
+            $_historyTable = table('wiki_history');
+            $_historyTable->put(array(
+                'wiki_id' => $node_id,
+                'uid' => $this->uid,
+                'content' => $_POST['content'],
+                'title' => $in['text'],
+                'version' => 0,
+            ));
             $this->reflushPage('增加成功');
         }
         else
@@ -478,16 +503,35 @@ class Wiki_admin extends Swoole\Controller
 
         if (!empty($_POST))
         {
-            $cont->title = trim($_POST['title']);
+
             if (!empty($_POST['content']) and $_POST['content'][0] == '`')
             {
                 $_POST['content'] = ' '.$_POST['content'];
             }
 
+            //更新内容和标题
+            if (!($_POST['content'] === $cont->content and trim($_POST['title']) == $cont->title))
+            {
+                //写入历史记录
+                $_historyTable = table('wiki_history');
+                $_historyTable->put(array(
+                    'wiki_id' => $node->id,
+                    'uid' => $this->uid,
+                    'content' => $cont->content,
+                    'title' => $cont->title,
+                    'version' => intval($cont->version),
+                ));
+                //增加版本号
+                $cont->version = intval($cont->version) + 1;
+            }
+
+            $cont->title = trim($_POST['title']);
             $cont->content = $_POST['content'];
             $cont->close_comment = $_POST['close_comment'];
             $cont->uptime = time();
 
+            //更新节点
+            $node->update_uid = $this->uid;
             $node->text = $cont->title;
             $node->link = trim($_POST['link']);
             $node->order_by_time = $_POST['order_by_time'];

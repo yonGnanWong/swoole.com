@@ -99,19 +99,6 @@ class Content
         return $nodes;
     }
 
-    static function newPage($content)
-    {
-        $_cont = createModel('WikiContent');
-        $in2['title'] = $content['title'];
-        if(strlen($content['content']) > 0 and $content['content']{0} == '`')
-        {
-            $content['content'] = ' '.$content['content'];
-        }
-        $in2['content'] = $content['content'];
-        $in2['id'] = $content['id'];
-        $_cont->put($in2);
-    }
-
     static function getPage($id)
     {
 
