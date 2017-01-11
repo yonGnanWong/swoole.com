@@ -37,8 +37,8 @@
             var open;
             var node_id;
             for (var i = 0; i < wiki_tree_data.length; i++) {
-                if(wiki_tree_data[i]['link'].substring(0, 7)=='http://'
-                        || wiki_tree_data[i]['link'].substring(0, 8)=='https://') {
+                if(wiki_tree_data[i]['link'].length > 0 && (wiki_tree_data[i]['link'].substring(0, 7)=='http://'
+                        || wiki_tree_data[i]['link'].substring(0, 8)=='https://')) {
                     link = wiki_tree_data[i]['link']
                 } else {
                     link = '/wiki_admin/main/'+wiki_tree_data[i]['id'];

@@ -24,16 +24,48 @@
 </head>
 <body>
     <div class="main_right">
+        <style type="text/css">
+            td {
+                vertical-align: middle !important;
+            }
+        </style>
         <div id="readme" class="blob instapaper_body">
             <article class="markdown-body entry-content" itemprop="mainContentOfPage">
                 <?php if ($wiki_page) { ?>
                 <h1><?=$wiki_page['title']?>
-                    <a href="/wiki_admin/history/?id=<?=$wiki_page['id']?>"><span class="badge right">当前版本: <?=$wiki_page['version']?></span></a>
+                    <a href="/wiki_admin/main/?id=<?= $wiki_page['id'] ?>"> <span
+                            class="badge right">当前版本: <?= $wiki_page['version'] ?></span></a>
                 </h1>
             <?php }?>
-                <?php include __DIR__."/admin_menu.php"; ?>
-                <?=$content?>
             </article>
+            <table class="table table-bordered table-striped" style="margin-top: 20px;">
+                <thead>
+                <tr>
+                    <th style="width: 70px;">版本号</th>
+                    <th>标题</th>
+                    <th>修改人</th>
+                    <th>修改时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach($list as $li): ?>
+                <tr>
+                    <td>
+                        <span class="badge right">版本: <?=$li['version']?></span>
+                    </td>
+                    <td><?=$li['title']?></td>
+                    <td><?=$li['uid']?></td>
+                    <td><?=$li['addtime']?></td>
+                    <td>
+                        <a href="/wiki_admin/diff/?id=<?=$_GET['id']?>&version=<?=$li['version']?>&compare=current" class="btn btn-sm btn-info">与当前版本对比</a>
+                        <?php if ($li['version'] > 0) {?>
+                        <a href="/wiki_admin/diff/?id=<?=$_GET['id']?>&version=<?=$li['version']?>&compare=last" class="btn btn-sm btn-default">与上个版本对比</a>
+                        <?php } ?>
+                </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
         <hr />
         <!-- Duoshuo Comment BEGIN -->

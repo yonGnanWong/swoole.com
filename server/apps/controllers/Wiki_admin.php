@@ -97,6 +97,55 @@ class Wiki_admin extends Swoole\Controller
         $this->display();
     }
 
+    function history()
+    {
+        if (empty($_GET['id']))
+        {
+            throw new Swoole\Exception\InvalidParam("缺少ID");
+        }
+        $this->getMainData();
+        $_table = table('wiki_history');
+        $list = $_table->gets(array('select' => 'id, version, title, uid, addtime',
+            'wiki_id' => intval($_GET['id'])));
+        $this->assign('list', $list);
+        $this->display();
+    }
+
+    function diff()
+    {
+        if (empty($_GET['id']))
+        {
+            throw new Swoole\Exception\InvalidParam("缺少ID");
+        }
+        if (!isset($_GET['version']))
+        {
+            throw new Swoole\Exception\InvalidParam("需要version参数");
+        }
+        $this->getMainData();
+        $_table = table('wiki_history');
+        list($res) = $_table->gets(array(
+            'version' => intval($_GET['version']),
+            'wiki_id' => $_GET['id']
+        ));
+        $this->assign('a', $res['content']);
+        if (isset($_GET['compare']) and $_GET['compare'] == 'last')
+        {
+            $version_b = intval($_GET['version']) - 1;
+            list($res) = $_table->gets(array(
+                'version' => $version_b,
+                'wiki_id' => $_GET['id']
+            ));
+            $this->assign('b', $res['content']);
+            $this->assign('version_b', $version_b);
+        }
+        else
+        {
+            $this->assign('b', $this->tpl_var['wiki_page']['content']);
+            $this->assign('version_b', $this->tpl_var['wiki_page']['version']);
+        }
+        $this->display();
+    }
+
     function order()
     {
         if(empty($_GET['id']))
@@ -346,7 +395,7 @@ class Wiki_admin extends Swoole\Controller
             $node_id = $_tree->put($in);
             $_cont = createModel('WikiContent');
 
-            $in2['title'] = $in['title'];
+            $in2['title'] = $in['text'];
             if (strlen($_POST['content']) > 0 and $_POST['content']{0} == '`')
             {
                 $_POST['content'] = ' ' . $_POST['content'];
