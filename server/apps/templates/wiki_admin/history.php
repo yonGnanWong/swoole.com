@@ -54,8 +54,8 @@
                     <td>
                         <span class="badge right">版本: <?=$li['version']?></span>
                     </td>
-                    <td><?=$li['title']?></td>
-                    <td><?=$li['uid']?></td>
+                    <td><a href="/wiki_admin/main/?id=<?= $_GET['id']?>&version=<?=$li['version']?>"><?= $li['title'] ?></a></td>
+                    <td><a href="/page/user/uid-<?= $li['uid'] ?>"><?= $users[$li['uid']] ?></a></td>
                     <td><?=$li['addtime']?></td>
                     <td>
                         <a href="/wiki_admin/diff/?id=<?=$_GET['id']?>&version=<?=$li['version']?>&compare=current" class="btn btn-sm btn-info">与当前版本对比</a>

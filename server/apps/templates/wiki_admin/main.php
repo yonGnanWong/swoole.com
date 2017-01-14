@@ -28,10 +28,11 @@
             <article class="markdown-body entry-content" itemprop="mainContentOfPage">
                 <?php if ($wiki_page) { ?>
                 <h1><?=$wiki_page['title']?>
-                    <a href="/wiki_admin/history/?id=<?=$wiki_page['id']?>"><span class="badge right">当前版本: <?=$wiki_page['version']?></span></a>
+                    <a href="/wiki_admin/history/?id=<?=$wiki_page['id']?>">
+                        <span class="badge right"><?=empty($history)?"当前":"历史"?>版本: <?=$wiki_page['version']?></span></a>
                 </h1>
             <?php }?>
-                <?php include __DIR__."/admin_menu.php"; ?>
+                <?php if (empty($history)) include __DIR__."/admin_menu.php"; ?>
                 <?=$content?>
             </article>
         </div>

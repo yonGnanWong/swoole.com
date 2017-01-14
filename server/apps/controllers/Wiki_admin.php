@@ -107,6 +107,15 @@ class Wiki_admin extends Swoole\Controller
         $_table = table('wiki_history');
         $list = $_table->gets(array('select' => 'id, version, title, uid, addtime',
             'wiki_id' => intval($_GET['id'])));
+
+        $uid_list = array();
+        foreach($list as $li)
+        {
+            $uid_list[] = $li['uid'];
+        }
+        $uid_list = array_unique($uid_list);
+        $users = Model('UserInfo')->getMap(array('in' => array('id', $uid_list)), 'nickname');
+        $this->assign('users', $users);
         $this->assign('list', $list);
         $this->display();
     }
@@ -249,6 +258,24 @@ class Wiki_admin extends Swoole\Controller
         else
         {
             $text = $wiki_page['content'];
+        }
+        //历史版本
+        if (isset($_GET['version']) and $_GET['version'] != $wiki_page['version'])
+        {
+            $version = intval($_GET['version']);
+            $historyVersion = table('wiki_history')->gets(array(
+                'wiki_id' => $wiki_id,
+                'version' => $version,
+                'limit' => 1,
+                'select' => 'content',
+            ));
+            if (empty($historyVersion))
+            {
+                throw new \Exception("页面不存在");
+            }
+            $text = $historyVersion[0]['content'];
+            $wiki_page['version'] = $version;
+            $this->assign("history", true);
         }
         $this->assign("id", $wiki_id);
         $this->assign("wiki_page", $wiki_page);

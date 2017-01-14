@@ -25,13 +25,13 @@
 <body>
 <div class="main_right">
     <div class="container">
-        {{if $info}}
-        <div id="alert-info" class="alert alert-success">{{$info}}</div>
+        <?php if ($info) {?>
+        <div id="alert-info" class="alert alert-success"><?=$info?></div>
         <script>
             parent.window.frames['tree'].location.reload();
             setTimeout(function(){$('#alert-info').hide(500);}, 2000);
         </script>
-        {{/if}}
+        <?php } ?>
 
         <div class="alert alert-info">注意：多个ID之间使用英文逗号进行分隔</div>
         <form method="post" class="form-horizontal" role="form">
@@ -44,18 +44,18 @@
             <div class="form-group">
                 <label class="col-sm-2 control-label">管理员的UID</label>
                 <div class="col-sm-10">
-                    <input type="input" name="owner" value="{{$project.owner}}" class="form-control">
+                    <input type="input" name="owner" value="<?=$project['owner']?>" class="form-control">
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-2 control-label">链接其他项目</label>
                 <div class="col-sm-10">
-                    <input type="input" name="links" value="{{$project.id}},{{$project.links}}" class="form-control">
+                    <input type="input" name="links" value="<?=$project['id']?>,<?=$project['links']?>" class="form-control">
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-2 control-label" style="margin-right: 16px">是否关闭评论</label>
-                {{$form.comment}}
+                <?=$form['comment']?>
             </div>
             <hr>
             <button type="submit" class="button btn-primary">提交</button>

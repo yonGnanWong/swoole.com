@@ -30,8 +30,8 @@ function getNews()
 function getLastVersion()
 {
     $curl = new \Swoole\Client\CURL();
-    $html = $curl->get('http://git.oschina.net/matyhtf/swoole/tags', null, 30);
-    if ($html and preg_match('#/matyhtf/swoole/tree/v(1\.9\.\d+)#i', $html, $match))
+    $html = $curl->get('http://git.oschina.net/swoole/swoole/tags', null, 30);
+    if ($html and preg_match('#/swoole/swoole/tree/v(1\.9\.\d+)#i', $html, $match))
     {
         return $match[1];
     }
