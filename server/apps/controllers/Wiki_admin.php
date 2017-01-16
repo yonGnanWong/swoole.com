@@ -155,12 +155,61 @@ class Wiki_admin extends Swoole\Controller
         $this->display();
     }
 
+    function revert()
+    {
+        if (empty($_GET['id']))
+        {
+            throw new Swoole\Exception\InvalidParam("缺少ID");
+        }
+        if (!isset($_GET['version']))
+        {
+            throw new Swoole\Exception\InvalidParam("需要version参数");
+        }
+        $wiki_id = intval($_GET['id']);
+        $_table = table('wiki_history');
+        list($res) = $_table->gets(array(
+            'version' => intval($_GET['version']),
+            'wiki_id' => $wiki_id,
+        ));
+
+        $_cont = model('WikiContent');
+        $_tree = model('WikiTree');
+        $cont = $_cont->get($wiki_id);
+        $node = $_tree->get($wiki_id);
+        if (!$cont->exist())
+        {
+            throw new Swoole\Exception\NotFound("页面不存在");
+        }
+
+        $newVersion = intval($cont->version) + 1;
+        //写入历史记录
+        $_historyTable = table('wiki_history');
+        $_historyTable->put(array(
+            'wiki_id' => $wiki_id,
+            'uid' => $this->uid,
+            'content' => $cont->content,
+            'title' => $cont->title,
+            'version' => $cont->version,
+        ));
+        //增加版本号
+        $cont->version = $newVersion;
+        $cont->title = $res['title'];
+        $cont->content = $res['content'];
+        $cont->uptime = time();
+        //更新节点
+        $node->link = $res['title'];
+        $node->update_uid = $this->uid;
+        $node->save();
+        $cont->save();
+        $this->http->redirect('/wiki_admin/main/?id='.$wiki_id);
+    }
+
     function order()
     {
-        if(empty($_GET['id']))
+        if (empty($_GET['id']))
         {
             return "错误：父页面id为空";
-        };
+        }
 
         $parent_id = intval($_GET['id']);
         $model = createModel('WikiTree');
@@ -418,6 +467,9 @@ class Wiki_admin extends Swoole\Controller
                 $in['project_id'] = $cnode['project_id'];
             }
 
+            $in['publish'] = intval($_POST['publish']);
+            $in['order_by_time'] = intval($_POST['order_by_time']);
+
             $in['create_uid'] = $this->uid;
             $node_id = $_tree->put($in);
             $_cont = createModel('WikiContent');
@@ -429,6 +481,8 @@ class Wiki_admin extends Swoole\Controller
             }
             $in2['content'] = $_POST['content'];
             $in2['id'] = $node_id;
+            $in2['close_comment'] = intval($_POST['close_comment']);
+            $in2['close_edit'] = intval($_POST['close_edit']);
             $_cont->put($in2);
 
             //写入历史记录
@@ -449,10 +503,15 @@ class Wiki_admin extends Swoole\Controller
                 'close_comment',
                 array('0' => '开启', '1' => '关闭'), 0, false, null, 'radio-inline'
             );
+            //关闭编辑
+            $form['close_edit'] = Swoole\Form::radio('close_edit',
+                array('0' => '允许', '1' => '禁止'), 0, false, null, 'radio-inline');
             $form['order_by_time'] = Swoole\Form::radio(
                 'order_by_time',
                 array('0'=>'手工排序', '1'=>'按添加时间自动排序'), 0, false, null, 'radio-inline'
             );
+            $form['publish'] = Swoole\Form::radio('publish',
+                array('0' => '关闭', '1' => '开启'), 1, false, null, 'radio-inline');
             $this->assign("page", array());
             $this->assign("form", $form);
             $this->display();
@@ -566,12 +625,14 @@ class Wiki_admin extends Swoole\Controller
 
         $cont = $_cont->get($id);
         $node = $_tree->get($id);
+        //关闭评论
         $form['comment'] = Swoole\Form::radio('close_comment',
             array('0' => '开启', '1' => '关闭'), $cont['close_comment'], false, null, 'radio-inline');
-
+        //关闭编辑
+        $form['close_edit'] = Swoole\Form::radio('close_edit',
+            array('0' => '允许', '1' => '禁止'), $cont['close_edit'], false, null, 'radio-inline');
         $form['order_by_time'] = Swoole\Form::radio('order_by_time',
             array('0' => '手工排序', '1' => '按添加时间自动排序'), $node['order_by_time'], false, null, 'radio-inline');
-
         $form['publish'] = Swoole\Form::radio('publish',
             array('0' => '关闭', '1' => '开启'), $node['publish'], false, null, 'radio-inline');
 
@@ -579,7 +640,6 @@ class Wiki_admin extends Swoole\Controller
 
         if (!empty($_POST))
         {
-
             if (!empty($_POST['content']) and $_POST['content'][0] == '`')
             {
                 $_POST['content'] = ' '.$_POST['content'];
@@ -603,7 +663,8 @@ class Wiki_admin extends Swoole\Controller
 
             $cont->title = trim($_POST['title']);
             $cont->content = $_POST['content'];
-            $cont->close_comment = $_POST['close_comment'];
+            $cont->close_comment = intval($_POST['close_comment']);
+            $cont->close_edit = intval($_POST['close_edit']);
             $cont->uptime = time();
 
             //更新节点

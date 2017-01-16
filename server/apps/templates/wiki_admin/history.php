@@ -23,7 +23,7 @@
     <title><?=$wiki_page['title']?>_Swoole文档中心</title>
 </head>
 <body>
-    <div class="main_right">
+    <div class="main_right" style="width: 96%;">
         <style type="text/css">
             td {
                 vertical-align: middle !important;
@@ -58,6 +58,7 @@
                     <td><a href="/page/user/uid-<?= $li['uid'] ?>"><?= $users[$li['uid']] ?></a></td>
                     <td><?=$li['addtime']?></td>
                     <td>
+                        <a href="/wiki_admin/revert/?id=<?=$_GET['id']?>&version=<?=$li['version']?>" class="btn btn-sm btn-warning">回滚到此版本</a>
                         <a href="/wiki_admin/diff/?id=<?=$_GET['id']?>&version=<?=$li['version']?>&compare=current" class="btn btn-sm btn-info">与当前版本对比</a>
                         <?php if ($li['version'] > 0) {?>
                         <a href="/wiki_admin/diff/?id=<?=$_GET['id']?>&version=<?=$li['version']?>&compare=last" class="btn btn-sm btn-default">与上个版本对比</a>

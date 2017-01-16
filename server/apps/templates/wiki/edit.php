@@ -13,6 +13,7 @@
     <link href="/static/css/code.css" rel="stylesheet">
     <link href="/static/editor.md/css/editormd.css" rel="stylesheet">
     <link rel="StyleSheet" href="/static/js/tree/dtree.css" type="text/css" />
+    <link rel="StyleSheet" href="/static/css/doc.css" type="text/css" />
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
     <script src="/static/bootstrap3/dist/js/html5shiv.js"></script>
@@ -22,65 +23,38 @@
     <script src="/static/js/jquery.min.js"></script>
     <script src="/static/js/dtree.js"></script>
     <script src="/static/editor.md/editormd.min.js"></script>
-    <title>新建页面_Swoole文档中心</title>
+    <title>编辑页面_Swoole文档中心</title>
 </head>
 <body>
-<div class="main_right" style="width: 96%;overflow-y: scroll;">
-        <?php if (!empty($info)): ?>
-        <div id="alert-info" class="alert alert-success"><?= $info ?></div>
-        <script>
-            //parent.window.frames['tree'].location.reload();
-            setTimeout(function(){$('#alert-info').hide(500);}, 2000);
-        </script>
-        <?php endif; ?>
+<div class="main" style="width: 96%; margin-top: 20px;">
+        <?php if (!empty($info)){ ?>
+        <div id="alert-info" class="alert alert-success"><?= $info ?> <a href="/wiki/page/<?=$page['id']?>.html">点击返回</a></div>
+        <?php }else{ ?>
+            <div class="bs-callout bs-callout-info" style="margin-top: 0" id="div_notice">
+                <h4>感谢您向我们贡献文档！
+                    <button type="button" class="close" onclick="$('#div_notice').hide(200);"><span
+                            aria-hidden="true">×</span><span
+                            class="sr-only">Close</span></button>
+                </h4>
+                <p style="line-height: 2; margin-top: 15px;">请遵守
+                    <a href="/wiki/page/p-document_contribution.html" target="_blank">《Swoole社区文档编辑条例》</a>中约定的各项细则，编辑成功后系统会自动将您的名字加入贡献者名单。
+                    <br/>请勿恶意编辑内容，否则根据社区编辑规则您的账户会被加入黑名单。</p>
+            </div>
+        <?php } ?>
         <form method="post">
             <div class="form-group">
                 <input type="input" name="title" style="width: 100%;" value="<?= $this->value($page, 'title') ?>"
                        class="form-control" placeholder="请输入标题">
             </div>
-            <div class="form-group">
-                <input type="input" name="link" style="width: 100%;" value="<?= $this->value($node, 'link') ?>"
-                       class="form-control" placeholder="请输入页面文件名">
-            </div>
-            <?php if (empty($node['markdown_file'])) :?>
             <div class="form-group" id="md_editor">
                 <textarea id="content" name="content"
                           style="width: 100%; height: 640px;"><?= $this->value($page, 'content') ?></textarea>
             </div>
-            <div class="form-group">
-                <?php if ($use_editor){ ?>
-                <a href="javascript: location.href += '&editor=0';"> 使用文本编辑器</a>
-                <?php }else{ ?>
-                <a href="javascript: location.href += '&editor=1';"> 使用MarkDown编辑器</a>
-                <?php } ?>
-            </div>
-            <?php endif; ?>
-            <div class="form-group">
-                <span>允许评论：</span>
-                <?= $form['comment'] ?>
-            </div>
-            <div class="form-group">
-                <span>是否公开：</span>
-                <?= $form['publish'] ?>
-            </div>
-            <div class="form-group">
-                <span>允许编辑：</span>
-                <?= $form['close_edit'] ?>
-            </div>
-            <div class="form-group">
-                <span>时间排序：</span>
-                <?= $form['order_by_time'] ?>
-            </div>
-            <div class="form-group">
-                <input type="input" name="markdown_file" value="<?= $this->value($node, 'markdown_file') ?>"
-                       class="form-control" placeholder="请输入Markdow页面Git地址">
-            </div>
             <hr>
-                <button type="submit" class="button btn-primary">提交</button>
-                <button type="button" class="button" onclick="history.back()">取消</button>
+                <button type="submit" class="button btn-primary">提交编辑</button>
+                <button type="button" class="button" onclick="history.back()">取消并返回</button>
         </form>
 </div>
-<?php if (empty($node['markdown_file']) and $use_editor){ ?>
 <script>
     var WikiEditor;
     $(function () {
@@ -95,6 +69,5 @@
         });
     });
 </script>
-<?php } ?>
 </body>
 </html>

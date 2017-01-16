@@ -27,7 +27,7 @@ class Wiki extends Swoole\Controller
 
     function index()
     {
-        if(isset($_GET['prid']))
+        if (isset($_GET['prid']))
         {
             $this->project_id = intval($_GET['prid']);
         }
@@ -219,10 +219,66 @@ class Wiki extends Swoole\Controller
         $this->swoole->tpl->assign("tree", $tree);
     }
 
-    function tree()
+    function edit()
     {
-        $this->swoole->tpl->assign("tree", json_encode(App\Content::getTree($this->project_id)));
-        $this->swoole->tpl->display("wiki/tree.html");
+        $this->user->loginRequire();
+        if (empty($_GET['id']))
+        {
+            return "error: requirer miki_page id";
+        }
+
+        $id = (int)$_GET['id'];
+        $_cont = model('WikiContent');
+        $_tree = model('WikiTree');
+
+        $cont = $_cont->get($id);
+        $node = $_tree->get($id);
+
+        if ($cont->close_edit == 1)
+        {
+            return "管理员已禁止编辑本页面。";
+        }
+
+        if (!empty($_POST))
+        {
+            if (!empty($_POST['content']) and $_POST['content'][0] == '`')
+            {
+                $_POST['content'] = ' '.$_POST['content'];
+            }
+
+            $uid =  $_SESSION['user_id'];
+            //更新内容和标题
+            if (!($_POST['content'] === $cont->content and trim($_POST['title']) == $cont->title))
+            {
+                //写入历史记录
+                $_historyTable = table('wiki_history');
+                $_historyTable->put(array(
+                    'wiki_id' => $node->id,
+                    'uid' => $uid,
+                    'content' => $cont->content,
+                    'title' => $cont->title,
+                    'version' => intval($cont->version),
+                ));
+                //增加版本号
+                $cont->version = intval($cont->version) + 1;
+            }
+
+            $cont->title = trim($_POST['title']);
+            $cont->content = $_POST['content'];
+            $cont->uptime = time();
+
+            //更新节点
+            $node->update_uid = $uid;
+            $node->text = $cont->title;
+            $node->link = trim($_POST['link']);
+
+            $node->save();
+            $cont->save();
+            $this->assign("info", "编辑成功，感谢您的贡献！");
+        }
+        $this->assign("node", $node->get());
+        $this->assign("page", $cont->get());
+        $this->display();
     }
 }
 

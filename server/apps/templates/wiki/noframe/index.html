@@ -81,7 +81,13 @@
     <div class="wiki_content blob instapaper_body">
         <article class="markdown-body entry-content" itemprop="mainContentOfPage">
             {{if $wiki_page}}
-            <h1>{{$wiki_page.title}}</h1>
+            <h1 id="h_title">{{$wiki_page.title}}
+                {{if $wiki_page.close_edit == 0}}
+                <small class="right" style="font-size: 14px; margin-top: 40px;">
+                    <a href="/wiki/edit/?id={{$wiki_page.id}}">[编辑本页]</a>
+                </small>
+                {{/if}}
+            </h1>
             {{/if}}
             {{$content}}
         </article>
