@@ -33,19 +33,12 @@ class Page extends App\FrontPage
             $keys = $oauth->getRequestToken();
             $_SESSION['oauth_keys'] = $keys;
             $_SESSION['oauth_serv'] = 'sina';
-            $login_url = $oauth->getAuthorizeURL($keys['oauth_token'], false, WEBROOT . '/page/oauth_callback/');
+            $login_url = $oauth->getAuthorizeURL($keys['oauth_token'], false, $conf['callback']);
             $this->swoole->http->redirect($login_url);
         }
-        elseif ($_GET['s'] == 'qq')
+        else
         {
-
-            $conf = $this->config['oauth']['qq'];
-            $oauth = new \QQOAuth($conf['APP_ID'], $conf['APP_KEY']);
-            $token = $oauth->getRequestToken();
-            $_SESSION['oauth_keys'] = $token;
-            $_SESSION['oauth_serv'] = 'qq';
-            $login_url = $oauth->getAuthorizeURL($token, WEBROOT . '/page/oauth_callback/');
-            $this->swoole->http->redirect($login_url);
+            return "不支持等OAuth类型。";
         }
     }
 
@@ -84,40 +77,7 @@ class Page extends App\FrontPage
 			$_SESSION['user'] = $u;
 			$this->setLoginStat();
             $this->http->redirect(WEBROOT."/person/index/");
-		}
-		elseif($_SESSION['oauth_serv']=='qq')
-		{
-            $conf = $this->swoole->config['oauth']['qq'];
-			
-			$oauth = new \QQOAuth($conf['APP_ID'], $conf['APP_KEY']);
-			$oauth->getAccessToken($_GET['oauth_token'], $_SESSION['oauth_keys']['oauth_token_secret'], $_GET['oauth_vericode']);
-
-			$username = $oauth->access_token['openid'];
-
-			$model = createModel('UserInfo');
-			$u = $model->get($username,'username')->get();
-            //不存在，则插入数据库
-            if (empty($u))
-            {
-                $user = $oauth->api_get('user/get_user_info');
-                if (empty($user))
-                {
-                    return Swoole\JS::js_back("请求错误");
-                }
-
-				$u['username'] = $username;
-				$u['nickname'] = $user['nickname'];
-				$u['avatar'] = $user['figureurl_2'];
-				//插入到表中
-				$u['id'] = $model->put($u);
-			}
-			//写入SESSION
-			$_SESSION['isLogin'] = 1;
-			$_SESSION['user_id'] = $u['id'];
-			$_SESSION['user'] = $u;
-			$this->setLoginStat();
-            $this->http->redirect(WEBROOT."/person/index/");
-		}
+        }
 	}
 
 	function flist()
@@ -338,15 +298,6 @@ class Page extends App\FrontPage
 			$this->swoole->tpl->assign('forms',$_forms);
 			$this->swoole->tpl->display();
 		}
-	}
-	function chatroom()
-	{
-		session();
-        Swoole\Auth::$login_url = '/page/login/?';
-        Swoole\Auth::login_require();
-		$userInfo = createModel('UserInfo');
-		$this->swoole->tpl->assign('user',$userInfo->get($_SESSION['user_id'])->get());
-		$this->swoole->tpl->display();
 	}
 
 	/**
