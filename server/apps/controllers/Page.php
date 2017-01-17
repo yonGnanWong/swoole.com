@@ -528,5 +528,8 @@ class Page extends App\FrontPage
 		$tm = time();
         Swoole\Cookie::set('uname', $_SESSION['user']['nickname'], $tm + 86400 * 30, '/');
         Swoole\Cookie::set('uid', $_SESSION['user_id'], $tm + 86400 * 30, '/');
+        $user = $this->model->UserInfo->get($_SESSION['user_id']);
+        $user->lastlogin = Swoole\Tool::now();
+        $user->lastip = $this->request->getClientIP();
 	}
 }
