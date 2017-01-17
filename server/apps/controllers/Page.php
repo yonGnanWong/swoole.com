@@ -2,9 +2,10 @@
 namespace App\Controller;
 use App;
 use Swoole;
+use ZenAPI\QqClient;
+use ZenAPI\QqOAuth2;
 
-require_once APPSPATH.'/classes/WeiboOAuth.php';
-require_once APPSPATH.'/classes/qqoauth.func.php';
+require_once APPSPATH.'/include/libweibo/saetv2.ex.class.php';
 
 class Page extends App\FrontPage
 {
@@ -23,62 +24,119 @@ class Page extends App\FrontPage
         return $verifyCode['image'];
     }
 
-    function oauth()
-    {
-        session();
-        if (empty($_GET['s']) or $_GET['s'] == 'sina')
-        {
-            $conf = $this->config['oauth']['weibo'];
-            $oauth = new \WeiboOAuth($conf['appid'], $conf['skey']);
-            $keys = $oauth->getRequestToken();
-            $_SESSION['oauth_keys'] = $keys;
-            $_SESSION['oauth_serv'] = 'sina';
-            $login_url = $oauth->getAuthorizeURL($keys['oauth_token'], false, $conf['callback']);
-            $this->swoole->http->redirect($login_url);
-        }
-        else
-        {
-            return "不支持等OAuth类型。";
-        }
-    }
-
-	function oauth_callback()
+	function callback_weibo()
 	{
         session();
-        if ($_SESSION['oauth_serv'] == 'sina')
+        if (empty($_GET['code']))
         {
-			$conf = $this->config['oauth']['weibo'];
-			$oauth = new \WeiboOAuth($conf['appid'], $conf['skey'], $_SESSION['oauth_keys']['oauth_token'], $_SESSION['oauth_keys']['oauth_token_secret']);
-			$_SESSION['last_key'] = $oauth->getAccessToken($_REQUEST['oauth_verifier']);
+            $this->http->redirect('/page/login/');
+            return;
+        }
 
-            $client = new \WeiboClient($conf['appid'], $conf['skey'], $_SESSION['last_key']['oauth_token'],
-                $_SESSION['last_key']['oauth_token_secret']);
-            $userinfo = $client->verify_credentials();
+        $conf = $this->config['oauth']['weibo'];
+        $oauth = new \SaeTOAuthV2($conf['appid'], $conf['skey']);
+        $keys['code'] = $_GET['code'];
+        $keys['redirect_uri'] = $conf['callback'];
+
+        $token = $oauth->getAccessToken('code', $keys);
+        if ($token)
+        {
+            $_SESSION['weibo_token'] = $token;
+            $client = new \SaeTClientV2($conf['appid'], $conf['skey'], $token['access_token']);
+            $uid = $client->get_uid();
+            $userinfo = $client->show_user_by_id($uid['uid']);
             if (!isset($userinfo['id']))
             {
-                return "请求错误:" . var_export($userinfo, $conf, $_SESSION, true);
+                return "请求错误.";
             }
-			$model = createModel('UserInfo');
-			$username = 'sina_'.$userinfo['id'];
-			$u = $model->get($username,'username')->get();
-			//不存在，则插入数据库
-			if(empty($u))
-			{
-				$u['username'] = $username;
-				$u['nickname'] = $userinfo['name'];
-				$u['avatar'] = $userinfo['profile_image_url'];
-				list($u['province'],$u['city']) = explode(' ',$userinfo['location']);
-				//插入到表中
-				$u['id'] = $model->put($u);
-			}
-			//写入SESSION
-			$_SESSION['isLogin'] = 1;
-			$_SESSION['user_id'] = $u['id'];
-			$_SESSION['user'] = $u;
-			$this->setLoginStat();
+            $model = createModel('UserInfo');
+            $username = 'sina_' . $userinfo['id'];
+            $u = $model->get($username, 'username');
+            //不存在，则插入数据库
+            if (!$u->exist())
+            {
+                $u['username'] = $username;
+                $u['nickname'] = $userinfo['name'];
+                $u['avatar'] = $userinfo['avatar_large'];
+                $u['blog'] = $userinfo['url'];
+                list($u['province'], $u['city']) = explode(' ', $userinfo['location']);
+                //插入到表中
+                $u['id'] = $model->put($u);
+            }
+            else
+            {
+                $u->nickname = $userinfo['name'];
+                $u->avatar = $userinfo['avatar_large'];
+                $u->blog = $userinfo['url'];
+                $u->save();
+            }
+            //写入SESSION
+            $_SESSION['isLogin'] = 1;
+            $_SESSION['user_id'] = $u['id'];
+            $_SESSION['user'] = $u;
+            $this->setLoginStat();
             $this->http->redirect(WEBROOT."/person/index/");
         }
 	}
+
+    function callback_qq()
+    {
+        session();
+        if (empty($_GET['code']))
+        {
+            $this->http->redirect('/page/login/');
+            return;
+        }
+
+        $conf = $this->config['oauth']['qq'];
+        Swoole\Loader::addNameSpace('ZenAPI', APPSPATH . '/include/zenapi');
+        $oauth = new QqOAuth2($conf['appid'], $conf['skey']);
+        $keys['code'] = $_GET['code'];
+        $keys['redirect_uri'] = $conf['callback'];
+
+        $token = $oauth->getAccessToken('code', $keys);
+        if ($token)
+        {
+            $openid = $oauth->getOpenid($token['access_token']);
+            $_SESSION['qq_token'] = $token;
+            $client = new QqClient($token['access_token'], $conf['appid'], $openid['openid']);
+            $userinfo = $client->get('user/get_user_info');
+            if (!isset($userinfo['ret']) and $userinfo['ret'] != 0)
+            {
+                return "请求错误. 错误码：{$userinfo['ret']}\n";
+            }
+            $model = createModel('UserInfo');
+            $username = $openid['openid'];
+            $u = $model->get($username, 'username');
+            //不存在，则插入数据库
+            if (!$u->exist())
+            {
+                $u['username'] = $username;
+                $u['nickname'] = $userinfo['nickname'];
+                $u['avatar'] = $userinfo['figureurl_2'];
+                $u['birth_year'] = $userinfo['year'];
+                $u['province'] = $userinfo['province'];
+                $u['city'] = $userinfo['city'];
+                $u['sex'] = $userinfo['gender'] == '男' ? 1 : 2;
+                //插入到表中
+                $u['id'] = $model->put($u);
+            }
+            else
+            {
+                $u->nickname = $userinfo['nickname'];
+                $u->avatar = $userinfo['figureurl_2'];
+                $u->province = $userinfo['province'];
+                $u->city = $userinfo['city'];
+                $u->save();
+            }
+            //写入SESSION
+            $_SESSION['isLogin'] = 1;
+            $_SESSION['user_id'] = $u->_current_id;
+            $_SESSION['user'] = $u;
+            $this->setLoginStat();
+            $this->http->redirect(WEBROOT."/person/index/");
+        }
+    }
 
 	function flist()
 	{
@@ -233,12 +291,29 @@ class Page extends App\FrontPage
         }
         else
         {
-            $this->swoole->tpl->display();
+            $conf = $this->config['oauth']['weibo'];
+            $weibo_oauth = new \SaeTOAuthV2($conf['appid'], $conf['skey']);
+            $weibo_login_url = $weibo_oauth->getAuthorizeURL($conf['callback']);
+
+            Swoole\Loader::addNameSpace('ZenAPI', APPSPATH . '/include/zenapi');
+            $conf = $this->config['oauth']['qq'];
+            $qq_oauth = new QqOAuth2($conf['appid'], $conf['skey']);
+            $qq_login_url = $qq_oauth->getAuthorizeURL(array(
+                'client_id' => $conf['appid'],
+                'redirect_uri'  =>  $conf['callback'],
+                'response_type' => 'code',
+                'display'   => null,
+                'scope'     => $conf['scope'],
+            ));
+            $this->tpl->assign('weibo_login_url', $weibo_login_url);
+            $this->tpl->assign('qq_login_url', $qq_login_url);
+            $this->tpl->display();
         }
     }
 
     function logout()
     {
+        $this->http->setcookie('uname', '', null, '/', 'swoole.com');
         $this->user->logout();
         $this->swoole->http->redirect('/page/login/');
     }
@@ -451,7 +526,7 @@ class Page extends App\FrontPage
 	private function setLoginStat()
 	{
 		$tm = time();
-        Swoole\Cookie::set('uname', $_SESSION['user']['nickname'], $tm+86400*30,'/');
-        Swoole\Cookie::set('uid', $_SESSION['user_id'], $tm+86400*30,'/');
+        Swoole\Cookie::set('uname', $_SESSION['user']['nickname'], $tm + 86400 * 30, '/');
+        Swoole\Cookie::set('uid', $_SESSION['user_id'], $tm + 86400 * 30, '/');
 	}
 }
