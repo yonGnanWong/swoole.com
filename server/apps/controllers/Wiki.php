@@ -257,7 +257,6 @@ class Wiki extends Swoole\Controller
                     'uid' => $uid,
                     'content' => $cont->content,
                     'title' => $cont->title,
-                    'project_id' => $node->project_id,
                     'version' => intval($cont->version),
                 ));
                 //增加版本号

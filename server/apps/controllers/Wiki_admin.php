@@ -97,6 +97,35 @@ class Wiki_admin extends Swoole\Controller
         $this->display();
     }
 
+    function update_list()
+    {
+        $_table = table('wiki_tree');
+
+        $list = $_table->gets(array(
+            'select' => ' wiki_tree.id wiki_id, text title, update_uid, wiki_content.uptime uptime, wiki_content.version version',
+            'project_id' => $this->project_id,
+            'page' => empty($_GET['page']) ? 1 : intval($_GET['page']),
+            'pagesize' => 15,
+            'order' => 'uptime desc',
+            'leftjoin' => array('wiki_content', '`wiki_tree`.id =  `wiki_content`.id'),
+        ));
+
+        $uid_list = array();
+        foreach($list as $li)
+        {
+            if (empty($li['update_uid']))
+            {
+                continue;
+            }
+            $uid_list[] = $li['update_uid'];
+        }
+        $uid_list = array_unique($uid_list);
+        $users = Model('UserInfo')->getMap(array('in' => array('id', $uid_list)), 'nickname');
+        $this->assign('users', $users);
+        $this->assign('list', $list);
+        $this->display();
+    }
+
     function history()
     {
         if (empty($_GET['id']))
@@ -483,6 +512,7 @@ class Wiki_admin extends Swoole\Controller
             $in2['id'] = $node_id;
             $in2['close_comment'] = intval($_POST['close_comment']);
             $in2['close_edit'] = intval($_POST['close_edit']);
+            $in2['project_id'] = $this->project_id;
             $_cont->put($in2);
 
             //写入历史记录
@@ -492,7 +522,6 @@ class Wiki_admin extends Swoole\Controller
                 'uid' => $this->uid,
                 'content' => $_POST['content'],
                 'title' => $in['text'],
-                'project_id' => $this->project_id,
                 'version' => 0,
             ));
             $this->reflushPage('增加成功');
@@ -656,7 +685,6 @@ class Wiki_admin extends Swoole\Controller
                     'uid' => $this->uid,
                     'content' => $cont->content,
                     'title' => $cont->title,
-                    'project_id' => $this->project_id,
                     'version' => intval($cont->version),
                 ));
                 //增加版本号
