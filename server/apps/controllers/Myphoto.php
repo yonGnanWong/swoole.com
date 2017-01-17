@@ -7,7 +7,6 @@ class Myphoto extends App\UserBase
 {
     /**
      * 相片的呈现
-     * @return unknown_type
      */
     function index()
     {
@@ -23,6 +22,7 @@ class Myphoto extends App\UserBase
         if(isset($_GET['from'])) $this->swoole->tpl->display('myphoto_insert.html');
         else $this->swoole->tpl->display('myphoto_index.html');
     }
+
     /**
      * 用flash添加照片
      */
@@ -33,9 +33,9 @@ class Myphoto extends App\UserBase
             global $php;
             $php->upload->thumb_width = 136;
             $php->upload->thumb_height = 136;
-            $php->upload->max_width = 500;
-            $php->upload->max_height = 500;
-            $php->upload->thumb_qulitity = 100;
+            $php->upload->max_width = 1280;
+            $php->upload->max_height = 1280;
+            $php->upload->thumb_qulitity = 90;
             $php->upload->sub_dir = 'user_images';
             $up_pic = Swoole::$php->upload->save('Filedata');
             if (empty($up_pic))

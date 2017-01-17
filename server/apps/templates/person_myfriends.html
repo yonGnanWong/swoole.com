@@ -22,7 +22,9 @@
 <div class="welcome">您还没有好友，赶快去添加好友吧</div>{{/if}}
 {{foreach item=v from=$list}}
 <div class="friend">
-<div class="userPic" style="max-width:150px"> <a href="/page/user/uid-{{$v.uid}}"><img class="avatar photo" src="{{$v.avatar|default:'/static/images/default.png'}}"></a>
+<div class="userPic" style="max-width:150px">
+    <a href="/page/user/uid-{{$v.uid}}">
+        <img style="max-width:100px" class="avatar photo" src="{{$v.avatar|default:'/static/images/default.png'}}"></a>
 </div>
 <a href="/page/user/uid-{{$v.uid}}">{{$v.nickname}}</a><br />
 最近登录：<span>{{$v.addtime|howLongAgo}} <br />

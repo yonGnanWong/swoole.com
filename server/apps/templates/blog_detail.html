@@ -27,10 +27,9 @@ window.onload = function(){
 <!--欢迎页面-->
 <div class="microblog" id='mblog_list' style="border-bottom:1px dotted #CCC; margin-top:12px;">
 <div class="welcome">{{$blog.title}} <span class="date" style="float:right">
-发表时间：{{$blog.addtime}}</span></div>
+发表时间：{{$blog.addtime|howLongAgo}}</span></div>
 <div class="content">{{$blog.content}}</div>
 <div class="clear"></div>
-<div class="pages">{{$pager.render}}</div>
 </div>
 <div id='comment' style="margin-top:12px;">
 <table width="620" border="0" align="left" cellpadding="0" cellspacing="0" style="margin-top:12px;">	

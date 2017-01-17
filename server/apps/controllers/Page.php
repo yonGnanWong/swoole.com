@@ -120,6 +120,7 @@ class Page extends App\FrontPage
                 $u['sex'] = $userinfo['gender'] == '男' ? 1 : 2;
                 //插入到表中
                 $u['id'] = $model->put($u);
+                $uid = $u['id'];
             }
             else
             {
@@ -128,10 +129,11 @@ class Page extends App\FrontPage
                 $u->province = $userinfo['province'];
                 $u->city = $userinfo['city'];
                 $u->save();
+                $uid = $u->get()['id'];
             }
             //写入SESSION
             $_SESSION['isLogin'] = 1;
-            $_SESSION['user_id'] = $u->_current_id;
+            $_SESSION['user_id'] = $uid;
             $_SESSION['user'] = $u;
             $this->setLoginStat();
             $this->http->redirect(WEBROOT."/person/index/");
@@ -514,14 +516,18 @@ class Page extends App\FrontPage
 			$php->tpl->display('guestbook.html');
 		}
 	}
-	function user()
-	{
-		if(empty($_GET['uid'])) exit('Uid is empty');
-		$uid = (int)$_GET['uid'];
-		$this->userinfo($uid);
-		$this->getMblogs(10,$uid);
-		$this->swoole->tpl->display();
-	}
+
+    function user()
+    {
+        if (empty($_GET['uid']))
+        {
+            exit('Uid is empty');
+        }
+        $uid = (int)$_GET['uid'];
+        $this->userinfo($uid);
+        $this->getMblogs(10, $uid);
+        $this->swoole->tpl->display();
+    }
 
 	private function setLoginStat()
 	{

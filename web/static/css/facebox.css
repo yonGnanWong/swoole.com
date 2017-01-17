@@ -58,8 +58,9 @@
 }
 
 #facebox img {
-  border: 0;
-  margin: 0;
+    border: 0;
+    margin: 0;
+    max-width: 900px;
 }
 
 #facebox_overlay {

@@ -4,51 +4,67 @@ use Swoole;
 
 class FrontPage extends Swoole\Controller
 {
-	/**
-	 * 展示用户信息
-	 * @param $uid
-	 * @return unknown_type
-	 */
+    /**
+     * 展示用户信息
+     * @param $uid
+     * @throws Swoole\Exception\NotFound
+     * @throws \Exception
+     */
 	protected function userinfo($uid)
 	{
-		$_user = createModel('UserInfo');
-		$_cate = createModel('UserLogCat');
-		$_pic = createModel('UserPhoto');
-		$user = $_user->getInfo($uid);
-		if(empty($user)) return false;
+        $_user = createModel('UserInfo');
+        $_cate = createModel('UserLogCat');
+        $_pic = createModel('UserPhoto');
+        $user = $_user->getInfo($uid);
+        if (empty($user))
+        {
+            throw new Swoole\Exception\NotFound("user[$uid] not found.");
+        }
 
-		if(!empty($user['skill']))
+        if (!empty($user['skill']))
         {
             $user['skill_info'] = implode('、', $user['skill']);
         }
-		$gets2['select'] = 'name,id,num';
-		$gets2['uid'] = $uid;
-		$gets2['order'] = 'id';
-		$gets2['limit'] = 15;
-		$blog_cates = $_cate->gets($gets2);
-		if($user['sex']=='女') $ta = '她';
-		else if($user['sex']=='男') $ta = '他';
-        else $ta = "TA";
-	
-		$this->swoole->tpl->assign('user',$user);
-		$this->swoole->tpl->assign('ta',$ta);
-		$this->swoole->tpl->assign('blog_cates',$blog_cates);
+        $gets2['select'] = 'name,id,num';
+        $gets2['uid'] = $uid;
+        $gets2['order'] = 'id';
+        $gets2['limit'] = 15;
+        $blog_cates = $_cate->gets($gets2);
+        if ($user['sex'] == '女')
+        {
+            $ta = '她';
+        }
+        else
+        {
+            if ($user['sex'] == '男')
+            {
+                $ta = '他';
+            }
+            else
+            {
+                $ta = "TA";
+            }
+        }
 
-		$gets3['uid'] = $uid;
-		$c = $_pic->count($gets3);
-		$this->swoole->tpl->assign('myphoto_count',$c);
-		if($c>0)
-		{
-			$gets3['limit'] = 1;
-			$gets3['select'] = 'imagep';
-			$pic = $_pic->gets($gets3);
-			$this->swoole->tpl->assign('myphoto',$pic[0]);
-		}
+        $this->swoole->tpl->assign('user', $user);
+        $this->swoole->tpl->assign('ta', $ta);
+        $this->swoole->tpl->assign('blog_cates', $blog_cates);
+
+        $gets3['uid'] = $uid;
+        $c = $_pic->count($gets3);
+        $this->swoole->tpl->assign('myphoto_count', $c);
+        if ($c > 0)
+        {
+            $gets3['limit'] = 1;
+            $gets3['select'] = 'imagep';
+            $pic = $_pic->gets($gets3);
+            $this->swoole->tpl->assign('myphoto', $pic[0]);
+        }
 	}
+
 	/**
 	 * 获取微博客内容列表
 	 * @param $pagesize
-	 * @return unknown_type
 	 */
 	protected function getMblogs($pagesize=10,$uid=0)
 	{
@@ -90,19 +106,25 @@ class FrontPage extends Swoole\Controller
                 $mblogs_atta['pic'][] = $m['pic_id'];
             }
         }
-		if(!empty($mblogs_atta['pic']))
-		{
-			$pics = $_photo->getMap(array('select'=>'id,imagep,picture','in'=>array('id',implode(',',$mblogs_atta['pic']))));
-			$this->swoole->tpl->assign('pics',$pics);
-		}
-		if(!empty($mblogs_atta['url']))
-		{
+        if (!empty($mblogs_atta['pic']))
+        {
+            $pics = $_photo->getMap(array(
+                'select' => 'id,imagep,picture',
+                'in' => array('id', implode(',', $mblogs_atta['pic']))
+            ));
+            $this->swoole->tpl->assign('pics', $pics);
+        }
+        if (!empty($mblogs_atta['url']))
+        {
 
-			$urls = $_link->getMap(array('select'=>'id,title,url','in'=>array('id',implode(',',$mblogs_atta['url']))));
-			$this->swoole->tpl->assign('urls',$urls);
-		}
-		$this->swoole->tpl->assign('mblogs',$mblogs);
-		$this->swoole->tpl->assign('pager',$pager);
+            $urls = $_link->getMap(array(
+                'select' => 'id,title,url',
+                'in' => array('id', implode(',', $mblogs_atta['url']))
+            ));
+            $this->swoole->tpl->assign('urls', $urls);
+        }
+        $this->swoole->tpl->assign('mblogs', $mblogs);
+        $this->swoole->tpl->assign('pager', $pager);
 	}
 	
 	function getActiveUsers($num = 10)
