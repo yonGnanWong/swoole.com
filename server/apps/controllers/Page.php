@@ -2,6 +2,7 @@
 namespace App\Controller;
 use App;
 use Swoole;
+use ZenAPI\Exception;
 use ZenAPI\QqClient;
 use ZenAPI\QqOAuth2;
 
@@ -55,13 +56,14 @@ class Page extends App\FrontPage
             //不存在，则插入数据库
             if (!$u->exist())
             {
-                $u['username'] = $username;
-                $u['nickname'] = $userinfo['name'];
-                $u['avatar'] = $userinfo['avatar_large'];
-                $u['blog'] = $userinfo['url'];
-                list($u['province'], $u['city']) = explode(' ', $userinfo['location']);
+                $user['username'] = $username;
+                $user['nickname'] = $userinfo['name'];
+                $user['avatar'] = $userinfo['avatar_large'];
+                $user['blog'] = $userinfo['url'];
+                list($user['province'], $user['city']) = explode(' ', $userinfo['location']);
                 //插入到表中
-                $u['id'] = $model->put($u);
+                $user['id'] = $model->put($user);
+                $uid = $user['id'];
             }
             else
             {
@@ -69,11 +71,13 @@ class Page extends App\FrontPage
                 $u->avatar = $userinfo['avatar_large'];
                 $u->blog = $userinfo['url'];
                 $u->save();
+                $user = $u->get();
+                $uid = $user['id'];
             }
             //写入SESSION
             $_SESSION['isLogin'] = 1;
-            $_SESSION['user_id'] = $u['id'];
-            $_SESSION['user'] = $u;
+            $_SESSION['user_id'] = $uid;
+            $_SESSION['user'] = $user;
             $this->setLoginStat();
             $this->http->redirect(WEBROOT."/person/index/");
         }
@@ -98,6 +102,11 @@ class Page extends App\FrontPage
         if ($token)
         {
             $openid = $oauth->getOpenid($token['access_token']);
+            if (empty($openid['openid']))
+            {
+                return "请求错误. 错误码：{$openid['ret']}\n";
+            }
+
             $_SESSION['qq_token'] = $token;
             $client = new QqClient($token['access_token'], $conf['appid'], $openid['openid']);
             $userinfo = $client->get('user/get_user_info');
@@ -106,21 +115,25 @@ class Page extends App\FrontPage
                 return "请求错误. 错误码：{$userinfo['ret']}\n";
             }
             $model = createModel('UserInfo');
-            $username = $openid['openid'];
+            $username = trim($openid['openid']);
+            if (empty($username))
+            {
+                throw new Exception("QQ登录出错了");
+            }
             $u = $model->get($username, 'username');
             //不存在，则插入数据库
             if (!$u->exist())
             {
-                $u['username'] = $username;
-                $u['nickname'] = $userinfo['nickname'];
-                $u['avatar'] = $userinfo['figureurl_2'];
-                $u['birth_year'] = $userinfo['year'];
-                $u['province'] = $userinfo['province'];
-                $u['city'] = $userinfo['city'];
-                $u['sex'] = $userinfo['gender'] == '男' ? 1 : 2;
+                $user['username'] = $username;
+                $user['nickname'] = $userinfo['nickname'];
+                $user['avatar'] = $userinfo['figureurl_2'];
+                $user['birth_year'] = $userinfo['year'];
+                $user['province'] = $userinfo['province'];
+                $user['city'] = $userinfo['city'];
+                $user['sex'] = $userinfo['gender'] == '男' ? 1 : 2;
                 //插入到表中
-                $u['id'] = $model->put($u);
-                $uid = $u['id'];
+                $user['id'] = $model->put($user);
+                $uid = $user['id'];
             }
             else
             {
@@ -129,12 +142,13 @@ class Page extends App\FrontPage
                 $u->province = $userinfo['province'];
                 $u->city = $userinfo['city'];
                 $u->save();
-                $uid = $u->get()['id'];
+                $user = $u->get();
+                $uid = $user['id'];
             }
             //写入SESSION
             $_SESSION['isLogin'] = 1;
             $_SESSION['user_id'] = $uid;
-            $_SESSION['user'] = $u;
+            $_SESSION['user'] = $user;
             $this->setLoginStat();
             $this->http->redirect(WEBROOT."/person/index/");
         }
@@ -176,6 +190,7 @@ class Page extends App\FrontPage
 		$this->swoole->tpl->assign('ltitle',$ftype['typename']);
 		$this->swoole->tpl->display('page_news_index.html');
 	}
+
 	function detail()
 	{
 		$pagenews = $this->swoole->model->CmsNews->get((int)$_GET['d'])->get();
@@ -537,5 +552,6 @@ class Page extends App\FrontPage
         $user = $this->model->UserInfo->get($_SESSION['user_id']);
         $user->lastlogin = Swoole\Tool::now();
         $user->lastip = $this->request->getClientIP();
+        $user->save();
 	}
 }

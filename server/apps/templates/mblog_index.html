@@ -33,8 +33,9 @@ jQuery(document).ready(function($){
 
 {{foreach from=$users item=v}}
 <div style="clear:both;">
-<div class="userPic" style="margin-bottom:12px;"> <a href="/page/user/uid-{{$v.uid}}"><img class="avatar photo" src="{{$v.avatar|default:'/static/images/default.png'}}" /></a> </div>
-<a href="/page/user/uid-{{$v.uid}}" class="f12">{{$v.nickname}}</a>
+<div class="userPic" style="margin-bottom:12px;"> <a href="/page/user/uid-{{$v.id}}">
+    <img class="avatar photo" src="{{$v.avatar|default:'/static/images/default.png'}}" /></a> </div>
+<a href="/page/user/uid-{{$v.id}}" class="f12">{{$v.nickname}}</a>
 </div>
 {{/foreach}}
 </div>

@@ -19,6 +19,10 @@
                       <?php endforeach; ?>
                     </ul>
                     <div class="btn-group" style="margin-left: 600px;line-height: 50px;">
+
+                        <a href="/wiki_admin/update_list/" class="small" target="main">
+                            <span class="glyphicon glyphicon-list"></span> 更新列表</a>
+                        <span style="color: #fff; margin-left: 10px;margin-right: 10px;">|</span>
                         <a href="/wiki_admin/setting/prid-<?=$project_id?>" class="small" target="main">
                             <span class="glyphicon glyphicon-th"></span> 项目设置</a>
                         <span style="color: #fff; margin-left: 10px;margin-right: 10px;">|</span>

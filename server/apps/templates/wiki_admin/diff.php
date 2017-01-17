@@ -26,7 +26,7 @@
     <title>比较_Swoole文档中心</title>
 </head>
 <body>
-    <div class="main_right">
+    <div class="main_right" style="width: 96%">
         <style type="text/css">
             td {
                 vertical-align: middle !important;

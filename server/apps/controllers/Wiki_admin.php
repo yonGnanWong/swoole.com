@@ -492,6 +492,7 @@ class Wiki_admin extends Swoole\Controller
                 'uid' => $this->uid,
                 'content' => $_POST['content'],
                 'title' => $in['text'],
+                'project_id' => $this->project_id,
                 'version' => 0,
             ));
             $this->reflushPage('增加成功');
@@ -655,6 +656,7 @@ class Wiki_admin extends Swoole\Controller
                     'uid' => $this->uid,
                     'content' => $cont->content,
                     'title' => $cont->title,
+                    'project_id' => $this->project_id,
                     'version' => intval($cont->version),
                 ));
                 //增加版本号

@@ -133,19 +133,13 @@ class FrontPage extends Swoole\Controller
 		$_mblog = createModel('MicroBlog');
 		$_user = createModel('UserInfo');
 		$table = $_mblog->table;
-		$uids = $this->swoole->db->query("select uid from $table order by id desc limit 500")->fetchall();
+		$uids = $this->swoole->db->query("select distinct uid from $table order by id desc limit 20")->fetchall();
 		foreach($uids as $u)
 		{
-			$_uids[$u['uid']] = 1;
+			$_uids[] = $u['uid'];
 		}
-		$gets['select'] = 'id,nickname,avatar';
-		$gets['in'] = array('id', implode(',', array_keys($_uids)));
-		$_users = $_user->getMap($gets);
-		$new = array();
-		foreach($_uids as $uid=>$u)
-		{
-			$new[] = $_users[$uid];
-		}
-		return $new;
+        $gets['select'] = 'id, nickname, avatar';
+        $gets['in'] = array('id', $_uids);
+        return $_user->getMap($gets);
 	}
 }
