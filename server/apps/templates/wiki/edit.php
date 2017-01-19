@@ -51,8 +51,9 @@
                           style="width: 100%; height: 640px;"><?= $this->value($page, 'content') ?></textarea>
             </div>
             <hr>
-                <button type="submit" class="button btn-primary">提交编辑</button>
-                <button type="button" class="button" onclick="history.back()">取消并返回</button>
+            <button type="submit" class="button btn-primary">提交编辑</button>
+            <button type="button" class="button" onclick="location.href='/wiki/page/<?= $_GET['id'] ?>.html';">取消并返回
+            </button>
         </form>
 </div>
 <script>

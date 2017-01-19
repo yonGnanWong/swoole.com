@@ -3,12 +3,8 @@ namespace App\Controller;
 use App;
 use Swoole;
 
-require_once __DIR__ . '/../classes/php-markdown/Michelf/Markdown.php';
-require_once __DIR__ . '/../classes/php-markdown/Michelf/MarkdownExtra.php';
-require_once __DIR__ . '/../classes/Content.php';
-require_once __DIR__.'/../classes/xunsearch/lib/XS.php';
-
-use \Michelf;
+require_once dirname(__DIR__) . '/classes/Content.php';
+require_once dirname(__DIR__) . '/classes/xunsearch/lib/XS.php';
 
 class Wiki extends Swoole\Controller
 {
@@ -194,14 +190,7 @@ class Wiki extends Swoole\Controller
         $this->swoole->tpl->assign("wiki_page",  $this->pageInfo);
 
         markdown:
-        //GitHub Code Parse
-        $text = str_replace('```', '~~~', $text);
-        $parser = new Michelf\MarkdownExtra;
-        $parser->fn_id_prefix = "post22-";
-        $parser->code_attr_on_pre = false;
-        $parser->tab_width = 4;
-        $html = $parser->transform($text);
-
+        $html = App\Content::md2html($wiki_id, $text);
         $this->swoole->tpl->assign("content", $html);
     }
 
@@ -262,6 +251,10 @@ class Wiki extends Swoole\Controller
                 //增加版本号
                 $cont->version = intval($cont->version) + 1;
             }
+            else
+            {
+                goto display;
+            }
 
             $cont->title = trim($_POST['title']);
             $cont->content = $_POST['content'];
@@ -272,10 +265,20 @@ class Wiki extends Swoole\Controller
             $node->text = $cont->title;
             $node->link = trim($_POST['link']);
 
-            $node->save();
-            $cont->save();
+            //更新缓存
+            App\Content::clearCache($node->id);
+            if (!$node->save())
+            {
+                error:
+                $this->assign("info", "提交失败，请稍后重试！");
+            }
+            if (!$cont->save())
+            {
+                goto error;
+            }
             $this->assign("info", "编辑成功，感谢您的贡献！");
         }
+        display:
         $this->assign("node", $node->get());
         $this->assign("page", $cont->get());
         $this->display();

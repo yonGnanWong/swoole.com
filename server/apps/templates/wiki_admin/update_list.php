@@ -47,7 +47,7 @@
                         <span class="badge right">版本: <?=$li['version']?></span>
                     </td>
                     <td><a href="/wiki_admin/main/?id=<?= $li['wiki_id']?>"><?= $li['title'] ?></a></td>
-                    <td><a href="/page/user/uid-<?= $li['uid'] ?>"><?= $users[$li['update_uid']] ?></a></td>
+                    <td><a target="_blank" href="/page/user/uid-<?= $li['update_uid'] ?>"><?= $users[$li['update_uid']] ?></a></td>
                     <td><?=\Swoole\Tool::howLongAgo(date('Y-m-d H:i:s', $li['uptime']))?></td>
                     <td>
                         <a href="/wiki_admin/revert/?id=<?= $li['wiki_id']?>&version=<?=$li['version']-1?>" class="btn btn-sm btn-warning">回滚</a>

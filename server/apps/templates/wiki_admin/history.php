@@ -55,7 +55,7 @@
                         <span class="badge right">版本: <?=$li['version']?></span>
                     </td>
                     <td><a href="/wiki_admin/main/?id=<?= $_GET['id']?>&version=<?=$li['version']?>"><?= $li['title'] ?></a></td>
-                    <td><a href="/page/user/uid-<?= $li['uid'] ?>"><?= $users[$li['uid']] ?></a></td>
+                    <td><a target="_blank" href="/page/user/uid-<?= $li['uid'] ?>"><?= $users[$li['uid']] ?></a></td>
                     <td><?=$li['addtime']?></td>
                     <td>
                         <a href="/wiki_admin/revert/?id=<?=$_GET['id']?>&version=<?=$li['version']?>" class="btn btn-sm btn-warning">回滚到此版本</a>

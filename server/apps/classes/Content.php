@@ -1,6 +1,13 @@
 <?php
 namespace App;
 
+require_once dirname(__DIR__) . '/classes/php-markdown/Michelf/Markdown.php';
+require_once dirname(__DIR__) . '/classes/php-markdown/Michelf/MarkdownExtra.php';
+require_once dirname(__DIR__) . '/classes/Content.php';
+
+use \Michelf;
+use \Swoole;
+
 class Content
 {
     static $php;
@@ -138,5 +145,43 @@ class Content
             }
             return $childs;
         }
+    }
+
+    /**
+     * @param $wiki_id
+     * @param $text
+     * @return string
+     */
+    static function md2html($wiki_id, $text)
+    {
+        $key = 'wiki_page_'.$wiki_id;
+        $html = \Swoole::$php->cache->get($key);
+        if (!$html)
+        {
+            //GitHub Code Parse
+            $text = str_replace('```', '~~~', $text);
+            $parser = new Michelf\MarkdownExtra;
+            $parser->fn_id_prefix = "post22-";
+            $parser->code_attr_on_pre = false;
+            $parser->tab_width = 4;
+            $html = $parser->transform($text);
+            \Swoole::$php->cache->set($key, $html, 0);
+        }
+        else
+        {
+            \Swoole::$php->http->header('X-Cache', 'Memcache');
+        }
+        return $html;
+    }
+
+    /**
+     * 更新页面
+     * @param $wiki_id
+     * @return bool
+     */
+    static function clearCache($wiki_id)
+    {
+        $key = 'wiki_page_' . $wiki_id;
+        return \Swoole::$php->cache->delete($key);
     }
 }

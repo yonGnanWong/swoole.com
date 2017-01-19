@@ -3,9 +3,7 @@ namespace App\Controller;
 use App;
 use Swoole;
 
-require_once __DIR__ . '/../classes/php-markdown/Michelf/Markdown.php';
-require_once __DIR__ . '/../classes/php-markdown/Michelf/MarkdownExtra.php';
-require_once __DIR__ . '/../classes/Content.php';
+require_once dirname(__DIR__) . '/classes/Content.php';
 
 use \Michelf;
 
@@ -359,14 +357,7 @@ class Wiki_admin extends Swoole\Controller
         $this->assign("wiki_page", $wiki_page);
 
         markdown:
-        //GitHub Code Parse
-        $text = str_replace('```', '~~~', $text);
-        $parser = new Michelf\MarkdownExtra;
-        $parser->fn_id_prefix = "post22-";
-        $parser->code_attr_on_pre = false;
-        $parser->tab_width = 4;
-        $html = $parser->transform($text);
-
+        $html = App\Content::md2html($wiki_id, $text);
         $this->assign("content", $html);
     }
 
@@ -689,6 +680,7 @@ class Wiki_admin extends Swoole\Controller
                 ));
                 //增加版本号
                 $cont->version = intval($cont->version) + 1;
+                App\Content::clearCache($node->id);
             }
 
             $cont->title = trim($_POST['title']);
