@@ -210,6 +210,7 @@ class Wiki extends Swoole\Controller
 
     function edit()
     {
+        $this->session->start();
         $this->user->loginRequire();
         if (empty($_GET['id']))
         {

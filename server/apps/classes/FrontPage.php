@@ -60,6 +60,10 @@ class FrontPage extends Swoole\Controller
             $pic = $_pic->gets($gets3);
             $this->swoole->tpl->assign('myphoto', $pic[0]);
         }
+        else
+        {
+            $this->swoole->tpl->assign('myphoto', false);
+        }
 	}
 
 	/**

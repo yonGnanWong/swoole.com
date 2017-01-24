@@ -5,8 +5,6 @@ use Swoole;
 
 require_once dirname(__DIR__) . '/classes/Content.php';
 
-use \Michelf;
-
 class Wiki_admin extends Swoole\Controller
 {
     public $if_filter = false;
@@ -17,12 +15,15 @@ class Wiki_admin extends Swoole\Controller
 
     function __construct($swoole)
     {
+        parent::__construct($swoole);
+        if ($this->request->server['HTTP_HOST'] == 'wiki.swoole.com')
+        {
+            $this->http->redirect('http://www.swoole.com/wiki_admin/index/', 301);
+            return;
+        }
         session();
         //$this->swoole->db->debug = true;
-
         App\Content::$php = $swoole;
-        parent::__construct($swoole);
-
         if (isset($_GET['prid']))
         {
             $this->project_id = intval($_GET['prid']);
@@ -228,6 +229,7 @@ class Wiki_admin extends Swoole\Controller
         $node->update_uid = $this->uid;
         $node->save();
         $cont->save();
+        App\Content::clearCache($wiki_id);
         $this->http->redirect('/wiki_admin/main/?id='.$wiki_id);
     }
 
@@ -503,7 +505,6 @@ class Wiki_admin extends Swoole\Controller
             $in2['id'] = $node_id;
             $in2['close_comment'] = intval($_POST['close_comment']);
             $in2['close_edit'] = intval($_POST['close_edit']);
-            $in2['project_id'] = $this->project_id;
             $_cont->put($in2);
 
             //写入历史记录

@@ -6,6 +6,10 @@ if (!empty($_SERVER['SERVER_NAME']))
 {
     define("WEBROOT", 'http://' . $_SERVER['SERVER_NAME']);
 }
+else
+{
+    define("WEBROOT", 'http://www.swoole.com');
+}
 
 define("TABLE_PREFIX", 'st');
 define("SITENAME", 'Swoole_PHP开发社区');

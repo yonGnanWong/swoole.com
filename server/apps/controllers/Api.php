@@ -245,6 +245,26 @@ class Api extends Swoole\Controller
         echo json_encode($result, JSON_UNESCAPED_SLASHES);
     }
 
+    function get_user_info()
+    {
+        if (empty($_GET['token']))
+        {
+            $this->http->status(403);
+            return "access deny\n";
+        }
+
+        $token = trim($_GET['token']);
+        $user = $this->cache->get('login_token_'.$token);
+        if ($user)
+        {
+            return json_encode($user);
+        }
+        else
+        {
+            return json_encode(false);
+        }
+    }
+
     function login()
     {
         if (empty($_POST['password']) or empty($_POST['username']))

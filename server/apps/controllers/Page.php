@@ -78,10 +78,35 @@ class Page extends App\FrontPage
             $_SESSION['isLogin'] = 1;
             $_SESSION['user_id'] = $uid;
             $_SESSION['user'] = $user;
-            $this->setLoginStat();
-            $this->http->redirect(WEBROOT."/person/index/");
+            $this->loginSucess();
         }
 	}
+
+    /**
+     * 登录成功
+     */
+    protected function loginSucess()
+    {
+        $this->setLoginStat();
+        $refer = isset($_GET['refer']) ? $_GET['refer'] : WEBROOT . '/person/index/';
+        if (!empty($_GET['return_token']))
+        {
+            $token = Swoole\RandomKey::string(32);
+            $user = $_SESSION['user'];
+            unset($user['password'], $user['username'], $user['reg_ip'], $user['reg_time'], $user['lastip'], $user['lastlogin']);
+            if (empty($user['avatar']))
+            {
+                $user['avatar'] = '/static/images/default.png';
+            }
+            if (substr($user['avatar'], 0, 4) != 'http')
+            {
+                $user['avatar'] = WEBROOT . $user['avatar'];
+            }
+            $this->cache->set('login_token_' . $token, $user, 86400);
+            $refer = Swoole\Tool::urlAppend($refer, array('token' => $token));
+        }
+        $this->http->redirect($refer);
+    }
 
     function callback_qq()
     {
@@ -149,8 +174,7 @@ class Page extends App\FrontPage
             $_SESSION['isLogin'] = 1;
             $_SESSION['user_id'] = $uid;
             $_SESSION['user'] = $user;
-            $this->setLoginStat();
-            $this->http->redirect(WEBROOT."/person/index/");
+            $this->loginSucess();
         }
     }
 
@@ -267,10 +291,9 @@ class Page extends App\FrontPage
     function login()
     {
         session();
-        $refer = isset($_GET['refer']) ? $_GET['refer'] : WEBROOT . '/person/index/';
         if ($this->user->isLogin())
         {
-            $this->swoole->http->redirect($refer);
+            $this->loginSucess();
             return;
         }
 
@@ -296,8 +319,7 @@ class Page extends App\FrontPage
             {
                 $userinfo = $this->swoole->model->UserInfo->get($_SESSION['user_id'])->get();
                 $_SESSION['user'] = $userinfo;
-                $this->setLoginStat();
-                $this->swoole->http->redirect($refer);
+                $this->loginSucess();
             }
             else
             {
@@ -308,19 +330,26 @@ class Page extends App\FrontPage
         }
         else
         {
+            $refer = isset($_GET['refer']) ? $_GET['refer'] : WEBROOT . '/person/index/';
             $conf = $this->config['oauth']['weibo'];
             $weibo_oauth = new \SaeTOAuthV2($conf['appid'], $conf['skey']);
-            $weibo_login_url = $weibo_oauth->getAuthorizeURL($conf['callback']);
+
+            $params = array(
+                'refer' => $refer,
+                'return_token' => !empty($_GET['return_token'])
+            );
+
+            $weibo_login_url = $weibo_oauth->getAuthorizeURL(Swoole\Tool::urlAppend($conf['callback'], $params));
 
             Swoole\Loader::addNameSpace('ZenAPI', APPSPATH . '/include/zenapi');
             $conf = $this->config['oauth']['qq'];
             $qq_oauth = new QqOAuth2($conf['appid'], $conf['skey']);
             $qq_login_url = $qq_oauth->getAuthorizeURL(array(
                 'client_id' => $conf['appid'],
-                'redirect_uri'  =>  $conf['callback'],
+                'redirect_uri' => Swoole\Tool::urlAppend($conf['callback'], $params),
                 'response_type' => 'code',
-                'display'   => null,
-                'scope'     => $conf['scope'],
+                'display' => null,
+                'scope' => $conf['scope'],
             ));
             $this->tpl->assign('weibo_login_url', $weibo_login_url);
             $this->tpl->assign('qq_login_url', $qq_login_url);
@@ -483,8 +512,8 @@ class Page extends App\FrontPage
 
 	function guestbook()
 	{
-		if($_POST)
-		{
+        if ($_POST)
+        {
 			if(empty($_POST['realname']))
 			{
 				Swoole\JS::js_back('姓名不能为空！');
