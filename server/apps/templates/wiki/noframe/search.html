@@ -75,7 +75,8 @@
         </div>
     </div>
     <div class="wiki_content blob instapaper_body">
-        <article class="markdown-body entry-content" itemprop="mainContentOfPage">
+        <article class="markdown-body" id="search_result">
+            <div id="ResultStats">找到约 {{$count}} 条结果 （用时约 {{$cost_time}} 秒）</div>
             {{foreach item=li from=$list}}
             <h2><a href="/wiki/page/{{$li.id}}.html" target="_blank">{{$li.title}}</a></h2>
             <div>

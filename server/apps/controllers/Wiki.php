@@ -40,6 +40,17 @@ class Wiki extends Swoole\Controller
         $this->swoole->tpl->display("wiki/noframe/index.html");
     }
 
+    /**
+     * 高亮关键词
+     * @param \XSSearch $xs
+     * @param $subject
+     * @return mixed
+     */
+    protected static function highlight($xs, $subject)
+    {
+        return $xs->highlight(htmlspecialchars($subject, ENT_QUOTES, 'UTF-8'));
+    }
+
     function search()
     {
         if (isset($_GET['prid']))
@@ -63,12 +74,14 @@ class Wiki extends Swoole\Controller
 
         $pagesize = 10;
         $page = empty($_GET['page']) ? 1: intval($_GET['page']);
+
+        $s = microtime(true);
         $xs = new \XS(WEBPATH.'/search.ini');
         $search = $xs->getSearch();
         $q = trim($_GET['q']);
         $search->setQuery($q);
         $total = $search->count();
-        if ($page * $pagesize > $total)
+        if (($page - 1) * $pagesize > $total)
         {
             $page = 1;
         }
@@ -79,12 +92,14 @@ class Wiki extends Swoole\Controller
         foreach ($docs as $doc)
         {
             $li['id'] = $doc->pid;
-            $li['title'] = $doc->subject;
-            $li['desc'] = $doc->message;
+            $li['title'] = self::highlight($search, $doc->subject);
+            $li['desc'] = self::highlight($search, $doc->message);
             $list[] = $li;
         }
         $pager->page_tpl = "/wiki/search/?q=".urlencode($_GET['q']).'&page={page}';
         $this->tpl->assign('list', $list);
+        $this->tpl->assign('cost_time', round(microtime(true) - $s, 3));
+        $this->tpl->assign('count', $total);
         $this->tpl->assign('pager', $pager->render());
         $this->tpl->display("wiki/noframe/search.html");
     }
