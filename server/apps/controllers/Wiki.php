@@ -37,6 +37,7 @@ class Wiki extends Swoole\Controller
         $this->getTreeData();
         $_GET['id'] = $this->project['home_id'];
         $this->getPageInfo();
+        $this->getComments();
         $this->swoole->tpl->display("wiki/noframe/index.html");
     }
 
@@ -109,6 +110,19 @@ class Wiki extends Swoole\Controller
         $this->page();
     }
 
+    protected function getComments()
+    {
+        $thread_key = 'wiki-'.$this->tpl->_tpl_vars['id'];
+        $t = table('duoshuo_posts');
+        $list = $t->gets(array('thread_key' => $thread_key, 'order' => 'id asc'));
+        $this->tpl->assign('comments', $list);
+
+        $t2 = table('duoshuo_thread');
+        $list2 = $t2->gets(array('thread_key' => $thread_key, 'limit' => 1, 'order' => ''));
+        $this->tpl->assign('thread', $list2[0]);
+    }
+
+
     function page()
     {
         $this->getPageInfo();
@@ -123,6 +137,7 @@ class Wiki extends Swoole\Controller
         $this->getProjectInfo();
         $this->getTreeData();
         $this->getProjectLinks();
+        $this->getComments();
         $this->swoole->tpl->display("wiki/noframe/index.html");
     }
 
@@ -279,7 +294,6 @@ class Wiki extends Swoole\Controller
             //更新节点
             $node->update_uid = $uid;
             $node->text = $cont->title;
-            $node->link = trim($_POST['link']);
 
             //更新缓存
             App\Content::clearCache($node->id);

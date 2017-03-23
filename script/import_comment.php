@@ -6,8 +6,6 @@ $table2 = table('wiki_tree');
 $table3 = table('wiki_comment');
 
 $i = 0;
-$json = json_decode(file_get_contents('./export.json'), true);
-$threads = array();
 
 foreach($json['threads'] as $li)
 {
@@ -55,5 +53,6 @@ foreach($json['threads'] as $li)
 foreach($json['posts'] as $li)
 {
     if (!isset($threads[$li['thread_id']])) continue;
+    $record ['wiki_id'] = $threads[$li['thread_id']];
     debug($li, $threads[$li['thread_id']]);
 }

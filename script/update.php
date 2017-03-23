@@ -11,6 +11,8 @@ function getNews()
         'Referer' => 'https://www.oschina.net/p/swoole-server',
     ));
     $html = $curl->get('https://www.oschina.net/search?scope=news&q=swoole&sort_by_time=1');
+
+
     $dom = new Swoole\DOM\Tree($html);
     $list = $dom->find('ul#results > h3 > a');
 
