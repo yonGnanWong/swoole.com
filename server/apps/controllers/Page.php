@@ -93,15 +93,8 @@ class Page extends App\FrontPage
         {
             $token = Swoole\RandomKey::string(32);
             $user = $_SESSION['user'];
-            unset($user['password'], $user['username'], $user['reg_ip'], $user['reg_time'], $user['lastip'], $user['lastlogin']);
-            if (empty($user['avatar']))
-            {
-                $user['avatar'] = '/static/images/default.png';
-            }
-            if (substr($user['avatar'], 0, 4) != 'http')
-            {
-                $user['avatar'] = WEBROOT . $user['avatar'];
-            }
+            App\Api::userInfoSafe($user);
+            App\Api::updateAvatarUrl($user);
             $this->cache->set('login_token_' . $token, $user, 86400);
             $refer = Swoole\Tool::urlAppend($refer, array('token' => $token));
         }

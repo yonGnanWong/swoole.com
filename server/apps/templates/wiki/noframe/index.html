@@ -91,35 +91,25 @@
             {{/if}}
             {{$content}}
         </article>
-        <hr />
-        <!-- Duoshuo Comment BEGIN -->
+        <hr/>
         {{if $wiki_page.close_comment == 0}}
-        <div class="ds-thread" data-thread-key="wiki-106" data-title="Swoole扩展"
-             data-url="http://wiki.swoole.com/wiki/page/106.html" id="ds-thread">
+        <div class="ds-thread" id="ds-thread">
             <div id="ds-reset">
-                <div class="ds-meta"><a href="javascript:void(0)"
-                                        class="ds-like-thread-button ds-rounded ds-thread-liked"><span
-                        class="ds-icon ds-icon-heart"></span> <span class="ds-thread-like-text">已喜欢</span><span
-                        class="ds-thread-cancel-like">取消喜欢</span></a><span class="ds-like-panel"><span
-                        class="ds-highlight">{{$thread.likes}}</span> 人喜欢</span></div>
                 <div class="ds-comments-info">
-                    <div class="ds-sort"><a class="ds-order-desc">最新</a><a class="ds-order-asc ds-current">最早</a><a
-                            class="ds-order-hot">最热</a></div>
+                    <div class="ds-sort"><a class="ds-order-desc" target="_blank">最新</a><a class="ds-order-asc ds-current" target="_blank">最早</a><a class="ds-order-hot" target="_blank">最热</a></div>
                     <ul class="ds-comments-tabs">
-                        <li class="ds-tab"><a class="ds-comments-tab-duoshuo ds-current"
-                                              href="javascript:void(0);"><span class="ds-highlight">{{$comments|@count}}</span>条评论</a>
+                        <li class="ds-tab"><a class="ds-comments-tab-duoshuo ds-current" href="javascript:void(0);" target="_blank"><span class="ds-highlight">{{$comments|@count}}</span>条评论</a>
                         </li>
                     </ul>
                 </div>
-
                 <ul class="ds-comments">
                     {{foreach item=v from=$comments}}
-                    <li class="ds-post" >
+                    <li class="ds-post">
                         <div class="ds-post-self">
                             <div class="ds-avatar" data-user-id="8435783"><a rel="nofollow author" target="_blank"
                                                                              href="{{$v.author_url}}"
                                                                              title="{{$v.author_name}}"><img
-                                    src="https://wiki.swoole.com/static/images/default.png"
+                                    src="{{if $v.avatar}}{{$v.avatar}}{{else}}/static/images/default.png{{/if}}"
                                     alt="{{$v.author_name}}"></a></div>
                             <div class="ds-comment-body">
                                 <div class="ds-comment-header"><a class="ds-user-name ds-highlight" data-qqt-account=""
@@ -127,71 +117,46 @@
                                                                   rel="nofollow" target="_blank" data-user-id="8435783">{{$v.author_name}}</a>
                                 </div>
                                 <p>{{$v.message}}</p>
-
-                                <div class="ds-comment-footer ds-comment-actions"><span class="ds-time">{{$v.created_at|substr:0:10}}</span><a
-                                        class="ds-post-reply" href="javascript:void(0);"><span
-                                        class="ds-icon ds-icon-reply"></span>回复</a><a class="ds-post-likes"
-                                                                                      href="javascript:void(0);"><span
-                                        class="ds-icon ds-icon-like"></span>顶</a><a class="ds-post-repost"
-                                                                                    href="javascript:void(0);">
-                                </div>
                             </div>
+                        </div>
                     </li>
                     {{/foreach}}
                 </ul>
-                <div class="ds-paginator" style="display: none;">
-                    <div class="ds-border"></div>
-                    <a data-page="1" href="javascript:void(0);" class="ds-current">1</a></div>
-                <div class="ds-toolbar">
-                    <div class="ds-account-control"><span class="ds-icon ds-icon-settings"></span> <span>帐号管理</span>
-                        <ul>
-                            <li><a class="ds-bind-more" href="javascript:void(0);" style="border-top: none">绑定更多</a>
-                            </li>
-                            <li><a target="_blank" href="http://duoshuo.com/settings/">设置</a></li>
-                            <li><a rel="nofollow" href="http://www4swoole.duoshuo.com/logout/"
-                                   style="border-bottom: none">登出</a></li>
-                        </ul>
-                    </div>
-                    <div class="ds-visitor"><a class="ds-visitor-name" href="http://weibo.com/hantianfeng"
-                                               target="_blank">Rango-韩天峰</a><a class="ds-unread-comments-count"
-                                                                               href="javascript:void(0);" title="你没有新回复"
-                                                                               style="display: none;">0</a></div>
-                </div>
-                <div class="ds-replybox"><a class="ds-avatar" href="http://duoshuo.com/settings/avatar/" target="_blank"
-                                            title="设置头像"><img
-                        src="http://tva4.sinaimg.cn/crop.1.1.561.561.50/3fecf63djw8f7t533npdhj20g00i5dgz.jpg"
-                        alt="Rango-韩天峰"></a>
 
-                    <form method="post"><input type="hidden" name="thread_id" value="1163167853466092117">
-                        <input type="hidden" name="parent_id" value="">
-                        <input type="hidden" name="nonce" value="573edf51578e7">
-
-                        <div class="ds-textarea-wrapper ds-rounded-top"><textarea name="message" title="Ctrl+Enter快捷提交"
-                                                                                  placeholder="说点什么吧…"></textarea>
+                <div class="ds-replybox" id="post_comment_div" style="display: none;">
+                    <div class="ds-avatar"><img src="" id="login_user_avatar"></div>
+                    <form method="post" onsubmit="return postComment(this);">
+                        <input type="hidden" name="wiki_id" value="{{$wiki_page.id}}">
+                        <div class="ds-textarea-wrapper ds-rounded-top">
+                            <textarea name="message" title="Ctrl+Enter快捷提交" placeholder="说点什么吧（支持Markdown语法）…"></textarea>
                             <pre class="ds-hidden-text"></pre>
                         </div>
                         <div class="ds-post-toolbar">
-                            <div class="ds-post-options ds-gradient-bg"><span class="ds-sync"><input
-                                    id="ds-sync-checkbox" type="checkbox" name="repost" checked="checked" value="weibo"> <label
-                                    for="ds-sync-checkbox">分享到:</label><a href="javascript:void(0)"
-                                                                          class="ds-service-icon ds-weibo"
-                                                                          data-service="weibo" title="新浪微博"></a></span>
+                            <div class="ds-post-options ds-gradient-bg">
                             </div>
                             <button class="ds-post-button" type="submit">发布</button>
-                            <div class="ds-toolbar-buttons"><a class="ds-toolbar-button ds-add-emote" title="插入表情"></a>
-                            </div>
                         </div>
                     </form>
                 </div>
+            </div>
             </div>
         </div>
         <link href="/static/css/duoshuo.css" rel="stylesheet">
         {{/if}}
         <script type="text/javascript">
+            function postComment(o) {
+                if ($.trim(o.message.value) == '') {
+                    return false;
+                }
+                $.post('/api/postComment/', {'content': o.message.value, 'app' : 'wiki', 'id':o.wiki_id.value}, function(data){
+                    if (data.code == 0) {
+                        location.reload();
+                    }
+                });
+                return false;
+            }
             var _bdhmProtocol = (("https:" == document.location.protocol) ? "https://" : "http://");
-
             $(document).ready(function () {
-                var resize_count = 0;
                 var timer = setInterval(function () {
                     var a = $("#sidebar")[0];
                     var b = $("div.wiki_content")[0];
@@ -202,13 +167,26 @@
                     }
                     window.clearInterval(timer);
                 }, 300);
-            });
-
-            $(document).ready(function() {
                 $('a').each(function(e){
                     //外链
                     if (this.href.substring(_bdhmProtocol.length, location.host.length + _bdhmProtocol.length) != location.host) {
                         this.target = "_blank";
+                    }
+                });
+                $.getJSON('/api/getLoginInfo', function (data) {
+                    $('#post_comment_div').show();
+                    if (data.code == 0) {
+                        if (data.data.avatar.substring(0, 5) != 'https') {
+                            if (data.data.avatar.substring(0, 4) == 'http') {
+                                data.data.avatar = 'https' + data.data.avatar.substring(4);
+                            } else {
+                                data.data.avatar = 'https://' + location.host + data.data.avatar;
+                            }
+
+                        }
+                        $('#login_user_avatar').attr('src', data.data.avatar).attr('alt', data.data.nickname).attr('title', data.data.nickname);
+                    } else {
+                        $('#post_comment_div').html('<p><br/><a href="http://www.swoole.com/page/login/">[登录后发表评论]</a></p>');
                     }
                 });
             });

@@ -115,11 +115,35 @@ class Wiki extends Swoole\Controller
         $thread_key = 'wiki-'.$this->tpl->_tpl_vars['id'];
         $t = table('duoshuo_posts');
         $list = $t->gets(array('thread_key' => $thread_key, 'order' => 'id asc'));
+        $uids = [];
+        foreach($list as $li)
+        {
+            if ($li['uid'])
+            {
+                $uids[$li['uid']] = 1;
+            }
+        }
+        if (count($uids) > 0)
+        {
+            $users = model('UserInfo')->getMap(array('in' => ['id', $uids], 'select' => 'id, nickname, avatar'));
+        }
+        else
+        {
+            $users = [];
+        }
+        foreach($list as &$li)
+        {
+            $li['message'] = App\Content::parseMarkdown($li['message']);
+            if ($li['uid'])
+            {
+                $user = $users[$li['uid']];
+                App\Api::updateAvatarUrl($user, true);
+                $li['author_name'] = $user['nickname'];
+                $li['avatar'] = $user['avatar'];
+                $li['author_url'] = "http://www.swoole.com/page/user/uid-" . $li['uid'];
+            }
+        }
         $this->tpl->assign('comments', $list);
-
-        $t2 = table('duoshuo_thread');
-        $list2 = $t2->gets(array('thread_key' => $thread_key, 'limit' => 1, 'order' => ''));
-        $this->tpl->assign('thread', $list2[0]);
     }
 
 
@@ -220,7 +244,7 @@ class Wiki extends Swoole\Controller
         $this->swoole->tpl->assign("wiki_page",  $this->pageInfo);
 
         markdown:
-        $html = App\Content::md2html($wiki_id, $text);
+        $html = App\Content::getWikiHtml($wiki_id, $text);
         $this->swoole->tpl->assign("content", $html);
     }
 

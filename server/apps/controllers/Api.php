@@ -13,6 +13,58 @@ class Api extends Swoole\Controller
     const AVATAR_URL = 'http://182.254.148.72:9502/uploads/avatar/';
     const NO_AVATAR = 'http://182.254.148.72:9502/static/common/';
 
+    function getLoginInfo()
+    {
+        if (empty($_COOKIE['PHPSESSID']))
+        {
+            not_found:
+            return $this->json([], 404);
+        }
+        $this->session->start();
+        if (!empty($_SESSION['user']))
+        {
+            $user = $_SESSION['user'];
+            App\Api::userInfoSafe($user);
+            return $this->json($user);
+        }
+        goto not_found;
+    }
+
+    function postComment()
+    {
+        if (empty($_COOKIE['PHPSESSID']))
+        {
+            return $this->json([], 403);
+        }
+        $this->session->start();
+        if (empty($_SESSION['user']))
+        {
+            return $this->json(['login' => $this->config['user']['login_url']], 403);
+        }
+        if (empty($_POST['content']) or empty($_POST['app']) or empty($_POST['id']))
+        {
+            return $this->json(null, 1001);
+        }
+        $table = table('duoshuo_posts');
+        Swoole\Filter::safe($_POST['content']);
+        Swoole\Loader::addNameSpace('Stauros', Swoole::$app_path.'/include/Stauros/lib/Stauros');
+        $clean = strip_tags($_POST['content']);
+        $ret = $table->put(array(
+            'uid' => $_SESSION['user']['id'],
+            'created_at' => Swoole\Tool::now(),
+            'thread_id' => intval($_POST['id']),
+            'thread_key' => $_POST['app'] . '-' . intval($_POST['id']),
+            'message' => $clean,
+        ));
+        if ($ret)
+        {
+            return $this->json(['id' => $ret]);
+        }
+        else
+        {
+            return $this->json(null, 500);
+        }
+    }
 
     static function parseMarkdown($text)
     {

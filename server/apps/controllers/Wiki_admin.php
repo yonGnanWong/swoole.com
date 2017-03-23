@@ -359,7 +359,7 @@ class Wiki_admin extends Swoole\Controller
         $this->assign("wiki_page", $wiki_page);
 
         markdown:
-        $html = App\Content::md2html($wiki_id, $text);
+        $html = App\Content::getWikiHtml($wiki_id, $text);
         $this->assign("content", $html);
     }
 

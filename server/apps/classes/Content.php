@@ -147,24 +147,29 @@ class Content
         }
     }
 
+    static function parseMarkdown($text)
+    {
+        $text = str_replace('```', '~~~', $text);
+        $parser = new Michelf\MarkdownExtra;
+        $parser->fn_id_prefix = "post22-";
+        $parser->code_attr_on_pre = false;
+        $parser->tab_width = 4;
+        return $parser->transform($text);
+    }
+
     /**
      * @param $wiki_id
      * @param $text
      * @return string
      */
-    static function md2html($wiki_id, $text)
+    static function getWikiHtml($wiki_id, $text)
     {
         $key = 'wiki_page_'.$wiki_id;
         $html = \Swoole::$php->cache->get($key);
         if (!$html)
         {
             //GitHub Code Parse
-            $text = str_replace('```', '~~~', $text);
-            $parser = new Michelf\MarkdownExtra;
-            $parser->fn_id_prefix = "post22-";
-            $parser->code_attr_on_pre = false;
-            $parser->tab_width = 4;
-            $html = $parser->transform($text);
+            $html = self::parseMarkdown($text);
             \Swoole::$php->cache->set($key, $html, 0);
         }
         else
