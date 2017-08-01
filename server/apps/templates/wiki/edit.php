@@ -66,7 +66,7 @@
             path: "/static/editor.md/lib/",
             imageUpload : true,
             imageFormats : ["jpg", "jpeg", "gif", "png", "bmp"],
-            imageUploadURL : "/wiki_admin/upload/?id=<?=$this->value($page, 'id')?>"
+            imageUploadURL : "/wiki/upload/?id=<?=$this->value($page, 'id')?>"
         });
     });
 </script>

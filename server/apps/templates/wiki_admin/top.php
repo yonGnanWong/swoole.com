@@ -23,6 +23,11 @@
                         <a href="/wiki_admin/update_list/" class="small" target="main">
                             <span class="glyphicon glyphicon-list"></span> 更新列表</a>
                         <span style="color: #fff; margin-left: 10px;margin-right: 10px;">|</span>
+
+                        <a href="/wiki_admin/comments/" class="small" target="main">
+                            <span class="glyphicon glyphicon-list"></span> 评论管理</a>
+                        <span style="color: #fff; margin-left: 10px;margin-right: 10px;">|</span>
+
                         <a href="/wiki_admin/setting/prid-<?=$project_id?>" class="small" target="main">
                             <span class="glyphicon glyphicon-th"></span> 项目设置</a>
                         <span style="color: #fff; margin-left: 10px;margin-right: 10px;">|</span>

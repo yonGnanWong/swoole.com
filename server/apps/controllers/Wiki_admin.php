@@ -96,6 +96,42 @@ class Wiki_admin extends Swoole\Controller
         $this->display();
     }
 
+    function comments()
+    {
+        $_table = table('duoshuo_posts');
+        if (!empty($_GET['del']))
+        {
+            $_table->del(intval($_GET['del']));
+        }
+        $list = $_table->gets(array(
+            'page' => empty($_GET['page']) ? 1 : intval($_GET['page']),
+            'pagesize' => 15,
+        ), $pager);
+
+        $uid_list = array();
+        foreach($list as $li)
+        {
+            if (empty($li['uid']))
+            {
+                continue;
+            }
+            $uid_list[] = $li['uid'];
+        }
+        $uid_list = array_unique($uid_list);
+        if (count($uid_list) > 0)
+        {
+            $users = Model('UserInfo')->getMap(array('in' => array('id', $uid_list)), 'nickname');
+        }
+        else
+        {
+            $users = array();
+        }
+        $this->assign('users', $users);
+        $this->assign('list', $list);
+        $this->assign('pager', $pager->render());
+        $this->display();
+    }
+
     function update_list()
     {
         $_table = table('wiki_tree');
@@ -717,38 +753,7 @@ class Wiki_admin extends Swoole\Controller
 
     function upload()
     {
-        if (empty($_FILES['editormd-image-file']))
-        {
-            return "error: requirer editormd-image-file";
-        }
-
-        $this->upload->sub_dir = 'wiki';
-        $up_pic = Swoole::$php->upload->save('editormd-image-file');
-
-        if (empty($up_pic))
-        {
-            $result = array('success' => 0,
-                'message' => '上传失败，请重新上传！ Error:' . $this->upload->error_msg);
-            goto return_json;
-        }
-
-        $data['url'] = $up_pic['url'];
-        $data['page_id'] = (int)$_GET['id'];
-        $data['user_id'] = $_SESSION['user_id'];
-
-        $id = table('wiki_image')->put($data);
-        if ($id)
-        {
-            $result['success'] = 1;
-            $result['url'] = $data['url'];
-        }
-        else
-        {
-            $result['success'] = 0;
-            $result['message'] = "插入数据库失败";
-        }
-        return_json:
-        return json_encode($result);
+        return App\Content::upload();
     }
 }
 

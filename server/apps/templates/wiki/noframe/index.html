@@ -19,6 +19,8 @@
     <script src="/static/js/rainbow-custom.min.js"></script>
     <script src="/static/js/jquery.js"></script>
     <script src="/static/js/dtree.js"></script>
+    <script src="/static/js/tocbot.min.js"></script>
+    <link href="/static/css/tocbot.css" rel="stylesheet">
     <title>{{$wiki_page.title}}-{{$project.name}}-Swoole文档中心</title>
     <meta name="description" content="Swoole, {{$wiki_page.title}}">
     <meta name="keywords" content="swoole, {{$wiki_page.title}}">
@@ -91,6 +93,7 @@
             {{/if}}
             {{$content}}
         </article>
+        <nav class="toc js-toc"></nav>
         <hr/>
         {{if $wiki_page.close_comment == 0}}
         <div class="ds-thread" id="ds-thread">
@@ -104,19 +107,26 @@
                 </div>
                 <ul class="ds-comments">
                     {{foreach item=v from=$comments}}
-                    <li class="ds-post">
+                    <li class="ds-post" id="comment-{{$v.id}}">
                         <div class="ds-post-self">
-                            <div class="ds-avatar" data-user-id="8435783"><a rel="nofollow author" target="_blank"
-                                                                             href="{{$v.author_url}}"
-                                                                             title="{{$v.author_name}}"><img
-                                    src="{{if $v.avatar}}{{$v.avatar}}{{else}}/static/images/default.png{{/if}}"
-                                    alt="{{$v.author_name}}"></a></div>
+                            <div class="ds-avatar">
+                                <a rel="nofollow author" target="_blank" href="{{$v.author_url}}"
+                                   title="{{$v.author_name}}"><img
+                                        src="{{if $v.avatar}}{{$v.avatar}}{{else}}/static/images/default.png{{/if}}"
+                                        alt="{{$v.author_name}}"></a></div>
                             <div class="ds-comment-body">
                                 <div class="ds-comment-header"><a class="ds-user-name ds-highlight" data-qqt-account=""
                                                                   href="{{$v.author_url}}"
                                                                   rel="nofollow" target="_blank" data-user-id="8435783">{{$v.author_name}}</a>
                                 </div>
                                 <p>{{$v.message}}</p>
+
+                                <div class="ds-comment-footer ds-comment-actions">
+                                    <span class="ds-time">{{$v.created_at|substr:0:10}}</span>
+                                    <a class="ds-post-delete" href="javascript:delComment({{$v.id}});"><span
+                                            class="ds-icon ds-icon-delete"></span>删除</a>
+
+                                </div>
                             </div>
                         </div>
                     </li>
@@ -144,27 +154,61 @@
         <link href="/static/css/duoshuo.css" rel="stylesheet">
         {{/if}}
         <script type="text/javascript">
+            function divAlign() {
+                var a = $("#sidebar")[0];
+                var b = $("div.wiki_content")[0];
+                if (a.clientHeight < b.clientHeight) {
+                    a.style.height = (b.clientHeight + 2) + "px";
+                } else {
+                    b.style.height = (a.clientHeight + 2) + "px";
+                }
+            }
+            function delComment(id) {
+                if (confirm("确定要删除此条评论")) {
+                    $.post('/api/delComment/', {'id': id}, function (data) {
+                        if (data.code == 0) {
+                            $('#comment-'+id).remove();
+                            divAlign();
+                        }
+                    });
+                }
+            }
             function postComment(o) {
                 if ($.trim(o.message.value) == '') {
                     return false;
                 }
-                $.post('/api/postComment/', {'content': o.message.value, 'app' : 'wiki', 'id':o.wiki_id.value}, function(data){
+                $.post('/api/postComment/', {
+                    'content': o.message.value,
+                    'app': 'wiki',
+                    'id': o.wiki_id.value
+                }, function (data) {
                     if (data.code == 0) {
                         location.reload();
                     }
                 });
                 return false;
             }
+
             var _bdhmProtocol = (("https:" == document.location.protocol) ? "https://" : "http://");
             $(document).ready(function () {
+                $('.entry-content h2').each(function(o, e){
+                    $(e).attr('id', 'entry_h2_'+o);
+                });
+                $('.entry-content h3').each(function(o, e){
+                    $(e).attr('id', 'entry_h3_'+o);
+                });
+                tocbot.init({
+                    // Where to render the table of contents.
+                    tocSelector: '.js-toc',
+                    // Where to grab the headings to build the table of contents.
+                    contentSelector: '.entry-content',
+                    // Which headings to grab inside of the contentSelector element.
+                    headingSelector: 'h2, h3'
+                });
+                tocbot.refresh();
+                $('.js-toc').css("left", $('.entry-content').position().left + 850);
                 var timer = setInterval(function () {
-                    var a = $("#sidebar")[0];
-                    var b = $("div.wiki_content")[0];
-                    if (a.clientHeight < b.clientHeight) {
-                        a.style.height = (b.clientHeight + 2) + "px";
-                    } else {
-                        b.style.height = (a.clientHeight + 2) + "px";
-                    }
+                    divAlign();
                     window.clearInterval(timer);
                 }, 300);
                 $('a').each(function(e){
@@ -173,7 +217,7 @@
                         this.target = "_blank";
                     }
                 });
-                $.getJSON('/api/getLoginInfo', function (data) {
+                $.getJSON('/api/getLoginInfo?prid={{$project_id}}', function (data) {
                     $('#post_comment_div').show();
                     if (data.code == 0) {
                         if (data.data.avatar.substring(0, 5) != 'https') {
@@ -182,11 +226,14 @@
                             } else {
                                 data.data.avatar = 'https://' + location.host + data.data.avatar;
                             }
-
+                            if (!data.data.admin) {
+                                $('a.ds-post-delete').remove();
+                            }
                         }
                         $('#login_user_avatar').attr('src', data.data.avatar).attr('alt', data.data.nickname).attr('title', data.data.nickname);
                     } else {
                         $('#post_comment_div').html('<p><br/><a href="http://www.swoole.com/page/login/">[登录后发表评论]</a></p>');
+                        $('a.ds-post-delete').remove();
                     }
                 });
             });
@@ -195,7 +242,7 @@
 </div>
 <div class="container footer" style="height: 80px; clear: both">
     <hr />
-    <p>&copy; Swoole.com 2008 - {{'Y'|date}} 备案号：京ICP备14049466号-7 官方QQ群：193772828 开发组邮件列表：
+    <p>&copy; Swoole.com 2008 - {{'Y'|date}} 备案号：京ICP备14049466号-7 | <a href="https://wiki.swoole.com/wiki/page/p-copyright.html">版权声明</a> 官方QQ群：193772828 开发组邮件列表：
         <a href="mailto:team@swoole.com">team@swoole.com</a>
         当前Swoole扩展版本：<a href="https://github.com/swoole/swoole-src" target="_blank">swoole-{{$smarty.const.SWOOLE_VERSION}}</a>
     </p>
@@ -211,5 +258,6 @@
         </script>
     </div>
 </div>
+
 </body>
 </html>

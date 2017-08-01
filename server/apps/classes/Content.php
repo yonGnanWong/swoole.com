@@ -189,4 +189,47 @@ class Content
         $key = 'wiki_page_' . $wiki_id;
         return \Swoole::$php->cache->delete($key);
     }
+
+    static function upload()
+    {
+        if (empty($_FILES['editormd-image-file']))
+        {
+            $result = array(
+                'success' => 0,
+                'message' => 'error: requirer editormd-image-file',
+            );
+            goto return_json;
+        }
+
+        Swoole::$php->upload->sub_dir = 'wiki';
+        $up_pic = Swoole::$php->upload->save('editormd-image-file');
+
+        if (empty($up_pic))
+        {
+            $result = array(
+                'success' => 0,
+                'message' => '上传失败，请重新上传！ Error:' . Swoole::$php->upload->error_msg
+            );
+            goto return_json;
+        }
+
+        $data['url'] = $up_pic['url'];
+        $data['page_id'] = (int)$_GET['id'];
+        $data['user_id'] = $_SESSION['user_id'];
+
+        $id = table('wiki_image')->put($data);
+        if ($id)
+        {
+            $result['success'] = 1;
+            $result['url'] = $data['url'];
+        }
+        else
+        {
+            $result['success'] = 0;
+            $result['message'] = "插入数据库失败";
+        }
+        return_json:
+
+        return json_encode($result);
+    }
 }

@@ -24,10 +24,47 @@ class Api extends Swoole\Controller
         if (!empty($_SESSION['user']))
         {
             $user = $_SESSION['user'];
+            $user['admin'] = false;
             App\Api::userInfoSafe($user);
+
+            if (!empty($_GET['prid']))
+            {
+                $proj = table('wiki_project')->get(intval($_GET['prid']))->get();
+                if (!empty($proj['owner']))
+                {
+                    $user['admin'] = (new Swoole\StringObject($proj['owner']))->split(',')->contains($user['id']);
+                }
+            }
+
             return $this->json($user);
         }
         goto not_found;
+    }
+
+    function delComment()
+    {
+        if (empty($_COOKIE['PHPSESSID']))
+        {
+            return $this->json([], 403);
+        }
+        $this->session->start();
+        if (empty($_SESSION['user']))
+        {
+            return $this->json(['login' => $this->config['user']['login_url']], 403);
+        }
+        if (empty($_POST['id']))
+        {
+            return $this->json(null, 1001);
+        }
+        $table = table('duoshuo_posts');
+        if ($table->del($_POST['id']))
+        {
+            return $this->json([]);
+        }
+        else
+        {
+            return $this->json(null, 500);
+        }
     }
 
     function postComment()

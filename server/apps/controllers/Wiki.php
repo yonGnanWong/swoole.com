@@ -125,7 +125,7 @@ class Wiki extends Swoole\Controller
         }
         if (count($uids) > 0)
         {
-            $users = model('UserInfo')->getMap(array('in' => ['id', $uids], 'select' => 'id, nickname, avatar'));
+            $users = model('UserInfo')->getMap(array('in' => ['id', array_keys($uids)], 'select' => 'id, nickname, avatar'));
         }
         else
         {
@@ -169,10 +169,9 @@ class Wiki extends Swoole\Controller
     protected function getProjectInfo()
     {
         $this->project = createModel('WikiProject')->get($this->project_id);
-        if(empty($this->project))
+        if (empty($this->project))
         {
-            echo "您访问的项目不存在";
-            exit;
+            $this->http->finish("您访问的项目不存在");
         }
         $this->swoole->tpl->assign("project_id", $this->project_id);
         $this->swoole->tpl->assign("project", $this->project);
@@ -260,6 +259,11 @@ class Wiki extends Swoole\Controller
         //debug($tree);
 //        echo json_encode($tree);exit;
         $this->swoole->tpl->assign("tree", $tree);
+    }
+
+    function upload()
+    {
+        return App\Content::upload();
     }
 
     function edit()

@@ -2,11 +2,10 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Swoole: PHP的异步、并行、高性能网络通信引擎</title>
+    <title>Swoole®: PHP的异步、并行、高性能网络通信引擎</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Swoole: PHP的异步、并行、高性能网络通信引擎">
-    <meta name="keywords" content="PHP,Swoole,PHP异步,高并发,网络通信,并行,TCP,UDP,PHP应用服务器,Server">
-    <meta name="author" content="tianfenghan">
+    <meta name="description" content="Swoole: PHP的异步、并行、高性能网络通信引擎，支持TCP长连接，Websocket，Mqtt等协议。广泛用于手机app、手游服务端、网络游戏服务器、聊天室、硬件通讯、智能家居、车联网、物联网等领域的开发。">
+    <meta name="keywords" content="PHP,Swoole,PHP异步,高并发,网络通信,并行,TCP,UDP,PHP应用服务器,Server,WebSocket,TCP长连接,Mqtt,WebIM,聊天,推送系统,PUSH系统">
 
     <!-- Le styles -->
     <link href="/static/bootstrap/css/bootstrap.css" rel="stylesheet">
@@ -69,8 +68,9 @@
     </div>
 </div>
 <div class="container">
+    <div id="banner-ad"></div>
     <div class="hero-unit">
-		<h2 style="margin-bottom: 25px;">Swoole：重新定义PHP</h2>
+		<h2 style="margin-bottom: 25px;">Swoole®：重新定义PHP</h2>
         <p>
 		<span><img src="/static/images/swoole.png" width="160" style="float:left; margin-right: 25px; margin-top: 15px;" />
         </span>
@@ -81,16 +81,18 @@
 
         Swoole可以广泛应用于互联网、移动通信、企业软件、云计算、网络游戏、物联网（IOT）、车联网、智能家居等领域。
         使用PHP+Swoole作为网络通信框架，可以使企业IT研发团队的效率大大提升，更加专注于开发创新产品。
-        <p style="margin-top: 25px;"><a href="https://git.oschina.net/swoole/swoole" class="btn btn-primary">源代码(开源中国-码云)</a>&nbsp;&nbsp;
+        <p style="margin-top: 25px;">
+            <a href="https://github.com/swoole/swoole-src" class="btn btn-primary">源代码(GitHub)</a>&nbsp;&nbsp;
+            <a href="https://git.oschina.net/swoole/swoole" class="btn btn-primary">源代码(开源中国-码云)</a>&nbsp;&nbsp;
            <a href="http://git.oschina.net/swoole/swoole/issues/new" class="btn btn-danger">提交Bug</a>&nbsp;&nbsp;
            <a href="http://git.oschina.net/swoole/swoole/issues/new" class="btn">提建议</a>&nbsp;&nbsp;
            <a class="btn btn-sm btn-success" href="https://git.oschina.net/swoole/swoole/tree/v<?=$version?>">
              <i class="glyphicon glyphicon-download"></i> &nbsp; 下载 <span style="font-size: 60%;">(<?=$version?>)</span> &nbsp;
 		   </a>
-          <a class="btn btn-sm btn-success" href="https://git.oschina.net/swoole/swoole/tree/v2.0.5">
-             <i class="glyphicon glyphicon-download"></i> &nbsp; 下载 <span style="font-size: 60%;">(2.0.5)</span> &nbsp;
+          <a class="btn btn-sm btn-success" href="https://git.oschina.net/swoole/swoole/tree/v2.0.7">
+             <i class="glyphicon glyphicon-download"></i> &nbsp; 下载 <span style="font-size: 60%;">(2.0.7)</span> &nbsp;
 		   </a>
-        <a href="http://edu.csdn.net/course/detail/2800" class="btn btn-warning">视频教学课程</a>&nbsp;&nbsp;
+        <a href="http://compiler.swoole.com/" class="btn btn-warning">Swoole Compiler (PHP代码加密器)</a>&nbsp;&nbsp;
         </p>
     </div>
 
@@ -316,7 +318,7 @@ $serv->start();</code></pre>
     </div>
     <hr />
     <footer>
-        <p>&copy; Swoole.com 2008 - 2016 备案号：京ICP备14049466号-7 官方QQ群：193772828 开发组邮件列表：
+        <p>Swoole® 是 Swoole Inc. 公司所有的注册商标。 &copy; Swoole开源项目 2008 - 2017 备案号：京ICP备14049466号-7 官方QQ群：193772828 开发组邮件列表：
         <a href="mailto:team@swoole.com">team@swoole.com</a>
         </p>
     </footer>
@@ -325,6 +327,13 @@ $serv->start();</code></pre>
 <script src="/static/bootstrap/js/bootstrap.min.js"></script>
 <div style="display: none">
 <script type="text/javascript">
+$.get("http://group.swoole.com/ad.php", function(data) {
+    if (data) {        
+        $('#banner-ad').html(data);
+    } else {
+        $('#banner-ad').hide();
+    }
+});
 var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
 document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F4967f2faa888a2e52742bebe7fcb5f7d' type='text/javascript'%3E%3C/script%3E"));
 </script>

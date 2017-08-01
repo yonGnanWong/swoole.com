@@ -21,35 +21,34 @@ class UserInfo extends Swoole\Model
         $cache_key = 'user_info_'.$uid;
         $user = $this->swoole->cache->get($cache_key);
 
-        if(empty($user))
+        if (empty($user))
         {
-            $forms = require WEBPATH.'/dict/forms.php';
+            $forms = require WEBPATH . '/dict/forms.php';
             $user = $this->get($uid)->get();
-            if(!empty($user['sex']))
+            if (!empty($user['sex']))
             {
                 $user['sex'] = $forms['sex'][$user['sex']];
             }
-            if(!empty($user['education']))
+            if (!empty($user['education']))
             {
                 $user['education'] = $forms['education'][$user['education']];
             }
             $user['php_level'] = $forms['level'][$user['php_level']];
             $_skill = createModel('UserSkill')->getMap(array());
-            if(!empty($user['skill']))
+            if (!empty($user['skill']))
             {
-                $_s = explode(',',$user['skill']);
-                foreach($_s as $s)
+                $_s = explode(',', $user['skill']);
+                foreach ($_s as $s)
                 {
                     $skill[] = $_skill[$s];
                 }
                 $user['skill'] = $skill;
             }
 
-            if(substr($user['avatar'], 4)!='http')
+            if (substr($user['avatar'], 4) != 'http')
             {
-            	$user['avatar'] = str_replace('/static/', $this->swoole->config['site']['static'], $user['avatar']);
+                $user['avatar'] = str_replace('/static/', $this->swoole->config['site']['static'], $user['avatar']);
             }
-
             $this->swoole->cache->set($cache_key, $user, $this->cache_life);
         }
         return $user;
