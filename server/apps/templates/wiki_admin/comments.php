@@ -52,9 +52,9 @@
                             <?= $li['author_name'] ?>
                         <?php } ?>
                     </td>
-                    <td><?= \App\Content::parseMarkdown($li['message']) ?></td>
+                    <td><a href="/wiki/page/<?= explode('-', $li['thread_key'])[1]?>.html#comment-<?= $li['id']?>" target="_blank"><?= \App\Content::parseMarkdown($li['message']) ?></a></td>
                     <td>
-                        <a href="?del=<?= $li['id']?>" class="btn btn-sm btn-warning">删除</a>
+                        <a href="?del=<?= $li['id']?>&page=<?=$_GET['page']?>&wiki_id=<?=$this->value($_GET, 'wiki_id')?>" class="btn btn-sm btn-warning">删除</a>
                 </tr>
                 <?php endforeach; ?>
                 </tbody>

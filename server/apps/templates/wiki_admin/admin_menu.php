@@ -30,4 +30,8 @@
         <span class="glyphicon glyphicon-list"></span>
         子页排序
     </a>
+    <a class="button btn-sm btn-primary" href="/wiki_admin/comments/?wiki_id=<?=$id?>">
+        <span class="glyphicon glyphicon-comment"></span>
+        管理评论
+    </a>
 </div>

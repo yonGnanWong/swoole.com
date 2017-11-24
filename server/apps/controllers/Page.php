@@ -390,18 +390,19 @@ class Page extends App\FrontPage
 				exit;
 			}
 
-			$login['password'] = Swoole\Auth::makePasswordHash($login['email'],$_POST['password']);
-			$login['username'] = $login['email'];
-//			$login['reg_ip'] = Swoole\Http::getIP();
-			$login['nickname'] = $_POST['nickname'];
-			$login['sex'] = (int)$_POST['sex'];
-			//$login['skill'] = implode(',',$_POST['skill']);
-			// $login['php_level'] = (int)$_POST['php_level'];
-			$login['lastlogin'] = date('Y-m-d h:i:s');
-			$uid = $userInfo->put($login);
-			$_SESSION['isLogin'] = true;
-			$_SESSION['user_id'] = $uid;
-			$_SESSION['user'] = $login;
+            $login['password'] = Swoole\Auth::makePasswordHash($login['email'], $_POST['password']);
+            $login['username'] = $login['email'];
+			$login['reg_ip'] = $this->request->getClientIP();
+            $login['nickname'] = $_POST['nickname'];
+            $login['sex'] = (int)$_POST['sex'];
+            //$login['skill'] = implode(',',$_POST['skill']);
+            // $login['php_level'] = (int)$_POST['php_level'];
+            $login['lastlogin'] = date('Y-m-d h:i:s');
+            $uid = $userInfo->put($login);
+            $_SESSION['isLogin'] = true;
+            $_SESSION['user_id'] = $uid;
+            $login['id'] = $uid;
+            $_SESSION['user'] = $login;
 			return Swoole\JS::js_goto('注册成功！','/person/index/');
 		}
 		else

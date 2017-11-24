@@ -103,10 +103,16 @@ class Wiki_admin extends Swoole\Controller
         {
             $_table->del(intval($_GET['del']));
         }
-        $list = $_table->gets(array(
+
+        $params = array(
             'page' => empty($_GET['page']) ? 1 : intval($_GET['page']),
             'pagesize' => 15,
-        ), $pager);
+        );
+        if (!empty($_GET['wiki_id']))
+        {
+            $params['thread_key'] = 'wiki-'.intval($_GET['wiki_id']);
+        }
+        $list = $_table->gets($params, $pager);
 
         $uid_list = array();
         foreach($list as $li)

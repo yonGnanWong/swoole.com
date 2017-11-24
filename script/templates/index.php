@@ -61,7 +61,7 @@
                     <li><a target="_self" href="http://wiki.swoole.com/wiki/page/p-case.html">用户案例</a></li>
                     <li><a href="http://wiki.swoole.com/wiki/page/p-donate.html">捐赠</a></li>
 					<li><a href="https://github.com/swoole/swoole-src/releases">下载</a></li>
-                    <li><a href="https://rawgit.com/tchiotludo/swoole-ide-helper/english/docs/index.html">English Document</a></li>
+                    <li><a href="https://www.swoole.co.uk/">English</a></li>
                 </ul>
             </div>
         </div>
@@ -89,8 +89,8 @@
            <a class="btn btn-sm btn-success" href="https://git.oschina.net/swoole/swoole/tree/v<?=$version?>">
              <i class="glyphicon glyphicon-download"></i> &nbsp; 下载 <span style="font-size: 60%;">(<?=$version?>)</span> &nbsp;
 		   </a>
-          <a class="btn btn-sm btn-success" href="https://git.oschina.net/swoole/swoole/tree/v2.0.7">
-             <i class="glyphicon glyphicon-download"></i> &nbsp; 下载 <span style="font-size: 60%;">(2.0.7)</span> &nbsp;
+          <a class="btn btn-sm btn-success" href="https://git.oschina.net/swoole/swoole/tree/v2.0.8">
+             <i class="glyphicon glyphicon-download"></i> &nbsp; 下载 <span style="font-size: 60%;">(2.0.8)</span> &nbsp;
 		   </a>
         <a href="http://compiler.swoole.com/" class="btn btn-warning">Swoole Compiler (PHP代码加密器)</a>&nbsp;&nbsp;
         </p>
@@ -318,7 +318,7 @@ $serv->start();</code></pre>
     </div>
     <hr />
     <footer>
-        <p>Swoole® 是 Swoole Inc. 公司所有的注册商标。 &copy; Swoole开源项目 2008 - 2017 备案号：京ICP备14049466号-7 官方QQ群：193772828 开发组邮件列表：
+        <p>Swoole® 是 Swoole Inc. 公司所有的注册商标。 &copy; Swoole开源项目 2008 - 2017 备案号：京ICP备14049466号-7 官方QQ群：399424487 开发组邮件列表：
         <a href="mailto:team@swoole.com">team@swoole.com</a>
         </p>
     </footer>

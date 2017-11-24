@@ -1,5 +1,5 @@
 <?php
 return array(
-	'static' => 'http://www.swoole.com/static/',
+	'static' => 'https://www.swoole.com/static/',
     'git_path' => dirname(WEBPATH).'/git',
 );

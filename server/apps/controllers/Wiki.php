@@ -275,6 +275,17 @@ class Wiki extends Swoole\Controller
             return "error: requirer miki_page id";
         }
 
+        $uid =  $_SESSION['user_id'];
+
+        $backlist = table('wiki_blacklist');
+        $banInfo = $backlist->get($uid, 'uid');
+        if ($banInfo->exist())
+        {
+            $info = $banInfo->get();
+            $this->http->header('Content-Type', 'text/html; charset=utf-8');
+            return "您已被列入黑名单，请联系管理员。<br />操作时间：{$info['created_time']}<br />原因：{$info['remarks']}";
+        }
+
         $id = (int)$_GET['id'];
         $_cont = model('WikiContent');
         $_tree = model('WikiTree');
@@ -294,7 +305,6 @@ class Wiki extends Swoole\Controller
                 $_POST['content'] = ' '.$_POST['content'];
             }
 
-            $uid =  $_SESSION['user_id'];
             //更新内容和标题
             if (!($_POST['content'] === $cont->content and trim($_POST['title']) == $cont->title))
             {
