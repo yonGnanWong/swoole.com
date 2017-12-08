@@ -24,7 +24,7 @@
                             <span class="glyphicon glyphicon-list"></span> 更新列表</a>
                         <span style="color: #fff; margin-left: 10px;margin-right: 10px;">|</span>
 
-                        <a href="/wiki_admin/comments/" class="small" target="main">
+                        <a href="/wiki_admin/comments/prid-<?=$project_id?>" class="small" target="main">
                             <span class="glyphicon glyphicon-list"></span> 评论管理</a>
                         <span style="color: #fff; margin-left: 10px;margin-right: 10px;">|</span>
 

@@ -275,13 +275,9 @@ class Wiki extends Swoole\Controller
             return "error: requirer miki_page id";
         }
 
-        $uid =  $_SESSION['user_id'];
-
-        $backlist = table('wiki_blacklist');
-        $banInfo = $backlist->get($uid, 'uid');
-        if ($banInfo->exist())
+        $uid = $_SESSION['user_id'];
+        if ($info = App\Api::badUser($uid))
         {
-            $info = $banInfo->get();
             $this->http->header('Content-Type', 'text/html; charset=utf-8');
             return "您已被列入黑名单，请联系管理员。<br />操作时间：{$info['created_time']}<br />原因：{$info['remarks']}";
         }

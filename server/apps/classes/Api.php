@@ -21,7 +21,23 @@ class Api
 
     static function userInfoSafe(&$user)
     {
-        unset($user['password'], $user['username'], $user['reg_ip'], $user['reg_time'], $user['lastip'], $user['lastlogin']);
+        unset($user['password'], $user['reg_ip'], $user['reg_time'], $user['lastip'], $user['lastlogin']);
+    }
+
+    static function addBlackList($uid, $wiki_id = 0, $remarks = '')
+    {
+        return table('wiki_blacklist')->put(['uid' => $uid, 'wiki_id' => $wiki_id, 'op_uid' => $_SESSION['user_id'], 'remarks' => $remarks]);
+    }
+
+    static function badUser($uid)
+    {
+        $backlist = table('wiki_blacklist');
+        $banInfo = $backlist->get($uid, 'uid');
+        if (!$banInfo->exist())
+        {
+            return false;
+        }
+        return $banInfo->get();
     }
 
     static function updateAvatarUrl(&$user, $https = false)

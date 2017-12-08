@@ -82,6 +82,12 @@ class Api extends Swoole\Controller
         {
             return $this->json(null, 1001);
         }
+
+        if (App\Api::badUser($_SESSION['user']['id']))
+        {
+            return $this->json(null, 1006, "您的账户已被列入黑名单，请联系网站管理员。");
+        }
+
         $table = table('duoshuo_posts');
         Swoole\Filter::safe($_POST['content']);
         Swoole\Loader::addNameSpace('Stauros', Swoole::$app_path.'/include/Stauros/lib/Stauros');

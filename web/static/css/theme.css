@@ -158,3 +158,19 @@ body {
         margin-top: 120px;
     }
 }
+
+.pager > a,
+.pager > span {
+    padding: 6px 12px;
+    text-decoration: none;
+    color: #337ab7;
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+.pager > span.current {
+    z-index: 3;
+    color: #fff;
+    cursor: default;
+    background-color: #337ab7;
+    border-color: #337ab7;
+}

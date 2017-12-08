@@ -1,5 +1,5 @@
 <?php
-require __DIR__.'/../config.php';
+require __DIR__ . '/../config.php';
 require 'check.php';
 require_once 'func.php';
 $apps = getApps();

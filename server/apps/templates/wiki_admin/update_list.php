@@ -58,20 +58,7 @@
             </table>
         </div>
         <hr />
-        <!-- Duoshuo Comment BEGIN -->
-        <div class="ds-thread" data-thread-key="wiki-<?=$wiki_page['id']?>" data-title="<?=$wiki_page['title']?>"
-             data-url="http://wiki.swoole.com/wiki/page/<?=$wiki_page['id']?>.html"></div>
-        <script type="text/javascript">
-            $(document).ready(function() {
-                $('a').each(function(e){
-                    //外链
-                    if(this.href.substring(7, location.host.length +7) != location.host) {
-                        this.target = "_blank";
-                    }
-                });
-            });
-        </script>
-        <!-- Duoshuo Comment END -->
+    <div><?=$pager?></div>
     </div>
 <div style="display: none">
 <script type="text/javascript">

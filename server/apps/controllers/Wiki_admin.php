@@ -102,6 +102,10 @@ class Wiki_admin extends Swoole\Controller
         if (!empty($_GET['del']))
         {
             $_table->del(intval($_GET['del']));
+            if (!empty($_GET['block_user']))
+            {
+                App\Api::addBlackList(intval($_GET['block_user']), $_GET['thread_id'], '评论内容违反社区规定');
+            }
         }
 
         $params = array(
@@ -111,6 +115,10 @@ class Wiki_admin extends Swoole\Controller
         if (!empty($_GET['wiki_id']))
         {
             $params['thread_key'] = 'wiki-'.intval($_GET['wiki_id']);
+        }
+        if (!empty($_GET['prid']))
+        {
+            $params['project_id'] = intval($_GET['prid']);
         }
         $list = $_table->gets($params, $pager);
 
@@ -132,6 +140,7 @@ class Wiki_admin extends Swoole\Controller
         {
             $users = array();
         }
+        $pager->page_tpl = '/wiki_admin/comments/prid-'.$this->project_id.'-page-{page}';
         $this->assign('users', $users);
         $this->assign('list', $list);
         $this->assign('pager', $pager->render());
@@ -143,13 +152,13 @@ class Wiki_admin extends Swoole\Controller
         $_table = table('wiki_tree');
 
         $list = $_table->gets(array(
-            'select' => ' wiki_tree.id wiki_id, text title, update_uid, wiki_content.uptime uptime, wiki_content.version version',
+            'select' => 'wiki_tree.id wiki_id, text title, update_uid, wiki_content.uptime uptime, wiki_content.version version',
             'project_id' => $this->project_id,
             'page' => empty($_GET['page']) ? 1 : intval($_GET['page']),
             'pagesize' => 15,
             'order' => 'uptime desc',
             'leftjoin' => array('wiki_content', '`wiki_tree`.id =  `wiki_content`.id'),
-        ));
+        ), $pager);
 
         $uid_list = array();
         foreach($list as $li)
@@ -161,9 +170,17 @@ class Wiki_admin extends Swoole\Controller
             $uid_list[] = $li['update_uid'];
         }
         $uid_list = array_unique($uid_list);
-        $users = Model('UserInfo')->getMap(array('in' => array('id', $uid_list)), 'nickname');
+        if (!empty($uid_list))
+        {
+            $users = Model('UserInfo')->getMap(array('in' => array('id', $uid_list)), 'nickname');
+        }
+        else
+        {
+            $users = array();
+        }
         $this->assign('users', $users);
         $this->assign('list', $list);
+        $this->assign('pager', $pager->render());
         $this->display();
     }
 

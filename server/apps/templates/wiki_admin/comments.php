@@ -55,6 +55,7 @@
                     <td><a href="/wiki/page/<?= explode('-', $li['thread_key'])[1]?>.html#comment-<?= $li['id']?>" target="_blank"><?= \App\Content::parseMarkdown($li['message']) ?></a></td>
                     <td>
                         <a href="?del=<?= $li['id']?>&page=<?=$_GET['page']?>&wiki_id=<?=$this->value($_GET, 'wiki_id')?>" class="btn btn-sm btn-warning">删除</a>
+                        <a href="?del=<?= $li['id']?>&page=<?=$_GET['page']?>&wiki_id=<?=$this->value($_GET, 'wiki_id')?>&block_user=<?= $li['uid'] ?>&thread_id=<?= $li['thread_id'] ?>" class="btn btn-sm btn-danger">删除并加入黑名单</a>
                 </tr>
                 <?php endforeach; ?>
                 </tbody>

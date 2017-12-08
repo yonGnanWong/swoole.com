@@ -24,6 +24,7 @@
     <title>{{$wiki_page.title}}-{{$project.name}}-Swoole文档中心</title>
     <meta name="description" content="Swoole, {{$wiki_page.title}}">
     <meta name="keywords" content="swoole, {{$wiki_page.title}}">
+
 </head>
 <body>
 
@@ -184,6 +185,8 @@
                 }, function (data) {
                     if (data.code == 0) {
                         location.reload();
+                    } else {
+                        alert(data.message);
                     }
                 });
                 return false;
