@@ -27,20 +27,25 @@
 </head>
 <body>
 <div class="main" style="width: 96%; margin-top: 20px;">
-        <?php if (!empty($info)){ ?>
-        <div id="alert-info" class="alert alert-success"><?= $info ?> <a href="/wiki/page/<?=$page['id']?>.html">点击返回</a></div>
-        <?php }else{ ?>
-            <div class="bs-callout bs-callout-info" style="margin-top: 0" id="div_notice">
-                <h4>感谢您向我们贡献文档！
-                    <button type="button" class="close" onclick="$('#div_notice').hide(200);"><span
-                            aria-hidden="true">×</span><span
-                            class="sr-only">Close</span></button>
-                </h4>
-                <p style="line-height: 2; margin-top: 15px;">请遵守
-                    <a href="/wiki/page/p-document_contribution.html" target="_blank">《Swoole社区文档编辑条例》</a>中约定的各项细则，编辑成功后系统会自动将您的名字加入贡献者名单。
-                    <br/>请勿恶意编辑内容，否则根据社区编辑规则您的账户会被加入黑名单。</p>
-            </div>
-        <?php } ?>
+    <?php if (!empty($info))
+    { ?>
+        <div id="alert-info"
+             class="alert alert-<?= $info['code'] == 0 ? 'success' : 'danger' ?>"><?= $info['message'] ?> <a
+                href="/wiki/page/<?= $_GET['id'] ?>.html">点击返回</a></div>
+    <?php }
+    else
+    { ?>
+        <div class="bs-callout bs-callout-info" style="margin-top: 0" id="div_notice">
+            <h4>感谢您向我们贡献文档！
+                <button type="button" class="close" onclick="$('#div_notice').hide(200);"><span
+                        aria-hidden="true">×</span><span
+                        class="sr-only">Close</span></button>
+            </h4>
+            <p style="line-height: 2; margin-top: 15px;">请遵守
+                <a href="/wiki/page/p-document_contribution.html" target="_blank">《Swoole社区文档编辑条例》</a>中约定的各项细则，编辑成功后系统会自动将您的名字加入贡献者名单。
+                <br/>请勿恶意编辑内容，否则根据社区编辑规则您的账户会被加入黑名单。</p>
+        </div>
+    <?php } ?>
         <form method="post">
             <div class="form-group">
                 <input type="input" name="title" style="width: 100%;" value="<?= $this->value($page, 'title') ?>"

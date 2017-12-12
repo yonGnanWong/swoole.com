@@ -292,6 +292,11 @@ class Wiki extends Swoole\Controller
         return App\Content::upload();
     }
 
+    protected function createPage($pid)
+    {
+
+    }
+
     function edit()
     {
         $this->session->start();
@@ -312,24 +317,58 @@ class Wiki extends Swoole\Controller
         $_cont = model('WikiContent');
         $_tree = model('WikiTree');
 
-        $cont = $_cont->get($id);
-        $node = $_tree->get($id);
-
-        if ($cont->close_edit == 1)
+        if (!empty($_GET['create']))
         {
-            return "管理员已禁止编辑本页面。";
+            $cont = $_cont->get();
+            $node = $_tree->get();
+            $create = true;
+        }
+        else
+        {
+            $cont = $_cont->get($id);
+            $node = $_tree->get($id);
+            $create = false;
+
+            if ($cont->close_edit == 1)
+            {
+                return "管理员已禁止编辑本页面。";
+            }
         }
 
         if (!empty($_POST))
         {
+            if (empty($_POST['title']))
+            {
+                $this->assign("info", ['message' => "标题不能为空！", 'code' => 4001]);
+                goto display;
+            }
+            if (empty($_POST['content']))
+            {
+                $this->assign("info", ['message' => "内容不能为空！", 'code' => 4002]);
+                goto display;
+            }
             if (!empty($_POST['content']) and $_POST['content'][0] == '`')
             {
-                $_POST['content'] = ' '.$_POST['content'];
+                $_POST['content'] = ' ' . $_POST['content'];
+            }
+            //检查内容是否变更
+            if ($_POST['content'] === $cont->content and trim($_POST['title']) == $cont->title)
+            {
+                $this->assign("info", ['message' => "标题和内容无任何修改", 'code' => 4003]);
+                goto display;
             }
 
-            //更新内容和标题
-            if (!($_POST['content'] === $cont->content and trim($_POST['title']) == $cont->title))
+            //编辑
+            if (!$create)
             {
+                $cont->title = trim($_POST['title']);
+                $cont->content = $_POST['content'];
+                $cont->uptime = time();
+
+                //更新节点
+                $node->update_uid = $uid;
+                $node->text = $cont->title;
+
                 //写入历史记录
                 $_historyTable = table('wiki_history');
                 $_historyTable->put(array(
@@ -352,35 +391,84 @@ class Wiki extends Swoole\Controller
                 }
                 //增加版本号
                 $cont->version = intval($cont->version) + 1;
+
+                //更新缓存
+                App\Content::clearCache($node->id);
+                if (!$node->save())
+                {
+                    error:
+                    $this->assign("info", ['message' => "提交失败，请稍后重试！", 'code' => 201]);
+                    goto display;
+                }
+                if (!$cont->save())
+                {
+                    goto error;
+                }
+                $this->assign("info", ['message' => "编辑成功，感谢您的贡献！", 'code' => 0]);
             }
             else
             {
-                goto display;
-            }
+                $page = $_tree->get($_GET['id'])->get();
 
-            $cont->title = trim($_POST['title']);
-            $cont->content = $_POST['content'];
-            $cont->uptime = time();
+                $cont->title = trim($_POST['title']);
+                $cont->content = $_POST['content'];
 
-            //更新节点
-            $node->update_uid = $uid;
-            $node->text = $cont->title;
+                $node->project_id = $page['project_id'];
+                $node->update_uid = $node->create_uid = $uid;
+                $node->text = $cont->title;
 
-            //更新缓存
-            App\Content::clearCache($node->id);
-            if (!$node->save())
-            {
-                error:
-                $this->assign("info", "提交失败，请稍后重试！");
+                //创建子页面
+                if ($_GET['create'] == 'child')
+                {
+                    $node->pid = $_GET['id'];
+                }
+                //创建同级页面
+                else
+                {
+                    $node->pid = $page['pid'];
+                }
+                $node->publish = 1;
+                if (!$node->save())
+                {
+                    goto error;
+                }
+                $cont->id = $node->_current_id;
+                $cont->uptime = time();
+                $cont->version = 1;
+                //写入历史记录
+                $_historyTable = table('wiki_history');
+                $_historyTable->put(array(
+                    'wiki_id' => $node->id,
+                    'uid' => $uid,
+                    'content' => $cont->content,
+                    'title' => $cont->title,
+                    'version' => intval($cont->version),
+                ));
+                //更新索引
+                if ($this->project_id == 1)
+                {
+                    $index = new App\Indexer('wiki');
+                    $index->add([
+                        'pid' => $node->id,
+                        'subject' => $cont->title,
+                        'message' => $cont->content,
+                        'chrono' => time()
+                    ]);
+                }
+                if (!$cont->save())
+                {
+                    goto error;
+                }
+                $this->assign("info", ['message' => "添加成功，感谢您的贡献！", 'code' => 0]);
             }
-            if (!$cont->save())
-            {
-                goto error;
-            }
-            $this->assign("info", "编辑成功，感谢您的贡献！");
         }
         display:
-        $this->assign("node", $node->get());
+        $_node = $node->get();
+        if (empty($_node['id']))
+        {
+            $_node['id'] = $node->_current_id;
+        }
+        $this->assign("node", $_node);
         $this->assign("page", $cont->get());
         $this->display();
     }

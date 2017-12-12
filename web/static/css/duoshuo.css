@@ -1,4 +1,84 @@
-duoshuo.com/images/loading.gif");
+#ds-ssr {
+    display: none !important
+}
+
+#ds-reset, #ds-related-reads {
+    font-weight: normal;
+    font-size: 13px;
+    font-size-adjust: none;
+    color: #333;
+    line-height: 1;
+    text-align: left
+}
+
+#ds-reset *, #ds-related-reads * {
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box
+}
+
+#ds-reset input[type=button], #ds-related-reads input[type=button], #ds-reset input[type=submit], #ds-related-reads input[type=submit], #ds-reset input[type=reset], #ds-related-reads input[type=reset], #ds-reset button, #ds-related-reads button {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box
+}
+
+#ds-reset div, #ds-related-reads div, #ds-reset ul, #ds-related-reads ul, #ds-reset ol, #ds-related-reads ol, #ds-reset li, #ds-related-reads li, #ds-reset ul li, #ds-related-reads ul li, #ds-reset ol li, #ds-related-reads ol li, #ds-reset iframe, #ds-related-reads iframe, #ds-reset h1, #ds-related-reads h1, #ds-reset h2, #ds-related-reads h2, #ds-reset h3, #ds-related-reads h3, #ds-reset h4, #ds-related-reads h4, #ds-reset h5, #ds-related-reads h5, #ds-reset h6, #ds-related-reads h6, #ds-reset p, #ds-related-reads p, #ds-reset img, #ds-related-reads img, #ds-reset blockquote, #ds-related-reads blockquote, #ds-reset a, #ds-related-reads a, #ds-reset span, #ds-related-reads span, #ds-reset pre, #ds-related-reads pre, #ds-reset code, #ds-related-reads code, #ds-reset strong, #ds-related-reads strong, #ds-reset sub, #ds-related-reads sub, #ds-reset sup, #ds-related-reads sup, #ds-reset fieldset, #ds-related-reads fieldset, #ds-reset form, #ds-related-reads form, #ds-reset label, #ds-related-reads label, #ds-reset input, #ds-related-reads input, #ds-reset textarea, #ds-related-reads textarea, #ds-reset header, #ds-related-reads header, #ds-reset section, #ds-related-reads section, #ds-reset article, #ds-related-reads article, #ds-reset select, #ds-related-reads select {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    vertical-align: baseline;
+    font: inherit;
+    line-height: inherit;
+    background: none;
+    width: auto;
+    height: auto;
+    float: none;
+    overflow: visible;
+    transition: none
+}
+
+#ds-reset strong, #ds-related-reads strong {
+    font-weight: bold
+}
+
+#ds-reset p, #ds-related-reads p {
+    text-indent: 0;
+    clear: none
+}
+
+#ds-reset span, #ds-related-reads span, #ds-reset strong, #ds-related-reads strong, #ds-reset label, #ds-related-reads label, #ds-reset input, #ds-related-reads input {
+    display: inline;
+    margin: 0
+}
+
+#ds-reset textarea:focus, #ds-related-reads textarea:focus, #ds-reset input:focus, #ds-related-reads input:focus {
+    outline: none
+}
+
+#ds-reset ul, #ds-related-reads ul, #ds-reset ol, #ds-related-reads ol, #ds-reset ul li, #ds-related-reads ul li, #ds-reset ol li, #ds-related-reads ol li {
+    list-style: none;
+    display: block
+}
+
+#ds-reset input, #ds-related-reads input, #ds-reset button, #ds-related-reads button {
+    -webkit-border-radius: 3px;
+    border-radius: 3px
+}
+
+#ds-indicator {
+    display: none;
+    position: fixed;
+    z-index: 99999;
+    top: 150px;
+    left: 0;
+    padding: 8px;
+    border-bottom-right-radius: 3px;
+    border-top-right-radius: 3px;
+    width: 16px;
+    height: 16px;
+    background: #666 url("data:image/gif;base64,R0lGODlhEAAQAPQAAGZmZv///2lpadzc3K+vr/r6+ufn5319fZmZmfDw8Le3t8DAwHV1daOjo4eHh9LS0srKygAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAAFUCAgjmRpnqUwFGwhKoRgqq2YFMaRGjWA8AbZiIBbjQQ8AmmFUJEQhQGJhaKOrCksgEla+KIkYvC6SJKQOISoNSYdeIk1ayA8ExTyeR3F749CACH5BAkKAAAALAAAAAAQABAAAAVoICCKR9KMaCoaxeCoqEAkRX3AwMHWxQIIjJSAZWgUEgzBwCBAEQpMwIDwY1FHgwJCtOW2UDWYIDyqNVVkUbYr6CK+o2eUMKgWrqKhj0FrEM8jQQALPFA3MAc8CQSAMA5ZBjgqDQmHIyEAIfkECQoAAAAsAAAAABAAEAAABWAgII4j85Ao2hRIKgrEUBQJLaSHMe8zgQo6Q8sxS7RIhILhBkgumCTZsXkACBC+0cwF2GoLLoFXREDcDlkAojBICRaFLDCOQtQKjmsQSubtDFU/NXcDBHwkaw1cKQ8MiyEAIfkECQoAAAAsAAAAABAAEAAABVIgII5kaZ6AIJQCMRTFQKiDQx4GrBfGa4uCnAEhQuRgPwCBtwK+kCNFgjh6QlFYgGO7baJ2CxIioSDpwqNggWCGDVVGphly3BkOpXDrKfNm/4AhACH5BAkKAAAALAAAAAAQABAAAAVgICCOZGmeqEAMRTEQwskYbV0Yx7kYSIzQhtgoBxCKBDQCIOcoLBimRiFhSABYU5gIgW01pLUBYkRItAYAqrlhYiwKjiWAcDMWY8QjsCf4DewiBzQ2N1AmKlgvgCiMjSQhACH5BAkKAAAALAAAAAAQABAAAAVfICCOZGmeqEgUxUAIpkA0AMKyxkEiSZEIsJqhYAg+boUFSTAkiBiNHks3sg1ILAfBiS10gyqCg0UaFBCkwy3RYKiIYMAC+RAxiQgYsJdAjw5DN2gILzEEZgVcKYuMJiEAOwAAAAAAAAAAAA==") 8px 8px no-repeat;
+    *background-image: url("//static.duoshuo.com/images/loading.gif");
     *position: absolute;
     -webkit-box-sizing: content-box;
     -moz-box-sizing: content-box;
@@ -13,6 +93,7 @@ duoshuo.com/images/loading.gif");
     padding: 0 0 3px 5px;
     margin: 0;
     background: url("data:image/gif;base64,R0lGODlhEAALAPQAAP///z2LqeLt8dvp7u7090GNqz2LqV+fuJ/F1IW2ycrf51aatHWswaXJ14i4ys3h6FmctUCMqniuw+vz9eHs8fb5+meku+Tu8vT4+cfd5bbT3tbm7PH2+AAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCwAAACwAAAAAEAALAAAFLSAgjmRpnqSgCuLKAq5AEIM4zDVw03ve27ifDgfkEYe04kDIDC5zrtYKRa2WQgAh+QQJCwAAACwAAAAAEAALAAAFJGBhGAVgnqhpHIeRvsDawqns0qeN5+y967tYLyicBYE7EYkYAgAh+QQJCwAAACwAAAAAEAALAAAFNiAgjothLOOIJAkiGgxjpGKiKMkbz7SN6zIawJcDwIK9W/HISxGBzdHTuBNOmcJVCyoUlk7CEAAh+QQJCwAAACwAAAAAEAALAAAFNSAgjqQIRRFUAo3jNGIkSdHqPI8Tz3V55zuaDacDyIQ+YrBH+hWPzJFzOQQaeavWi7oqnVIhACH5BAkLAAAALAAAAAAQAAsAAAUyICCOZGme1rJY5kRRk7hI0mJSVUXJtF3iOl7tltsBZsNfUegjAY3I5sgFY55KqdX1GgIAIfkECQsAAAAsAAAAABAACwAABTcgII5kaZ4kcV2EqLJipmnZhWGXaOOitm2aXQ4g7P2Ct2ER4AMul00kj5g0Al8tADY2y6C+4FIIACH5BAkLAAAALAAAAAAQAAsAAAUvICCOZGme5ERRk6iy7qpyHCVStA3gNa/7txxwlwv2isSacYUc+l4tADQGQ1mvpBAAIfkECQsAAAAsAAAAABAACwAABS8gII5kaZ7kRFGTqLLuqnIcJVK0DeA1r/u3HHCXC/aKxJpxhRz6Xi0ANAZDWa+kEAA7AAAAAAAAAAAA") 0 0 no-repeat;
+    *background-image: url("//static.duoshuo.com/images/waiting.gif")
 }
 
 #ds-reset .ds-highlight {
@@ -39,7 +120,6 @@ duoshuo.com/images/loading.gif");
 }
 
 #ds-reset .ds-gradient-bg {
-    background: 0 -60px repeat-x
 }
 
 #ds-reset .ds-avatar {
@@ -79,6 +159,8 @@ duoshuo.com/images/loading.gif");
     vertical-align: middle;
     display: inline-block;
     overflow: hidden;
+    background: transparent url("//static.duoshuo.com/images/sprites.png") no-repeat;
+    _background-image: url("//static.duoshuo.com/images/sprites.gif")
 }
 
 #ds-reset a .ds-icon {
@@ -106,10 +188,14 @@ duoshuo.com/images/loading.gif");
     height: 16px !important;
     line-height: 100px;
     display: inline-block;
+    background: url("//static.duoshuo.com/images/service-icons-color.png?v=2") no-repeat;
+    _background-image: url("//static.duoshuo.com/images/service-icons-color.gif?v=2");
     overflow: hidden
 }
 
 #ds-reset .ds-service-icon-grey {
+    background-image: url("//static.duoshuo.com/images/service-icons-grey.png");
+    _background-image: url("//static.duoshuo.com/images/service-icons-grey.gif")
 }
 
 #ds-reset .ds-service-link {
@@ -117,6 +203,8 @@ duoshuo.com/images/loading.gif");
     line-height: 16px;
     padding-left: 20px;
     display: block;
+    background: url("//static.duoshuo.com/images/service-icons-color.png?v=2") no-repeat;
+    _background-image: url("//static.duoshuo.com/images/service-icons-color.gif?v=2");
     overflow: hidden
 }
 
@@ -173,6 +261,7 @@ duoshuo.com/images/loading.gif");
     cursor: pointer;
     width: 32px !important;
     height: 32px !important;
+    background: url("//static.duoshuo.com/images/icons_large.png") no-repeat !important;
     overflow: hidden;
     text-indent: -9999px
 }
@@ -325,6 +414,7 @@ duoshuo.com/images/loading.gif");
     position: relative;
     overflow: visible;
     margin-top: 15px;
+    padding: 25px;
 }
 
 #ds-thread #ds-reset a {
@@ -668,6 +758,7 @@ duoshuo.com/images/loading.gif");
     border: 1px solid #ccc;
     border-bottom: none;
     padding-right: 20px;
+    background: #fff 0 -90px repeat-x;
     overflow: hidden
 }
 
@@ -738,6 +829,8 @@ duoshuo.com/images/loading.gif");
     height: 19px;
     float: left;
     margin-right: 4px;
+    background: transparent url("//static.duoshuo.com/images/sprites.png") no-repeat;
+    _background-image: url("//static.duoshuo.com/images/sprites.gif");
     vertical-align: middle;
     opacity: .6;
     -webkit-transition: opacity .15s linear;
@@ -1628,6 +1721,8 @@ duoshuo.com/images/loading.gif");
     width: 13px;
     height: 13px;
     overflow: hidden;
+    background: transparent url("//static.duoshuo.com/images/sprites.png") 0 -163px no-repeat;
+    _background-image: url("//static.duoshuo.com/images/sprites.gif")
 }
 
 #ds-wrapper #ds-reset .ds-dialog-close:hover {
@@ -1639,6 +1734,7 @@ duoshuo.com/images/loading.gif");
     width: 64px;
     height: 21px;
     margin-right: 10px;
+    background: url("//static.duoshuo.com/images/logo.png") 0 0 no-repeat
 }
 
 #ds-wrapper #ds-reset .ds-dialog-footer {
@@ -1738,6 +1834,8 @@ duoshuo.com/images/loading.gif");
 #ds-notify #ds-reset a.ds-logo {
     width: 18px;
     height: 14px;
+    background: transparent url("//static.duoshuo.com/images/sprites.png") 0 -220px no-repeat;
+    _background-image: url("//static.duoshuo.com/images/sprites.gif");
     position: absolute;
     display: block;
     top: 8px;
@@ -1951,7 +2049,9 @@ duoshuo.com/images/loading.gif");
     color: #999;
     display: block;
     overflow: hidden;
+    background-image: url("//static.duoshuo.com/images/service-icons-color-32.png");
     background-repeat: no-repeat;
+    _background-image: url("//static.duoshuo.com/images/service-icons-color-32.gif")
 }
 
 #ds-share #ds-reset .ds-share-icons-32 .ds-weibo {
@@ -2067,6 +2167,8 @@ duoshuo.com/images/loading.gif");
 }
 
 #ds-share #ds-reset .ds-share-icons-32 .flat {
+    background-image: url("//static.duoshuo.com/images/service-icons-color-flat-32.png");
+    _background-image: url("//static.duoshuo.com/images/service-icons-color-flat-32.gif")
 }
 
 #ds-share #ds-reset .ds-share-icons-16 .ds-weibo, #ds-share #ds-reset .ds-share-icons-16 .ds-sohu, #ds-share #ds-reset .ds-share-icons-16 .ds-renren, #ds-share #ds-reset .ds-share-icons-16 .ds-netease, #ds-share #ds-reset .ds-share-icons-16 .ds-qqt, #ds-share #ds-reset .ds-share-icons-16 .ds-kaixin, #ds-share #ds-reset .ds-share-icons-16 .ds-douban, #ds-share #ds-reset .ds-share-icons-16 .ds-msn, #ds-share #ds-reset .ds-share-icons-16 .ds-qzone, #ds-share #ds-reset .ds-share-icons-16 .ds-duoshuo, #ds-share #ds-reset .ds-share-icons-16 .ds-360, #ds-share #ds-reset .ds-share-icons-16 .ds-alipay, #ds-share #ds-reset .ds-share-icons-16 .ds-qq, #ds-share #ds-reset .ds-share-icons-16 .ds-baidu, #ds-share #ds-reset .ds-share-icons-16 .ds-taobao, #ds-share #ds-reset .ds-share-icons-16 .ds-google, #ds-share #ds-reset .ds-share-icons-16 .ds-more, #ds-share #ds-reset .ds-share-icons-16 .ds-wechat, #ds-share #ds-reset .ds-share-icons-16 .ds-diandian, #ds-share #ds-reset .ds-share-icons-16 .ds-huaban, #ds-share #ds-reset .ds-share-icons-16 .ds-duitang, #ds-share #ds-reset .ds-share-icons-16 .ds-youdao, #ds-share #ds-reset .ds-share-icons-16 .ds-pengyou, #ds-share #ds-reset .ds-share-icons-16 .ds-facebook, #ds-share #ds-reset .ds-share-icons-16 .ds-twitter, #ds-share #ds-reset .ds-share-icons-16 .ds-linkedin, #ds-share #ds-reset .ds-share-icons-16 .ds-meilishuo, #ds-share #ds-reset .ds-share-icons-16 .ds-mogujie {
@@ -2076,7 +2178,9 @@ duoshuo.com/images/loading.gif");
     color: #999;
     display: block;
     overflow: hidden;
+    background-image: url("//static.duoshuo.com/images/service-icons-color.png?v=2");
     background-repeat: no-repeat;
+    _background-image: url("//static.duoshuo.com/images/service-icons-color.gif?v=2")
 }
 
 #ds-share #ds-reset .ds-share-icons-16 .ds-weibo {
@@ -2192,6 +2296,8 @@ duoshuo.com/images/loading.gif");
 }
 
 #ds-share #ds-reset .ds-share-icons-16 .flat {
+    background-image: url("//static.duoshuo.com/images/service-icons-color-flat.png");
+    _background-image: url("//static.duoshuo.com/images/service-icons-color-flat.gif")
 }
 
 #ds-share #ds-reset .ds-share-icons {

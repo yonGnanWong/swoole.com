@@ -53,7 +53,7 @@
             <div class="sidebar-nav">
                 <ul class="nav">
                     {{foreach item=v from=$tree.child}}
-                    <li class="active">
+                    <li class="active" {{if $v.id == $smarty.get.id}}id="wiki_node_active"{{/if}}>
                         <h3><a href="/wiki/page/{{if $v.link}}p-{{$v.link}}{{else}}{{$v.id}}{{/if}}.html">{{$v.text}}</a></h3>
                     </li>
                     <li>
@@ -82,15 +82,42 @@
         </div>
     </div>
     <div class="wiki_content blob instapaper_body">
+        <div class="panel-heading" style="margin: 0;background-color: #f5f5f5; border-color: #ddd;">
+            <div class="row text-right" style="padding-right: 10px;">
+
+                <a class="btn btn-info" href="/wiki/edit/?id={{$wiki_page.id}}&create=child">
+                    <span class="glyphicon glyphicon-file"></span>增加子页面</a>
+                {{if $wiki_page.id != $project.home_id}}
+                <a class="btn btn-info" href="/wiki/edit/?id={{$wiki_page.id}}&create=brother">
+                    <span class="glyphicon glyphicon-file"></span>增加同级页面</a>
+                {{/if}}
+
+                {{if $wiki_page.close_edit == 0}}
+                <a href="/wiki/edit/?id={{$wiki_page.id}}" class="btn btn-success"><span
+                        class="glyphicon glyphicon-edit"></span>
+                    编辑本页
+                </a>
+                {{/if}}
+
+                <div class="btn-group text-left">
+                    <button type="button" class="btn btn-default">更多...</button>
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Markdown源码</a></li>
+                        <li><a href="#">历史修改记录</a></li>
+                        <li><a href="#">贡献者名单</a></li>
+                        <!--<li role="separator" class="divider"></li>-->
+                        <!--<li><a href="#">Separated link</a></li>-->
+                    </ul>
+                </div>
+            </div>
+        </div>
         <article class="markdown-body entry-content" itemprop="mainContentOfPage">
             {{if $wiki_page}}
-            <h1 id="h_title">{{$wiki_page.title}}
-                {{if $wiki_page.close_edit == 0}}
-                <small class="right" style="font-size: 14px; margin-top: 40px;">
-                    <a href="/wiki/edit/?id={{$wiki_page.id}}">[编辑本页]</a>
-                </small>
-                {{/if}}
-            </h1>
+            <h1 id="h_title">{{$wiki_page.title}}</h1>
             {{/if}}
             {{$content}}
         </article>
@@ -209,7 +236,7 @@
                     headingSelector: 'h2, h3'
                 });
                 tocbot.refresh();
-                $('.js-toc').css("left", $('.entry-content').position().left + 850);
+                $('.js-toc').css("left", $('.entry-content').position().left + 870);
                 var timer = setInterval(function () {
                     divAlign();
                     window.clearInterval(timer);
@@ -243,6 +270,8 @@
         </script>
     </div>
 </div>
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/bootstrap3/dist/js/bootstrap.min.js"></script>
 <div class="container footer" style="height: 80px; clear: both">
     <hr />
     <p>&copy; Swoole.com 2008 - {{'Y'|date}} 备案号：京ICP备14049466号-7 | <a href="https://wiki.swoole.com/wiki/page/p-copyright.html">版权声明</a> 官方QQ群：399424487 开发组邮件列表：
