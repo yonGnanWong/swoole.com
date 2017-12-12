@@ -288,6 +288,16 @@ class Wiki_admin extends Swoole\Controller
         $node->update_uid = $this->uid;
         $node->save();
         $cont->save();
+        if ($this->project_id == 1)
+        {
+            $index = new App\Indexer('wiki');
+            $index->update([
+                'pid' => $node->id,
+                'subject' => $cont->title,
+                'message' => $cont->content,
+                'chrono' => $cont->uptime,
+            ]);
+        }
         App\Content::clearCache($wiki_id);
         $this->http->redirect('/wiki_admin/main/?id='.$wiki_id);
     }
@@ -538,7 +548,7 @@ class Wiki_admin extends Swoole\Controller
                 //同级页面
                 else
                 {
-                    $in['pid'] = empty($cnode)?0:$cnode['pid'];
+                    $in['pid'] = empty($cnode) ? 0 : $cnode['pid'];
                 }
                 if(!empty($_POST['link']))
                 {
@@ -565,6 +575,17 @@ class Wiki_admin extends Swoole\Controller
             $in2['close_comment'] = intval($_POST['close_comment']);
             $in2['close_edit'] = intval($_POST['close_edit']);
             $_cont->put($in2);
+
+            if ($in['project_id'] == 1)
+            {
+                $index = new App\Indexer('wiki');
+                $index->add([
+                    'pid' => $node_id,
+                    'subject' => $in2['title'],
+                    'message' => $in2['content'],
+                    'chrono' => time()
+                ]);
+            }
 
             //写入历史记录
             $_historyTable = table('wiki_history');
@@ -657,12 +678,20 @@ class Wiki_admin extends Swoole\Controller
 
     function delete()
     {
-        if(empty($_GET['id'])) return "error: requirer miki_page id";
+        if (empty($_GET['id']))
+        {
+            return "error: requirer miki_page id";
+        }
         $_cont = model('WikiContent');
         $_tree = model('WikiTree');
         $id = (int)$_GET['id'];
         $_cont->del($id);
         $_tree->del($id);
+        if ($this->project_id == 1)
+        {
+            $index = new App\Indexer('wiki');
+            $index->del($id);
+        }
         $this->reflushPage('删除成功');
     }
 
@@ -729,6 +758,16 @@ class Wiki_admin extends Swoole\Controller
             //更新内容和标题
             if (!($_POST['content'] === $cont->content and trim($_POST['title']) == $cont->title))
             {
+                if ($this->project_id == 1)
+                {
+                    $index = new App\Indexer('wiki');
+                    $index->update([
+                        'pid' => $node->id,
+                        'subject' => $cont->title,
+                        'message' => $cont->content,
+                        'chrono' => time()
+                    ]);
+                }
                 //写入历史记录
                 $_historyTable = table('wiki_history');
                 $_historyTable->put(array(

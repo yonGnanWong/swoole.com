@@ -68,16 +68,37 @@ class Wiki extends Swoole\Controller
             return "请输入搜索的关键词";
         }
 
-        $this->getProjectInfo();
-        $this->getProjectLinks();
-        $this->getTreeData();
-        $_GET['id'] = $this->project['home_id'];
-
         $pagesize = 10;
         $page = empty($_GET['page']) ? 1: intval($_GET['page']);
 
+        /**
+         * 搜索类型
+         */
+        $type = empty($_GET['type']) ? 'wiki' : trim($_GET['type']);
+        $iniFile = Swoole::$app_path . '/configs/search/' . $type . '.ini';
+        if (!is_file($iniFile))
+        {
+            $this->http->status(403);
+            return "bad request";
+        }
+
+        $link_tpl = '';
+        $page_tpl = "/wiki/search/?type={$type}&q=" . urlencode($_GET['q']) . '&page={page}';
         $s = microtime(true);
-        $xs = new \XS(WEBPATH.'/search.ini');
+        if ($type == 'wiki')
+        {
+            $link_tpl = '/wiki/page/{id}.html';
+        }
+        elseif ($type == 'question')
+        {
+            $link_tpl = 'http://group.swoole.com/question/{id}';
+        }
+        elseif ($type == 'answer')
+        {
+            $link_tpl = 'http://group.swoole.com/question/{question_id}#answer_list_{id}';
+        }
+
+        $xs = new \XS($iniFile);
         $search = $xs->getSearch();
         $q = trim($_GET['q']);
         $search->setQuery($q);
@@ -95,14 +116,19 @@ class Wiki extends Swoole\Controller
             $li['id'] = $doc->pid;
             $li['title'] = self::highlight($search, $doc->subject);
             $li['desc'] = self::highlight($search, $doc->message);
+            if ($type == 'answer')
+            {
+                $li['question_id'] = $doc->question_id;
+            }
             $list[] = $li;
         }
-        $pager->page_tpl = "/wiki/search/?q=".urlencode($_GET['q']).'&page={page}';
-        $this->tpl->assign('list', $list);
-        $this->tpl->assign('cost_time', round(microtime(true) - $s, 3));
-        $this->tpl->assign('count', $total);
-        $this->tpl->assign('pager', $pager->render());
-        $this->tpl->display("wiki/noframe/search.html");
+        $pager->page_tpl = $page_tpl;
+        $this->assign('list', $list);
+        $this->assign('cost_time', round(microtime(true) - $s, 3));
+        $this->assign('count', $total);
+        $this->assign('link_tpl', $link_tpl);
+        $this->assign('pager', $pager->render());
+        $this->display("wiki/noframe/search.php");
     }
 
     function main()
@@ -313,6 +339,17 @@ class Wiki extends Swoole\Controller
                     'title' => $cont->title,
                     'version' => intval($cont->version),
                 ));
+                //更新索引
+                if ($this->project_id == 1)
+                {
+                    $index = new App\Indexer('wiki');
+                    $index->update([
+                        'pid' => $node->id,
+                        'subject' => $cont->title,
+                        'message' => $cont->content,
+                        'chrono' => time()
+                    ]);
+                }
                 //增加版本号
                 $cont->version = intval($cont->version) + 1;
             }

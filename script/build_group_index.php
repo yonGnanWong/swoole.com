@@ -2,31 +2,33 @@
 require dirname(__DIR__).'/server/config.php';
 require APPSPATH.'/classes/xunsearch/lib/XS.php';
 
-$wikis = table('wiki_tree')->gets(array('project_id' => 1));
-$table = table('wiki_content');
+Swoole::$php->db->debug = true;
 
-echo "count=".count($wikis)."\n";
+$table = table('aws_question');
+$table->primary = 'question_id';
+$table->select = 'question_id, question_content, question_detail, update_time';
 
-$xs = new XS(WEBPATH.'/search.ini');
+$pages = $table->all();
+echo "count=".count($pages)."\n";
+
+$xs = new XS(APPSPATH.'/configs/search/question.ini');
 
 $index = $xs->index;
 $index->beginRebuild();
 
-foreach($wikis as $v)
+foreach($pages as $v)
 {
-    $wiki = $table->get($v['id'])->get();
+    $page = $table->get($v['question_id'])->get();
     $data = array(
-        'pid' => $v['id'],
-        'subject' => $v['text'],
-        'message' => $wiki['content'],
-        'chrono' => time(),
+        'pid' => $v['question_id'],
+        'subject' => $v['question_content'],
+        'message' => $v['question_detail'],
+        'chrono' => $v['update_time'],
     );
-
     $doc = new XSDocument;
     $doc->setFields($data);
-
     $ret = $index->add($doc);
-    echo "index #{$v['id']} ok\n";
+    echo "index #{$v['question_id']} ok\n";
 }
 
 $index->endRebuild();

@@ -7,7 +7,7 @@ $table = table('wiki_content');
 
 echo "count=".count($wikis)."\n";
 
-$xs = new XS(WEBPATH.'/search.ini');
+$xs = new XS(APPSPATH.'/configs/search/wiki.ini');
 
 $index = $xs->index; 
 $index->beginRebuild();
