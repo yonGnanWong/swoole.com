@@ -7,3 +7,7 @@
 /web/index.html
 /server/cache
 /server/libs
+/ssl/www.swoole.com.key
+/ssl/wiki.swoole.com.crt
+/ssl/www.swoole.com.crt
+/ssl/wiki.swoole.com.key
