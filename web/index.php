@@ -1,6 +1,9 @@
 <?php
 require dirname(__DIR__) . '/server/config.php';
-define('MARKDOWN_LIB_DIR', __DIR__ . '/apps/classes');
 Swoole\Error::$echo_html = true;
-$php->runMVC();
+if ($_SERVER['HTTP_HOST'] == 'wiki.swoole.com')
+{
+    Swoole::$default_controller['controller'] = 'wiki';
+}
+Swoole::$php->runMVC();
 
