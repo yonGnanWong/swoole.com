@@ -11,3 +11,5 @@
 /ssl/wiki.swoole.com.crt
 /ssl/www.swoole.com.crt
 /ssl/wiki.swoole.com.key
+/composer.lock
+/web/static/smartadmin/
