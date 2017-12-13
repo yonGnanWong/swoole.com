@@ -13,3 +13,4 @@
 /ssl/wiki.swoole.com.key
 /composer.lock
 /web/static/smartadmin/
+/server/apps/configs/sms.php
