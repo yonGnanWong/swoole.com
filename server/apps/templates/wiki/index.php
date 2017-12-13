@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <link rel='stylesheet' href='/static/css/markdown.css' type='text/css' />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel='stylesheet' href='/static/css/markdown.css' type='text/css'/>
     <!-- Bootstrap core CSS -->
     <link href="/static/bootstrap3/dist/css/bootstrap.css" rel="stylesheet">
     <!-- Bootstrap theme -->
     <link href="/static/bootstrap3/dist/css/bootstrap-theme.min.css" rel="stylesheet">
-
     <!-- Custom styles for this template -->
     <link href="/static/css/wiki/noframe.css" rel="stylesheet">
     <link href="/static/css/code.css" rel="stylesheet">
@@ -21,20 +20,21 @@
     <script src="/static/js/dtree.js"></script>
     <script src="/static/js/tocbot.min.js"></script>
     <link href="/static/css/tocbot.css" rel="stylesheet">
-    <title>{{$wiki_page.title}}-{{$project.name}}-Swoole文档中心</title>
-    <meta name="description" content="Swoole, {{$wiki_page.title}}">
-    <meta name="keywords" content="swoole, {{$wiki_page.title}}">
-
+    <title><?= $wiki_page['title'] ?>-<?= $project['name'] ?>-Swoole文档中心</title>
+    <meta name="description" content="Swoole, <?= $wiki_page['title'] ?>">
+    <meta name="keywords" content="swoole, <?= $wiki_page['title'] ?>">
 </head>
 <body>
 
 <div class="navbar-inverse navbar-fixed-top">
     <div class="navbar-collapse collapse container">
         <ul class="nav navbar-nav">
-            {{foreach item=v from=$projects}}
-            <li {{if $v.id==$project_id}}class="active"{{/if}}>
-            <a href="/wiki/index/prid-{{$v.id}}">{{$v.name}}</a></li>
-            {{/foreach}}
+            <?php
+            $no_create_child = false;
+            foreach ($projects as $v): ?>
+                <li <?php if ($v['id'] == $project_id) { ?>class="active"<?php } ?>>
+                    <a href="/wiki/index/prid-<?= $v['id'] ?>"><?= $v['name'] ?></a></li>
+            <?php endforeach; ?>
         </ul>
         <form class="navbar-form navbar-right" action="/wiki/search/" role="search" id="searchForm">
             <div class="form-inline form-group">
@@ -52,31 +52,38 @@
         <div class="sidebar-offcanvas" role="navigation">
             <div class="sidebar-nav">
                 <ul class="nav">
-                    {{foreach item=v from=$tree.child}}
-                    <li class="active" {{if $v.id == $smarty.get.id}}id="wiki_node_active"{{/if}}>
-                        <h3><a href="/wiki/page/{{if $v.link}}p-{{$v.link}}{{else}}{{$v.id}}{{/if}}.html">{{$v.text}}</a></h3>
+                    <?php foreach ($tree['child'] as $v): ?>
+                    <li class="active" <?php if ($v['id'] == $_GET['id']){ ?>id="wiki_node_active"<?php } ?>>
+                        <h3><a href="/wiki/page/<?php if ($v['link']) { ?>p-<?= $v['link'] ?><?php } else { ?><?= $v['id'] ?><?php } ?>.html">
+                                <?= $v['text'] ?>
+                            </a></h3>
                     </li>
                     <li>
-                    {{if $v.child}}
+                    <?php if ($v['child']){ ?>
                     <ul class="nav li2">
-                    {{foreach item=v2 from=$v.child}}
-                        <li {{if $v2.id == $smarty.get.id}}id="wiki_node_active"{{/if}}>
-                        <a href="/wiki/page/{{if $v2.link}}p-{{$v2.link}}{{else}}{{$v2.id}}{{/if}}.html">{{$v2.text}}</a></li>
+                        <?php foreach ($v['child'] as $v2): ?>
+                        <li <?php if ($v2['id'] == $_GET['id']){ ?>id="wiki_node_active"<?php } ?>>
+                        <a href="/wiki/page/<?php if ($v2['link']) { ?>p-<?= $v2['link'] ?><?php } else { ?><?= $v2['id'] ?><?php } ?>.html">
+                            <?= $v2['text'] ?></a></li>
                         <li>
-                            {{if $v2.child}}
+                            <?php if ($v2['child'])
+                            { ?>
                             <ul class="nav li3">
-                                {{foreach item=v3 from=$v2.child}}
-                                <li {{if $v3.id == $smarty.get.id}}id="wiki_node_active"{{/if}}>
-                                <a href="/wiki/page/{{if $v3.link}}p-{{$v3.link}}{{else}}{{$v3.id}}{{/if}}.html">{{$v3.text}}</a></li>
-                                {{/foreach}}
+                                <?php foreach ($v2['child'] as $v3): ?>
+                                    <li <?php if ($v3['id'] == $_GET['id']){
+                                        $no_create_child = true; ?>id="wiki_node_active"<?php } ?>>
+                                <a href="/wiki/page/<?php if ($v3['link']) { ?>p-<?= $v3['link'] ?><?php } else { ?><?= $v3['id'] ?><?php } ?>.html">
+                                    <?= $v3['text'] ?></a>
+                                </li>
+                            <?php endforeach; ?>
                             </ul>
-                            {{/if}}
+                            <?php } ?>
                         </li>
-                    {{/foreach}}
+                        <?php endforeach; ?>
                     </ul>
-                    {{/if}}
+                    <?php } ?>
                     </li>
-                    {{/foreach}}
+                <?php endforeach; ?>
                 </ul>
             </div><!--/.well -->
         </div>
@@ -84,20 +91,21 @@
     <div class="wiki_content blob instapaper_body">
         <div class="panel-heading" style="margin: 0;background-color: #f5f5f5; border-color: #ddd;">
             <div class="row text-right" style="padding-right: 10px;">
-
-                <a class="btn btn-info" href="/wiki/edit/?id={{$wiki_page.id}}&create=child">
+                <?php if (!$no_create_child){?>
+                <a class="btn btn-primary" href="/wiki/edit/?id=<?=$wiki_page['id']?>&create=child">
                     <span class="glyphicon glyphicon-file"></span>增加子页面</a>
-                {{if $wiki_page.id != $project.home_id}}
-                <a class="btn btn-info" href="/wiki/edit/?id={{$wiki_page.id}}&create=brother">
+                <?php } ?>
+                <?php if ($wiki_page['id'] != $project['home_id']){?>
+                <a class="btn btn-info" href="/wiki/edit/?id=<?=$wiki_page['id']?>&create=brother">
                     <span class="glyphicon glyphicon-file"></span>增加同级页面</a>
-                {{/if}}
+                <?php } ?>
 
-                {{if $wiki_page.close_edit == 0}}
-                <a href="/wiki/edit/?id={{$wiki_page.id}}" class="btn btn-success"><span
+                <?php if (!$wiki_page['close_edit']){?>
+                <a href="/wiki/edit/?id=<?=$wiki_page['id']?>" class="btn btn-success"><span
                         class="glyphicon glyphicon-edit"></span>
                     编辑本页
                 </a>
-                {{/if}}
+                <?php } ?>
 
                 <div class="btn-group text-left">
                     <button type="button" class="btn btn-default">更多...</button>
@@ -116,55 +124,55 @@
             </div>
         </div>
         <article class="markdown-body entry-content" itemprop="mainContentOfPage">
-            {{if $wiki_page}}
-            <h1 id="h_title">{{$wiki_page.title}}</h1>
-            {{/if}}
-            {{$content}}
+            <?php if ($wiki_page){ ?>
+            <h1 id="h_title"><?= $wiki_page['title'] ?></h1>
+            <?php } ?>
+            <?=$content?>
         </article>
         <nav class="toc js-toc"></nav>
         <hr/>
-        {{if $wiki_page.close_comment == 0}}
+        <?php if ($wiki_page['close_comment'] == 0){ ?>
         <div class="ds-thread" id="ds-thread">
             <div id="ds-reset">
                 <div class="ds-comments-info">
                     <div class="ds-sort"><a class="ds-order-desc" target="_blank">最新</a><a class="ds-order-asc ds-current" target="_blank">最早</a><a class="ds-order-hot" target="_blank">最热</a></div>
                     <ul class="ds-comments-tabs">
-                        <li class="ds-tab"><a class="ds-comments-tab-duoshuo ds-current" href="javascript:void(0);" target="_blank"><span class="ds-highlight">{{$comments|@count}}</span>条评论</a>
+                        <li class="ds-tab"><a class="ds-comments-tab-duoshuo ds-current" href="javascript:void(0);" target="_blank"><span class="ds-highlight"><?=count($comments)?></span>条评论</a>
                         </li>
                     </ul>
                 </div>
                 <ul class="ds-comments">
-                    {{foreach item=v from=$comments}}
-                    <li class="ds-post" id="comment-{{$v.id}}">
+                    <?php foreach ($comments as $v): ?>
+                    <li class="ds-post" id="comment-<?= $v['id'] ?>">
                         <div class="ds-post-self">
                             <div class="ds-avatar">
-                                <a rel="nofollow author" target="_blank" href="{{$v.author_url}}"
-                                   title="{{$v.author_name}}"><img
-                                        src="{{if $v.avatar}}{{$v.avatar}}{{else}}/static/images/default.png{{/if}}"
-                                        alt="{{$v.author_name}}"></a></div>
+                                <a rel="nofollow author" target="_blank" href="<?= $v['author_url'] ?>"
+                                   title="<?= $v['author_name'] ?>"><img
+                                        src="<?php if ($v['avatar']) echo $v['avatar']; else echo '/static/images/default.png';?>"
+                                        alt="<?= $v['author_name'] ?>"></a></div>
                             <div class="ds-comment-body">
                                 <div class="ds-comment-header"><a class="ds-user-name ds-highlight" data-qqt-account=""
-                                                                  href="{{$v.author_url}}"
-                                                                  rel="nofollow" target="_blank" data-user-id="8435783">{{$v.author_name}}</a>
+                                                                  href="<?= $v['author_url'] ?>"
+                                                                  rel="nofollow" target="_blank" data-user-id="8435783"><?= $v['author_name'] ?></a>
                                 </div>
-                                <p>{{$v.message}}</p>
+                                <p><?= $v['message'] ?></p>
 
                                 <div class="ds-comment-footer ds-comment-actions">
-                                    <span class="ds-time">{{$v.created_at|substr:0:10}}</span>
-                                    <a class="ds-post-delete" href="javascript:delComment({{$v.id}});"><span
+                                    <span class="ds-time"><?= substr($v['created_at'], 0, 10) ?></span>
+                                    <a class="ds-post-delete" href="javascript:delComment(<?= $v['id'] ?>);"><span
                                             class="ds-icon ds-icon-delete"></span>删除</a>
 
                                 </div>
                             </div>
                         </div>
                     </li>
-                    {{/foreach}}
+                    <?php endforeach; ?>
                 </ul>
 
                 <div class="ds-replybox" id="post_comment_div" style="display: none;">
                     <div class="ds-avatar"><img src="" id="login_user_avatar"></div>
                     <form method="post" onsubmit="return postComment(this);">
-                        <input type="hidden" name="wiki_id" value="{{$wiki_page.id}}">
+                        <input type="hidden" name="wiki_id" value="<?=$wiki_page['id']?>">
                         <div class="ds-textarea-wrapper ds-rounded-top">
                             <textarea name="message" title="Ctrl+Enter快捷提交" placeholder="说点什么吧（支持Markdown语法）…"></textarea>
                             <pre class="ds-hidden-text"></pre>
@@ -180,7 +188,7 @@
             </div>
         </div>
         <link href="/static/css/duoshuo.css" rel="stylesheet">
-        {{/if}}
+        <?php } ?>
         <script type="text/javascript">
             function divAlign() {
                 var a = $("#sidebar")[0];
@@ -247,7 +255,7 @@
                         this.target = "_blank";
                     }
                 });
-                $.getJSON('/api/getLoginInfo?prid={{$project_id}}', function (data) {
+                $.getJSON('/api/getLoginInfo?prid=<?=$project_id?>', function (data) {
                     $('#post_comment_div').show();
                     if (data.code == 0) {
                         if (data.data.avatar.substring(0, 5) != 'https') {
@@ -274,9 +282,9 @@
 <script src="/static/bootstrap3/dist/js/bootstrap.min.js"></script>
 <div class="container footer" style="height: 80px; clear: both">
     <hr />
-    <p>&copy; Swoole.com 2008 - {{'Y'|date}} 备案号：京ICP备14049466号-7 | <a href="https://wiki.swoole.com/wiki/page/p-copyright.html">版权声明</a> 官方QQ群：399424487 开发组邮件列表：
+    <p>&copy; Swoole.com 2008 - <?=date('Y')?> 备案号：京ICP备14049466号-7 | <a href="https://wiki.swoole.com/wiki/page/p-copyright.html">版权声明</a> 官方QQ群：399424487 开发组邮件列表：
         <a href="mailto:team@swoole.com">team@swoole.com</a>
-        当前Swoole扩展版本：<a href="https://github.com/swoole/swoole-src" target="_blank">swoole-{{$smarty.const.SWOOLE_VERSION}}</a>
+        当前Swoole扩展版本：<a href="https://github.com/swoole/swoole-src" target="_blank">swoole-<?=SWOOLE_VERSION?></a>
     </p>
     <div style="display: none">
         <script>
