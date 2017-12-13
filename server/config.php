@@ -4,11 +4,16 @@ define('WEBPATH', __DIR__);
 
 if (!empty($_SERVER['SERVER_NAME']))
 {
-    define("WEBROOT", 'http://' . $_SERVER['SERVER_NAME']);
+    $protocol = 'http';
+    if ($_SERVER['SERVER_PORT'] == 443)
+    {
+        $protocol .= 's';
+    }
+    define("WEBROOT", $protocol . '://' . $_SERVER['SERVER_NAME']);
 }
 else
 {
-    define("WEBROOT", 'http://www.swoole.com');
+    define("WEBROOT", 'https://www.swoole.com');
 }
 
 define("TABLE_PREFIX", 'st');
@@ -23,7 +28,7 @@ define('UPLOAD_DIR','/static/uploads');
 define('LOGIN_TABLE','user_login');
 
 require __DIR__.'/libs/lib_config.php';
-require __DIR__.'/admin/func.php';
+require __DIR__.'/apps/include/func.php';
 
 if (get_cfg_var('env.name') == 'dev')
 {
