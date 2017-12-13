@@ -1,7 +1,11 @@
 <div class="memberbox">
 <div class="memberpic"> <a href="/page/user/uid-{{$smarty.session.user_id}}"><img src="{{$smarty.session.user.avatar|default:'/static/images/default.gif'}}" /></a>
   </div>
-  <p>id:{{$smarty.session.user_id}} {{if empty($smarty.session.user.avatar)}}<a href="/person/profile/">上传头像</a>{{/if}}</p>
+  <p>id: {{$smarty.session.user_id}}
+      {{if $_user.mobile_verification}}<span style="color: green">[已验证]</span>{{else}}
+      <a href="/person/mobile_verify/"> <span style="color: red">[未验证]</span></a>
+      {{/if}}
+      {{if empty($smarty.session.user.avatar)}}<a href="/person/profile/">上传头像</a>{{/if}}</p>
 </div>
 <ul>
 <li><h2>空间管理</h2>
@@ -10,8 +14,6 @@
 <a href="/person/index/">我的空间首页</a></li>
 <li><img src="/static/images/user.png" width="16" height="16" /> 
 <a href="/person/profile/">编辑个人资料</a></li>
-
-
     <li><img src="/static/images/asterisk_orange.png" width="16" height="16" />
     <a href="/person/passwd/">修改登录密码</a>
 </li>

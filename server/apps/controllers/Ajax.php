@@ -14,6 +14,68 @@ class Ajax extends Swoole\Controller
             return $this->model->UserInfo->exists($_GET['email']);
         }
     }
+
+    function check_vcode()
+    {
+        if (!empty($_GET['vcode']))
+        {
+            \Swoole::$php->session->start();
+            return array('data' => strtoupper($_GET['vcode']) == $_SESSION['authcode']);
+        }
+        return "bad request";
+    }
+
+    function send_smscode()
+    {
+        require_once WEBPATH.'/vendor/autoload.php';
+        $code = rand(1000, 9999);
+        Swoole::$php->session->start();
+        if (!$this->user->isLogin())
+        {
+            return ['code' => 1001, 'message' => '未登录'];
+        }
+        if (empty($_GET['mobile']) or empty($_GET['vcode']))
+        {
+            return ['code' => 1002, 'message' => '缺少参数'];
+        }
+        if (strtoupper($_GET['vcode']) != $_SESSION['authcode'])
+        {
+            return ['code' => 1003, 'message' => '错误的图形验证码'];
+        }
+        if (strlen($_GET['mobile']) != 11)
+        {
+            return ['code' => 1004, 'message' => '错误的手机号码，必须为11位有效号码'];
+        }
+        $table = table('user_smscode');
+        if ($table->count([
+            'sms_code' => $_POST['smscode'],
+            'mobile' => $_POST['mobile'],
+            'where' => [['unix_timestamp(created_time) > ' . strtotime(date('Y-m-d'))]],
+        ]) > 5)
+        {
+            return ['code' => 1005, 'message' => '发生次数超过限制，同一个手机号每天只允许发送5条短信。'];
+        }
+        $user = Model('UserInfo')->get($this->user->getUid())->get();
+        if ($user['mobile_verification'])
+        {
+            return ['code' => 1006, 'message' => '您的手机号码已通过验证，无需再次验证。'];
+        }
+        try
+        {
+            if (!table('user_smscode')->put(['sms_code' => $code, 'uid' => $this->user->getUid(), 'mobile' => $_GET['mobile']]))
+            {
+                return ['code' => 6001, 'message' => '写入数据库失败'];
+            }
+            $sender = new \Qcloud\Sms\SmsSingleSender($this->config['sms']['appid'], $this->config['sms']['appkey']);
+            $ret = $sender->send(0, "86", $_GET['mobile'], "您的验证码为{$code}，请于15分钟内填写", "", "");
+            $result = json_decode($ret, true);
+            return ['code' => $result['result'], 'message' => $result['errmsg']];
+        }
+        catch (\Exception $e)
+        {
+            return array('code' => $e->getCode(), 'message' => $e->getMessage());
+        }
+    }
     
     function comment()
     {
@@ -24,9 +86,9 @@ class Ajax extends Swoole\Controller
     	$post['app'] = $_POST['app'];
     	$post['content'] = $_POST['content'];
     	$post['uid'] = $uid;
-    	$post['uname'] = $_SESSION['user']['nickname'];
-    	if($post['app']==='mblog')
-    	{
+        $post['uname'] = $_SESSION['user']['nickname'];
+        if ($post['app'] === 'mblog')
+        {
     		$m = createModel('MicroBlog');
     		$entity = $m->get($post['aid']);
     		$entity->reply_count ++;

@@ -227,7 +227,6 @@ class Person extends \App\UserBase
             $set['intro'] = trim($_POST['intro']);
             $set['company'] = $_POST['company'];
             $set['blog'] = $_POST['blog'];
-            $set['mobile'] = $_POST['mobile'];
             $set['sex'] = (int)$_POST['sex'];
             $set['education'] = (int)$_POST['education'];
             $set['skill'] = implode(',',$_POST['skill']);
@@ -241,20 +240,19 @@ class Person extends \App\UserBase
         }
         else
         {
-            require WEBPATH.'/dict/forms.php';
+            $forms = require WEBPATH . '/dict/forms.php';
             $_u = model('UserInfo');
             $u = $_u->get($this->uid)->get();
 
             $_skill = model('UserSkill')->getMap(array());
-            $_forms['sex'] = Swoole\Form::radio('sex',$forms['sex'],$u['sex']);
-            $_forms['education'] = Swoole\Form::select('education',$forms['education'],$u['education']);
-            $_forms['skill'] = Swoole\Form::checkbox('skill',$_skill,$u['skill']);
-            $_forms['level'] = Swoole\Form::radio('php_level',$forms['level'],$u['php_level']);
+            $_forms['sex'] = Swoole\Form::radio('sex', $forms['sex'], $u['sex']);
+            $_forms['education'] = Swoole\Form::select('education', $forms['education'], $u['education']);
+            $_forms['skill'] = Swoole\Form::checkbox('skill', $_skill, $u['skill']);
+            $_forms['level'] = Swoole\Form::radio('php_level', $forms['level'], $u['php_level']);
 
-            $this->swoole->tpl->assign('user',$u);
-            $this->swoole->tpl->assign('forms',$_forms);
+            $this->swoole->tpl->assign('user', $u);
+            $this->swoole->tpl->assign('forms', $_forms);
             $this->swoole->tpl->display();
-            //$this->view->showTrace();
         }
     }
     function index()
@@ -400,4 +398,47 @@ class Person extends \App\UserBase
 		$gw->action_list();
 		$this->swoole->tpl->display();
 	}
+
+    function mobile_verify()
+    {
+        if ($this->user['mobile_verification'])
+        {
+            $this->infoPage('您的手机号码已通过验证，无需再次验证');
+            return;
+        }
+        if ($_POST)
+        {
+            $this->validate($_POST, array(
+                'mobile' => 'required|mobile',
+                'smscode' => 'required|int'
+            ));
+
+            $table = table('user_smscode');
+            $data = $table->gets([
+                'sms_code' => $_POST['smscode'],
+                'mobile' => $_POST['mobile'],
+                'where' => [['unix_timestamp(created_time) > ' . strtotime(date('Y-m-d'))]],
+            ]);
+            if (empty($data))
+            {
+                $this->assign('msg', $this->message(4001, '错误的验证码'));
+                goto display;
+            }
+            if ($data['verified'])
+            {
+                $this->assign('msg', $this->message(4002, '该手机号码已验证过，无需再次验证'));
+                goto display;
+            }
+            $table->set($data[0]['id'], ['verified' => 1]);
+            $user = table('user_login')->get($this->uid);
+            $user->mobile = $_POST['mobile'];
+            $user->mobile_verification = 1;
+            $user->save();
+            $this->infoPage('验证通过');
+            return;
+        }
+        display:
+        $this->assign('_user', $this->user);
+        $this->display();
+    }
 }

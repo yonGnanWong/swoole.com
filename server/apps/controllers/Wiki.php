@@ -11,6 +11,7 @@ class Wiki extends Swoole\Controller
     public $if_filter = false;
 
     protected $project_id;
+    protected $wiki_id;
     protected $project;
     protected $pageInfo;
     protected $nodeInfo;
@@ -38,7 +39,7 @@ class Wiki extends Swoole\Controller
         $_GET['id'] = $this->project['home_id'];
         $this->getPageInfo();
         $this->getComments();
-        $this->swoole->tpl->display("wiki/noframe/index.html");
+        $this->display("wiki/index.php");
     }
 
     /**
@@ -128,7 +129,7 @@ class Wiki extends Swoole\Controller
         $this->assign('count', $total);
         $this->assign('link_tpl', $link_tpl);
         $this->assign('pager', $pager->render());
-        $this->display("wiki/noframe/search.php");
+        $this->display("wiki/search.php");
     }
 
     function main()
@@ -138,7 +139,7 @@ class Wiki extends Swoole\Controller
 
     protected function getComments()
     {
-        $thread_key = 'wiki-'.$this->tpl->_tpl_vars['id'];
+        $thread_key = 'wiki-'.$this->wiki_id;
         $t = table('duoshuo_posts');
         $list = $t->gets(array('thread_key' => $thread_key, 'order' => 'id asc'));
         $uids = [];
@@ -169,14 +170,14 @@ class Wiki extends Swoole\Controller
                 $li['author_url'] = "http://www.swoole.com/page/user/uid-" . $li['uid'];
             }
         }
-        $this->tpl->assign('comments', $list);
+        $this->assign('comments', $list);
     }
 
 
     function page()
     {
         $this->getPageInfo();
-        if(!empty($this->nodeInfo))
+        if (!empty($this->nodeInfo))
         {
             $this->project_id = $this->nodeInfo['project_id'];
         }
@@ -188,7 +189,7 @@ class Wiki extends Swoole\Controller
         $this->getTreeData();
         $this->getProjectLinks();
         $this->getComments();
-        $this->swoole->tpl->display("wiki/noframe/index.html");
+        $this->display("wiki/index.php");
     }
 
     //获取项目信息
@@ -199,8 +200,8 @@ class Wiki extends Swoole\Controller
         {
             $this->http->finish("您访问的项目不存在");
         }
-        $this->swoole->tpl->assign("project_id", $this->project_id);
-        $this->swoole->tpl->assign("project", $this->project);
+        $this->assign("project_id", $this->project_id);
+        $this->assign("project", $this->project);
     }
 
     //相关的项目
@@ -218,7 +219,7 @@ class Wiki extends Swoole\Controller
                 $projects_link = array_merge($projects_link, $_projects_link);
             }
         }
-        $this->swoole->tpl->assign("projects", $projects_link);
+        $this->assign("projects", $projects_link);
     }
 
     private function getPageInfo()
@@ -246,6 +247,7 @@ class Wiki extends Swoole\Controller
             $node = $_tree->get($wiki_id)->get();
         }
         $this->pageInfo =  $_cont->get($wiki_id)->get();
+        $this->wiki_id = $wiki_id;
 
         if (empty($this->pageInfo))
         {
@@ -265,12 +267,12 @@ class Wiki extends Swoole\Controller
         {
             $text = $this->pageInfo['content'];
         }
-        $this->swoole->tpl->assign("id", $wiki_id);
-        $this->swoole->tpl->assign("wiki_page",  $this->pageInfo);
+        $this->assign("id", $wiki_id);
+        $this->assign("wiki_page",  $this->pageInfo);
 
         markdown:
         $html = App\Content::getWikiHtml($wiki_id, $text);
-        $this->swoole->tpl->assign("content", $html);
+        $this->assign("content", $html);
     }
 
     private function getTreeData()
@@ -282,19 +284,12 @@ class Wiki extends Swoole\Controller
         //仅当前树
         $data = App\Content::getTree3($this->project_id, $node_id);
         $tree = App\Content::parseTreeArray($this->project['home_id'], $data);
-        //debug($tree);
-//        echo json_encode($tree);exit;
-        $this->swoole->tpl->assign("tree", $tree);
+        $this->assign("tree", $tree);
     }
 
     function upload()
     {
         return App\Content::upload();
-    }
-
-    protected function createPage($pid)
-    {
-
     }
 
     function edit()
