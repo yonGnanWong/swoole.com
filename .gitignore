@@ -13,3 +13,7 @@
 /composer.lock
 /web/static/smartadmin/
 /server/apps/configs/sms.php
+/vendor
+/server/composer.lock
+/server/server.pid
+/17monipdb.dat
