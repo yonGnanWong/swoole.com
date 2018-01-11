@@ -201,7 +201,7 @@
             }
             function delComment(id) {
                 if (confirm("确定要删除此条评论")) {
-                    $.post('/api/delComment/', {'id': id}, function (data) {
+                    $.post('/api/delComment/', {'id': id, 'prid': <?=$project_id?>}, function (data) {
                         if (data.code == 0) {
                             $('#comment-'+id).remove();
                             divAlign();

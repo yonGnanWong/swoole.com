@@ -4,7 +4,6 @@
 /web/static/uploads/
 /.idea/
 *.log
-/web/index.html
 /server/cache
 /server/libs
 /ssl/www.swoole.com.key

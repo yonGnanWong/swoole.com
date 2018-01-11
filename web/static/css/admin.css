@@ -14,7 +14,6 @@ BODY {
 	PADDING-BOTTOM: 0px;
 	MARGIN: 0px;
 	PADDING-TOP: 0px;
-	FONT-FAMILY: Tahoma
 }
 /*
 TD {
@@ -588,7 +587,6 @@ BLOCKQUOTE {
 .menu {
 	BORDER-RIGHT: #add2e1 1px solid;
 	BORDER-TOP: #add2e1 1px solid;
-	FILTER: progid : DXImageTransform.Microsoft.Alpha ( opacity = 93 );
 	BORDER-LEFT: #add2e1 1px solid;
 	BORDER-BOTTOM: #add2e1 1px solid;
 	POSITION: absolute;

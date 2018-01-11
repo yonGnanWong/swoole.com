@@ -308,6 +308,26 @@ class Wiki extends Swoole\Controller
             return "您已被列入黑名单，请联系管理员。<br />操作时间：{$info['created_time']}<br />原因：{$info['remarks']}";
         }
 
+        if (!App\Api::isVerified($uid))
+        {
+            $this->assign('error', 1);
+            $this->assign('info', '您的手机号码尚未验证通过，暂时无法参与编辑。请验证手机号码后重试。');
+            $this->assign('links', [
+                [
+                    'url' => '/person/mobile_verify/',
+                    'text' => '立即验证手机号码',
+                    'type' => 'success',
+                ],
+                [
+                    'url' => '/wiki/page/'.$_GET['id'].'.html',
+                    'text' => '取消并返回',
+                    'type' => 'warning',
+                ],
+            ]);
+            $this->display('include/page.php');
+            return;
+        }
+
         $id = (int)$_GET['id'];
         $_cont = model('WikiContent');
         $_tree = model('WikiTree');
@@ -363,7 +383,8 @@ class Wiki extends Swoole\Controller
                 //更新节点
                 $node->update_uid = $uid;
                 $node->text = $cont->title;
-
+                //增加版本号
+                $cont->version = intval($cont->version) + 1;
                 //写入历史记录
                 $_historyTable = table('wiki_history');
                 $_historyTable->put(array(
@@ -384,9 +405,6 @@ class Wiki extends Swoole\Controller
                         'chrono' => time()
                     ]);
                 }
-                //增加版本号
-                $cont->version = intval($cont->version) + 1;
-
                 //更新缓存
                 App\Content::clearCache($node->id);
                 if (!$node->save())
@@ -429,7 +447,7 @@ class Wiki extends Swoole\Controller
                 }
                 $cont->id = $node->_current_id;
                 $cont->uptime = time();
-                $cont->version = 1;
+                $cont->version = 0;
                 //写入历史记录
                 $_historyTable = table('wiki_history');
                 $_historyTable->put(array(

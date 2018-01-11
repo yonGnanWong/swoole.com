@@ -151,6 +151,8 @@ class Wiki_admin extends Swoole\Controller
     {
         $_table = table('wiki_tree');
 
+        $pager = null;
+
         $list = $_table->gets(array(
             'select' => 'wiki_tree.id wiki_id, text title, update_uid, wiki_content.uptime uptime, wiki_content.version version',
             'project_id' => $this->project_id,
@@ -207,6 +209,11 @@ class Wiki_admin extends Swoole\Controller
         $this->display();
     }
 
+    /**
+     * a : 老版本
+     * b : 新版本
+     * @throws \Exception
+     */
     function diff()
     {
         if (empty($_GET['id']))
@@ -219,26 +226,43 @@ class Wiki_admin extends Swoole\Controller
         }
         $this->getMainData();
         $_table = table('wiki_history');
-        list($res) = $_table->gets(array(
-            'version' => intval($_GET['version']),
-            'wiki_id' => $_GET['id']
-        ));
-        $this->assign('a', $res['content']);
+
+        //比较上个版本
         if (isset($_GET['compare']) and $_GET['compare'] == 'last')
         {
-            $version_b = intval($_GET['version']) - 1;
+            $version_a = intval($_GET['version']) - 1;
             list($res) = $_table->gets(array(
-                'version' => $version_b,
+                'version' => $version_a,
+                'wiki_id' => $_GET['id']
+            ));
+            $this->assign('a', $res['content']);
+            $this->assign('version_a', $version_a);
+
+            list($res) = $_table->gets(array(
+                'version' => intval($_GET['version']),
                 'wiki_id' => $_GET['id']
             ));
             $this->assign('b', $res['content']);
-            $this->assign('version_b', $version_b);
+            $this->assign('version_b', intval($_GET['version']));
         }
+        //与当前版本对比
         else
         {
-            $this->assign('b', $this->tpl_var['wiki_page']['content']);
-            $this->assign('version_b', $this->tpl_var['wiki_page']['version']);
+            list($res) = $_table->gets(array(
+                'version' => intval($_GET['version']),
+                'wiki_id' => $_GET['id']
+            ));
+            $this->assign('a', $res['content']);
+            $this->assign('version_a', intval($_GET['version']));
+
+            $table2 = table('wiki_content');
+            list($res) = $table2->gets(array(
+                'id' => $_GET['id'],
+            ));
+            $this->assign('b', $res['content']);
+            $this->assign('version_b', intval($res['version']));
         }
+
         $this->display();
     }
 
@@ -768,6 +792,9 @@ class Wiki_admin extends Swoole\Controller
                         'chrono' => time()
                     ]);
                 }
+                //增加版本号
+                $cont->version = intval($cont->version) + 1;
+
                 //写入历史记录
                 $_historyTable = table('wiki_history');
                 $_historyTable->put(array(
@@ -777,8 +804,8 @@ class Wiki_admin extends Swoole\Controller
                     'title' => $cont->title,
                     'version' => intval($cont->version),
                 ));
-                //增加版本号
-                $cont->version = intval($cont->version) + 1;
+
+                //刷新缓存
                 App\Content::clearCache($node->id);
             }
 

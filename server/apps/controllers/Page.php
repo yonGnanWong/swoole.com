@@ -56,17 +56,28 @@ class Page extends App\FrontPage
             //不存在，则插入数据库
             if (!$u->exist())
             {
-                $user['username'] = $username;
-                $user['nickname'] = $userinfo['name'];
-                $user['avatar'] = $userinfo['avatar_large'];
-                $user['blog'] = $userinfo['url'];
-                list($user['province'], $user['city']) = explode(' ', $userinfo['location']);
-                //插入到表中
-                $user['id'] = $model->put($user);
-                $uid = $user['id'];
+                $u =  $model->get($username, 'qq_uid');
+                if (!$u->exist())
+                {
+                    $user['username'] = $username;
+                    $user['nickname'] = $userinfo['name'];
+                    $user['avatar'] = $userinfo['avatar_large'];
+                    $user['blog'] = $userinfo['url'];
+                    $user['lastlogin'] = Swoole\Tool::now();
+                    $user['lastip'] = $this->request->getClientIP();
+                    list($user['province'], $user['city']) = explode(' ', $userinfo['location']);
+                    //插入到表中
+                    $user['id'] = $model->put($user);
+                    $uid = $user['id'];
+                }
+                else
+                {
+                    goto update;
+                }
             }
             else
             {
+                update:
                 $u->nickname = $userinfo['name'];
                 $u->avatar = $userinfo['avatar_large'];
                 $u->blog = $userinfo['url'];
@@ -138,27 +149,40 @@ class Page extends App\FrontPage
             {
                 throw new Exception("QQ登录出错了");
             }
+
             $u = $model->get($username, 'username');
             //不存在，则插入数据库
             if (!$u->exist())
             {
-                $user['username'] = $username;
-                $user['nickname'] = $userinfo['nickname'];
-                $user['avatar'] = $userinfo['figureurl_2'];
-                $user['birth_year'] = $userinfo['year'];
-                $user['province'] = $userinfo['province'];
-                $user['city'] = $userinfo['city'];
-                $user['sex'] = $userinfo['gender'] == '男' ? 1 : 2;
-                //插入到表中
-                $user['id'] = $model->put($user);
-                $uid = $user['id'];
+                $u =  $model->get($username, 'qq_uid');
+                if (!$u->exist())
+                {
+                    $user['qq_uid'] = $username;
+                    $user['nickname'] = $userinfo['nickname'];
+                    $user['avatar'] = $userinfo['figureurl_2'];
+                    $user['birth_year'] = $userinfo['year'];
+                    $user['province'] = $userinfo['province'];
+                    $user['city'] = $userinfo['city'];
+                    $user['sex'] = $userinfo['gender'] == '男' ? 1 : 2;
+                    $user['lastlogin'] = Swoole\Tool::now();
+                    $user['lastip'] = $this->request->getClientIP();
+                    //插入到表中
+                    $user['id'] = $model->put($user);
+                    $uid = $user['id'];
+                }
+                else
+                {
+                    goto update;
+                }
             }
             else
             {
+                update:
                 $u->nickname = $userinfo['nickname'];
                 $u->avatar = $userinfo['figureurl_2'];
                 $u->province = $userinfo['province'];
                 $u->city = $userinfo['city'];
+                $u->qq_uid = $username;
                 $u->save();
                 $user = $u->get();
                 $uid = $user['id'];
@@ -247,7 +271,18 @@ class Page extends App\FrontPage
 		$this->swoole->tpl->display('page_news_detail.html');
 	}
 
-	function index()
+    function index()
+    {
+        if (_string($_SERVER['HTTP_ACCEPT_LANGUAGE'])->startWith('en') and
+            !_string($_SERVER['HTTP_REFER'])->contains('swoole.co.uk')
+        )
+        {
+            $this->http->redirect('https://www.swoole.co.uk/');
+        }
+        $this->display();
+    }
+
+	function cms_index()
 	{
         if (empty($_GET['p']) or $_GET['p'] == 'index')
         {
@@ -352,7 +387,7 @@ class Page extends App\FrontPage
 
     function logout()
     {
-        $this->http->setcookie('uname', '', null, '/', 'swoole.com');
+        $this->http->setcookie('uname', '');
         $this->user->logout();
         $this->swoole->http->redirect('/page/login/');
     }

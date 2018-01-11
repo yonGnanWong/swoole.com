@@ -21,9 +21,17 @@
                 <?= $detail ?>
             </div>
             <div class="modal-footer">
+                <?php if (empty($links)) { ?>
                 <a class="btn btn-primary" href="/person/index/">
                     返回个人主页
                 </a>
+                <?php } else { ?>
+                    <?php foreach ($links as $li): ?>
+                        <a class="btn btn-<?= empty($li['type']) ? 'default' : $li['type'] ?>" href="<?= $li['url'] ?>">
+                            <?= $li['text'] ?>
+                        </a>
+                    <?php endforeach; ?>
+                <?php } ?>
             </div>
         </div>
     </div>

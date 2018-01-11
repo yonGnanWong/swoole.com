@@ -1,6 +1,7 @@
 <?php
 namespace App\Controller;
 use Swoole;
+use ZenAPI\Exception;
 
 class Person extends \App\UserBase
 {
@@ -408,10 +409,31 @@ class Person extends \App\UserBase
         }
         if ($_POST)
         {
-            $this->validate($_POST, array(
-                'mobile' => 'required|mobile',
-                'smscode' => 'required|int'
-            ));
+            try
+            {
+                $this->validate($_POST, array(
+                    'mobile' => 'required|mobile',
+                    'smscode' => 'required|int'
+                ));
+            }
+            catch (\Exception $e)
+            {
+                $this->assign('msg', ['code' => 5000, 'message' => $e->getMessage()]);
+                goto display;
+            }
+
+            if (strlen($_POST['mobile']) != 11)
+            {
+                $this->assign('msg', ['code' => 1001, 'message' => '错误的手机号码，必须为11位有效号码']);
+                goto display;
+            }
+
+            $userTable = table('user_login');
+            if ($userTable->exists(['mobile' => trim($_POST['mobile']), 'mobile_verification' => 1]))
+            {
+                $this->assign('msg', ['code' => 4003, 'message' => "手机号码 [{$_POST['mobile']}] 已绑定其他用户。"]);
+                goto display;
+            }
 
             $table = table('user_smscode');
             $data = $table->gets([
@@ -421,12 +443,12 @@ class Person extends \App\UserBase
             ]);
             if (empty($data))
             {
-                $this->assign('msg', $this->message(4001, '错误的验证码'));
+                $this->assign('msg',['code' => 4001, 'message' => '错误的短信验证码']);
                 goto display;
             }
             if ($data['verified'])
             {
-                $this->assign('msg', $this->message(4002, '该手机号码已验证过，无需再次验证'));
+                $this->assign('msg', ['code' => 4002, 'message' => '该手机号码已验证过，无需再次验证']);
                 goto display;
             }
             $table->set($data[0]['id'], ['verified' => 1]);

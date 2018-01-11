@@ -40,6 +40,16 @@ class Api
         return $banInfo->get();
     }
 
+    /**
+     * 是否验证过手机号码
+     */
+    static function isVerified($uid)
+    {
+        $user = table('user_login')->get($uid);
+
+        return $user->exist() and $user->mobile_verification;
+    }
+
     static function updateAvatarUrl(&$user, $https = false)
     {
         if (empty($user['avatar']))
@@ -54,5 +64,16 @@ class Api
         {
             $user['avatar'] = 'https'.substr($user['avatar'], 4);
         }
+    }
+
+    static function isAdmin($wiki_project_id, $uid)
+    {
+        $proj = table('wiki_project')->get(intval($wiki_project_id))->get();
+        if (!empty($proj['owner']))
+        {
+            return _string($proj['owner'])->split(',')->contains($uid);
+        }
+
+        return false;
     }
 }

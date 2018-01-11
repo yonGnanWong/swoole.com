@@ -29,11 +29,7 @@ class Api extends Swoole\Controller
 
             if (!empty($_GET['prid']))
             {
-                $proj = table('wiki_project')->get(intval($_GET['prid']))->get();
-                if (!empty($proj['owner']))
-                {
-                    $user['admin'] = (new Swoole\StringObject($proj['owner']))->split(',')->contains($user['id']);
-                }
+                $user['admin'] = App\Api::isAdmin($_GET['prid'], $user['id']);
             }
 
             return $this->json($user);
@@ -43,14 +39,18 @@ class Api extends Swoole\Controller
 
     function delComment()
     {
-        if (empty($_COOKIE['PHPSESSID']))
+        if (empty($_COOKIE['PHPSESSID']) or empty($_POST['prid']))
         {
-            return $this->json([], 403);
+            return $this->json([], 103);
         }
         $this->session->start();
         if (empty($_SESSION['user']))
         {
             return $this->json(['login' => $this->config['user']['login_url']], 403);
+        }
+        if (!App\Api::isAdmin($_POST['prid'], $_SESSION['user']['id']))
+        {
+            return $this->json([], 1002);
         }
         if (empty($_POST['id']))
         {

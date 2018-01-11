@@ -53,7 +53,7 @@
                             newTextLines: newtxt,
                             opcodes: opcodes,
                             // set the display titles for each resource
-                            baseTextName: "version-<?=$_GET['version']?>",
+                            baseTextName: "version-<?=$version_a?>",
                             newTextName: "version-<?=$version_b?>",
                             contextSize: null,
                             viewType: 0
