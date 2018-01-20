@@ -6,10 +6,7 @@
 *.log
 /server/cache
 /server/libs
-/ssl/www.swoole.com.key
-/ssl/wiki.swoole.com.crt
-/ssl/www.swoole.com.crt
-/ssl/wiki.swoole.com.key
+/ssl/
 /composer.lock
 /web/static/smartadmin/
 /server/apps/configs/sms.php

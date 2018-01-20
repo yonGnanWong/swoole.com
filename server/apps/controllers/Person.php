@@ -456,7 +456,14 @@ class Person extends \App\UserBase
             $user->mobile = $_POST['mobile'];
             $user->mobile_verification = 1;
             $user->save();
-            $this->infoPage('验证通过');
+            if (!empty($_GET['refer']))
+            {
+                $this->http->redirect($_GET['refer']);
+            }
+            else
+            {
+                $this->infoPage('验证通过');
+            }
             return;
         }
         display:
