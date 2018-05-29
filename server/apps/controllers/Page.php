@@ -95,8 +95,10 @@ class Page extends App\FrontPage
 
     /**
      * 登录成功
+     * @param $returnJson
+     * @return string
      */
-    protected function loginSucess()
+    protected function loginSucess($returnJson = false)
     {
         $this->setLoginStat();
         $refer = isset($_GET['refer']) ? $_GET['refer'] : WEBROOT . '/person/index/';
@@ -109,7 +111,14 @@ class Page extends App\FrontPage
             $this->cache->set('login_token_' . $token, $user, 86400);
             $refer = Swoole\Tool::urlAppend($refer, array('token' => $token));
         }
-        $this->http->redirect($refer);
+        if (!$returnJson)
+        {
+            $this->http->redirect($refer);
+        }
+        else
+        {
+            return $this->json(['url' => $refer]);
+        }
     }
 
     function callback_qq()
@@ -273,7 +282,7 @@ class Page extends App\FrontPage
 
     function index()
     {
-        if (_string($_SERVER['HTTP_ACCEPT_LANGUAGE'])->startWith('en') and
+        if (_string($_SERVER['HTTP_ACCEPT_LANGUAGE'])->startsWith('en') and
             !_string($_SERVER['HTTP_REFER'])->contains('swoole.co.uk')
         )
         {
@@ -384,6 +393,95 @@ class Page extends App\FrontPage
             $this->tpl->display();
         }
     }
+
+    /**
+     * 个人用户登录
+     */
+    function sms_login()
+    {
+        session();
+
+        if (!empty($_POST['mobile']))
+        {
+            if (!isset($_POST['mobile']))
+            {
+                return $this->json(null, __LINE__, '缺少手机号码！');
+            }
+
+            if (!isset($_POST['sms_code']))
+            {
+                return $this->json(null, __LINE__,'缺少短信验证码！');
+            }
+
+            $_POST['mobile'] = strtolower(trim($_POST['mobile']));
+            $_POST['sms_code'] = intval(trim($_POST['sms_code']));
+
+            if ($this->limit->exceed('sms_code_error:' . $_POST['mobile'], 6))
+            {
+                return $this->json(null, __LINE__, "重试次数超过频率限制，您的帐号已被冻结，请在24小时后重试");
+            }
+
+            if (!isset($_POST['sms_code']) or strlen($_POST['sms_code']) != 4)
+            {
+                return $this->json(null, __LINE__, '短信验证码格式错误，必须为4位数字！');
+            }
+
+            $table = table('user_smscode');
+            $ret = $table->exists(['sms_code' => $_POST['sms_code'], '']);
+
+            if (!$ret)
+            {
+                $this->limit->addCount('sms_code_error:' . $_POST['mobile'], 86400);
+
+                return $this->json(null, __LINE__, '短信验证码错误！');
+            }
+
+            $_SESSION['isLogin'] = 1;
+
+            $uTable =  $this->model->UserInfo;
+            $userinfo = $uTable->get($_POST['mobile'], 'mobile')->get();
+            if (!$userinfo)
+            {
+                $id = $uTable->put([
+                    'username' =>  $_POST['mobile'],
+                    'nickname' => '新用户(手机注册)',
+                    'realname' => '新用户(手机注册)',
+                    'mobile' => $_POST['mobile'],
+                    'mobile_verification' => 1,
+                    'reg_ip' => $this->request->getClientIP(),
+                    'reg_time' => Swoole\Tool::now(),
+                    'lastlogin' => time(),
+                    'lastip' => $this->request->getClientIP()
+                ]);
+                if ($id === false)
+                {
+                    return $this->json(null, __LINE__, '注册新用户失败，错误码' . $this->db->errno());
+                }
+                $_SESSION['user_id'] = $id;
+                $_SESSION['user'] = $uTable->get($id)->get();
+            }
+            else
+            {
+                $_SESSION['user_id'] = $userinfo['id'];
+                $_SESSION['user'] = $userinfo;
+            }
+
+            return $this->loginSucess(true);
+        }
+        else
+        {
+            if ($this->user->isLogin())
+            {
+                $this->loginSucess();
+
+                return;
+            }
+            $refer = isset($_GET['refer']) ? $_GET['refer'] : WEBROOT . '/person/index/';
+            $this->assign('refer', $refer);
+            $this->display();
+        }
+    }
+
 
     function logout()
     {

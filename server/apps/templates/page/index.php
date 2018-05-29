@@ -51,16 +51,24 @@
         <ul class="navbar-nav ml-auto">
 
 
-                                <li class="active"><a target="_self" class="nav-link" href="/">首页</a></li>
-                    <li class="nav-item dropdown"><a target="_self" class="nav-link" href="http://wiki.swoole.com/">文档</a></li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link" href="http://compiler.swoole.com/">商业支持</a>
-                    </li>
-					<li class="nav-item dropdown"><a target="_self" class="nav-link" href="http://wiki.swoole.com/wiki/page/prid-1-p-project/change_log.html">更新记录</a></li>
-					<li class="nav-item dropdown"><a class="nav-link" href="http://group.swoole.com">社区</a></li>
-                    <li class="nav-item dropdown"><a class="nav-link" target="_self" href="http://wiki.swoole.com/wiki/page/prid-1-p-author.html">开发者</a></li>
-                    <li class="nav-item dropdown"><a class="nav-link" target="_self" href="http://wiki.swoole.com/wiki/page/p-case.html">用户案例</a></li>
-                    <li class="nav-item dropdown"><a class="nav-link" href="http://wiki.swoole.com/wiki/page/p-donate.html">捐赠</a></li>
+            <li class="active"><a target="_self" class="nav-link" href="/">首页</a></li>
+            <li class="nav-item dropdown"><a target="_self" class="nav-link" href="http://wiki.swoole.com/">文档</a></li>
+            <li class="nav-item dropdown">
+                <a class="nav-link" href="http://compiler.swoole.com/">商业支持</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link" href="https://group.swoole.com/home/explore/category-9">企业招聘</a>
+            </li>
+            <li class="nav-item dropdown"><a target="_self" class="nav-link"
+                                             href="http://wiki.swoole.com/wiki/page/prid-1-p-project/change_log.html">更新记录</a>
+            </li>
+            <li class="nav-item dropdown"><a class="nav-link" href="http://group.swoole.com">社区</a></li>
+            <li class="nav-item dropdown"><a class="nav-link" target="_self"
+                                             href="http://wiki.swoole.com/wiki/page/prid-1-p-author.html">开发者</a></li>
+            <li class="nav-item dropdown"><a class="nav-link" target="_self"
+                                             href="http://wiki.swoole.com/wiki/page/p-case.html">用户案例</a></li>
+            <li class="nav-item dropdown"><a class="nav-link"
+                                             href="http://wiki.swoole.com/wiki/page/p-donate.html">捐赠</a></li>
 <!--                     <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">Blog</a>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
@@ -91,10 +99,10 @@
                             源代码（开源中国）
                         </a>
 
-                         <a class="btn btn-xl btn-success btn-rounded" href="https://git.oschina.net/swoole/swoole/tree/v1.9.22">
+                         <a class="btn btn-xl btn-success btn-rounded" href="https://git.oschina.net/swoole/swoole/tree/v<?=$this->redis->get('swoole:latest:version1')?>">
                         下载 <span style="font-size: 60%;">（<?=$this->redis->get('swoole:latest:version1')?>）</span>
 		               </a>
-                      <a class="btn btn-xl btn-success btn-rounded" href="https://git.oschina.net/swoole/swoole/tree/v2.0.9">
+                      <a class="btn btn-xl btn-success btn-rounded" href="https://git.oschina.net/swoole/swoole/tree/v<?=$this->redis->get('swoole:latest:version2')?>">
                          下载 <span style="font-size: 60%;">（<?=$this->redis->get('swoole:latest:version2')?>）</span>
 		               </a>
                     </div>
@@ -113,14 +121,12 @@
                     <div class="sw_steps_content">
                         <h4>安装</h4>
 
-<div style="background: #272822; overflow:auto;width:auto;border:solid gray;border-width:0;padding:1em 0;"><b style="color: #f8f8f2">Linux 用户</b><br><br><pre style="margin: 0; line-height: 125%"><span style="color: #75715e">#!/bin/bash</span>
-<span style="color: #f8f8f2">pecl</span> <span style="color: #f8f8f2">install</span> <span style="color: #f8f8f2">swoole</span>
-</pre></div>
-
-<div style="background: #272822; overflow:auto;width:auto;border:solid gray;border-width:0;padding:1em 0;"><b style="color: #f8f8f2">Mac 用户</b><br><br><pre style="margin: 0; line-height: 125%"><span style="color: #75715e">#!/bin/bash</span>
-<span style="color: #f8f8f2">brew</span> <span style="color: #f8f8f2">install</span> <span style="color: #f8f8f2">swoole</span>
-</pre></div>
-
+                        <div style="background: #272822; overflow:auto;width:auto;border:solid gray;border-width:0;padding:1em 0;">
+                            <pre style="margin: 0; line-height: 125%"><span style="color: #75715e">#!/bin/bash</span>
+<span style="color: #f8f8f2">pecl</span> <span style="color: #f8f8f2">install</span> <span
+                                        style="color: #f8f8f2">swoole</span>
+</pre>
+                        </div>
                     </div>
                 </li>
                 <li>

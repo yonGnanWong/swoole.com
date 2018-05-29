@@ -148,7 +148,7 @@
                             <div class="ds-avatar">
                                 <a rel="nofollow author" target="_blank" href="<?= $v['author_url'] ?>"
                                    title="<?= $v['author_name'] ?>"><img
-                                        src="<?php if ($v['avatar']) echo $v['avatar']; else echo '/static/images/default.png';?>"
+                                        src="<?php if (!empty($v['avatar'])) echo $v['avatar']; else echo '/static/images/default.png';?>"
                                         alt="<?= $v['author_name'] ?>"></a></div>
                             <div class="ds-comment-body">
                                 <div class="ds-comment-header"><a class="ds-user-name ds-highlight" data-qqt-account=""
@@ -258,15 +258,11 @@
                 $.getJSON('/api/getLoginInfo?prid=<?=$project_id?>', function (data) {
                     $('#post_comment_div').show();
                     if (data.code == 0) {
-                        if (data.data.avatar.substring(0, 5) != 'https') {
-                            if (data.data.avatar.substring(0, 4) == 'http') {
-                                data.data.avatar = 'https' + data.data.avatar.substring(4);
-                            } else {
-                                data.data.avatar = 'https://' + location.host + data.data.avatar;
-                            }
-                            if (!data.data.admin) {
-                                $('a.ds-post-delete').remove();
-                            }
+                        if (!(data.data.avatar.substring(0, 5) == 'https' || data.data.avatar.substring(0, 4) == 'http')) {
+                            data.data.avatar = '//' + location.host + data.data.avatar;
+                        }
+                        if (!data.data.admin) {
+                            $('a.ds-post-delete').remove();
                         }
                         $('#login_user_avatar').attr('src', data.data.avatar).attr('alt', data.data.nickname).attr('title', data.data.nickname);
                     } else {

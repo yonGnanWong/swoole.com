@@ -17,9 +17,12 @@ Swoole\Network\Server::start(function ($options)
     $config = array(
         'document_root' => WEBPATH,
         'worker_num' => 1,
-        'max_request' => 1000,
-        'log_file' => __DIR__.'/logs/swoole.log',
+//        'max_request' => 1000,
+        //'log_file' => __DIR__.'/logs/swoole.log',
+        'enable_static_filter' => true,
+        'document_root' => dirname(__DIR__) .'/web',
     );
+    Swoole::$enableCoroutine = true;
     Swoole::$php->runHttpServer('0.0.0.0', 9503, $config);
 //    $AppSvr = new Swoole\Protocol\AppServer();
 //    $AppSvr->loadSetting("./swoole.ini"); //加载配置文件

@@ -87,16 +87,26 @@ class Api extends Swoole\Controller
         {
             return $this->json(null, 1006, "您的账户已被列入黑名单，请联系网站管理员。");
         }
+        $id = intval($_POST['id']);
+        if ($_POST['app'] == 'wiki')
+        {
+            $node = Model('WikiTree')->get($id)->get();
+            $project_id = $node['project_id'];
+        }
+        else
+        {
+            $project_id = 0;
+        }
 
         $table = table('duoshuo_posts');
         Swoole\Filter::safe($_POST['content']);
-        Swoole\Loader::addNameSpace('Stauros', Swoole::$app_path.'/include/Stauros/lib/Stauros');
         $clean = strip_tags($_POST['content']);
         $ret = $table->put(array(
+            'project_id' => $project_id,
             'uid' => $_SESSION['user']['id'],
             'created_at' => Swoole\Tool::now(),
-            'thread_id' => intval($_POST['id']),
-            'thread_key' => $_POST['app'] . '-' . intval($_POST['id']),
+            'thread_id' => $id,
+            'thread_key' => $_POST['app'] . '-' . $id,
             'message' => $clean,
         ));
         if ($ret)

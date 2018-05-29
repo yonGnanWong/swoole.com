@@ -257,16 +257,9 @@ class Wiki extends Swoole\Controller
 
         //更新阅读计数
         $_cont->set($wiki_id, array('read_count' => $this->pageInfo['read_count'] + 1));
+        $this->nodeInfo = $_tree->get($wiki_id)->get();
+        $text = $this->pageInfo['content'];
 
-        $this->nodeInfo =  $_tree->get($wiki_id)->get();
-        if (!empty($node['markdown_file']))
-        {
-            $text = file_get_contents($this->config['site']['git_path'].'/'.$node['markdown_file']);
-        }
-        else
-        {
-            $text = $this->pageInfo['content'];
-        }
         $this->assign("id", $wiki_id);
         $this->assign("wiki_page",  $this->pageInfo);
 
