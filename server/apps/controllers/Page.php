@@ -333,13 +333,13 @@ class Page extends App\FrontPage
             $this->loginSucess();
             return;
         }
-
+	
         if (isset($_POST['username']) and $_POST['username'] != '')
-        {
-            if (!isset($_POST['authcode']) or strtoupper($_POST['authcode']) !== $_SESSION['authcode'])
-            {
-                return Swoole\JS::js_back('验证码错误！');
-            }
+		{
+            //if (!isset($_POST['authcode']) or strtoupper($_POST['authcode']) !== $_SESSION['authcode'])
+            //{
+            //    return Swoole\JS::js_back('验证码错误！');
+            //}
 
             $_POST['username'] = strtolower(trim($_POST['username']));
             $_POST['password'] = trim($_POST['password']);
@@ -349,20 +349,21 @@ class Page extends App\FrontPage
              */
             if ($this->limit->exceed('password_error:' . $_POST['username'], 6))
             {
-                return "密码输入错误超过频率限制，您的帐号已被冻结，请在24小时后重试";
+                return $this->json('', 1, "密码输入错误超过频率限制，您的帐号已被冻结，请在24小时后重试");
             }
 
             if ($this->user->login($_POST['username'], $_POST['password'], isset($_POST['auto']) ? 1 : 0))
             {
                 $userinfo = $this->swoole->model->UserInfo->get($_SESSION['user_id'])->get();
                 $_SESSION['user'] = $userinfo;
-                $this->loginSucess();
+                return $this->loginSucess(!empty($_GET['ret']) and $_GET['ret'] == 'json');
             }
             else
             {
                 //统计一天内的密码错误次数
                 $this->limit->addCount('password_error:' . $_POST['username'], 86400);
-                return Swoole\JS::js_goto('用户名或密码错误！', '/page/login/');
+                //return Swoole\JS::js_goto('用户名或密码错误！', '/page/login/');
+                return $this->json('', 1, "用户名或密码错误, 请重新输入");
             }
         }
         else
@@ -388,9 +389,12 @@ class Page extends App\FrontPage
                 'display' => null,
                 'scope' => $conf['scope'],
             ));
-            $this->tpl->assign('weibo_login_url', $weibo_login_url);
-            $this->tpl->assign('qq_login_url', $qq_login_url);
-            $this->tpl->display();
+            //$this->tpl->assign('weibo_login_url', $weibo_login_url);
+            //$this->tpl->assign('qq_login_url', $qq_login_url);
+            //$this->tpl->display();
+            $this->assign('weibo_login_url', $weibo_login_url);
+            $this->assign('qq_login_url', $qq_login_url);
+            $this->display();
         }
     }
 
@@ -495,32 +499,36 @@ class Page extends App\FrontPage
 		if ($_POST)
 		{
 			Swoole::$php->session->start();
-            if (!isset($_POST['authcode']) or strtoupper($_POST['authcode']) !== $_SESSION['authcode'])
-            {
-                Swoole\JS::js_back('验证码错误！');
-                exit;
-            }
-			if ($_POST['password']!==$_POST['repassword'])
+            //if (!isset($_POST['authcode']) or strtoupper($_POST['authcode']) !== $_SESSION['authcode'])
+            //{
+            //    Swoole\JS::js_back('验证码错误！');
+            //    exit;
+            //}
+			if ($_POST['password']!==$_POST['rpassword'])
 			{
-				Swoole\JS::js_back('两次输入的密码不一致！');
-				exit;
+				//Swoole\JS::js_back('两次输入的密码不一致！');
+				//exit;
+                return $this->json('', 1, "两次输入的密码不一致");
 			}
 			if (empty($_POST['nickname']))
 			{
-				Swoole\JS::js_back('昵称不能为空！');
-				exit;
+				//Swoole\JS::js_back('昵称不能为空！');
+				//exit;
+                return $this->json('', 1, "昵称不能为空！");
 			}
 			if (empty($_POST['sex']))
 			{
-				Swoole\JS::js_back('性别不能为空！');
-				exit;
+				//Swoole\JS::js_back('性别不能为空！');
+				//exit;
+                return $this->json('', 1, "性别不能为空！");
 			}
 			$userInfo = createModel('UserInfo');
 			$login['email'] = trim($_POST['email']);
 			if ($userInfo->exists($login['email']))
 			{
-				Swoole\JS::js_back('已存在此用户，同一个Email不能注册2次！');
-				exit;
+				//Swoole\JS::js_back('已存在此用户，同一个Email不能注册2次！');
+				//exit;
+                return $this->json('', 1, "已存在此用户，同一个Email不能注册2次！");
 			}
 
             $login['password'] = Swoole\Auth::makePasswordHash($login['email'], $_POST['password']);
@@ -536,15 +544,18 @@ class Page extends App\FrontPage
             $_SESSION['user_id'] = $uid;
             $login['id'] = $uid;
             $_SESSION['user'] = $login;
-			return Swoole\JS::js_goto('注册成功！','/person/index/');
+			//return Swoole\JS::js_goto('注册成功！','/person/index/');
+            return $this->json(['url' => '/person/index/']);
 		}
 		else
 		{
             $forms = require WEBPATH . '/dict/forms.php';
             $_forms['sex'] = Swoole\Form::radio('sex', $forms['sex']);
 			//$_forms['level'] = Form::radio('php_level',$forms['level'],'');
-			$this->swoole->tpl->assign('forms',$_forms);
-			$this->swoole->tpl->display();
+			//$this->tpl->assign('forms',$_forms);
+			//$this->tpl->display();
+			$this->assign('forms',$_forms);
+			$this->display();
 		}
 	}
 
